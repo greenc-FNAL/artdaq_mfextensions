@@ -1,4 +1,4 @@
-cet_make(
+cet_make(LIBRARY_NAME MFReceivers
   EXCLUDE UDP_receiver.cc LogReader_receiver.cc
   LIBRARIES
   ${FHICLCPP}

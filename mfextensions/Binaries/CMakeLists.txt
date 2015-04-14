@@ -23,6 +23,7 @@ find_package(Qt5Core)
 cet_make_exec(msgserver SOURCE msgserver.cc ReceiverManager.cc
 LIBRARIES
 MFExtensions
+MFReceivers
 ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ${MF_MESSAGELOGGER}
 ${FHICLCPP}
@@ -32,6 +33,7 @@ Qt5::Core
 cet_make_exec(msgviewer SOURCE msgviewer.cc mvdlg.cc qt_mf_msg.cc ReceiverManager.cc
 LIBRARIES
 MFExtensions
+MFReceivers
 ${MF_MESSAGELOGGER}
 ${FHICLCPP}
 Qt5::Widgets

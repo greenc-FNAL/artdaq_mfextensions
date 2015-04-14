@@ -14,6 +14,8 @@ public:
   virtual ~MVReceiver() =0;
   virtual const std::string & getPartition() = 0;
   virtual void setPartition(std::string const & partition) =0;
+  virtual void start() =0;
+  virtual void stop() =0;
 signals:
   void NewMessage(mf::MessageFacilityMsg const &);
   void NewSysMessage(mfviewer::SysMsgCode const &, QString const &);

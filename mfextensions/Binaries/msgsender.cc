@@ -11,7 +11,6 @@
 
 #include "fhiclcpp/ParameterSet.h"
 
-#include <boost/shared_ptr.hpp>
 #include <boost/program_options.hpp>
 
 using namespace boost;
@@ -20,8 +19,6 @@ namespace po = boost::program_options;
 #include <iostream>
 #include <algorithm>
 #include <iterator>
-using namespace std;
-
 
 std::string trim_copy(std::string const src)
 {
@@ -35,7 +32,7 @@ std::string trim_copy(std::string const src)
   return src.substr(i,j-i+1);
 }
 
-void parseDestinations (string const & s, vector<string> & dests)
+void parseDestinations (std::string const & s, std::vector<std::string> & dests)
 {
   dests.clear();
 
@@ -53,21 +50,21 @@ void parseDestinations (string const & s, vector<string> & dests)
 
 int main(int ac, char* av[])
 {
-  string         severity;
-  string         application;
-  string         message;
-  string         cat;
-  string         dest;
-  string         filename;
+  std::string         severity;
+  std::string         application;
+  std::string         message;
+  std::string         cat;
+  std::string         dest;
+  std::string         filename;
 
-  string         partition(mfviewer::NULL_PARTITION);
+  std::string         partition(mfviewer::NULL_PARTITION);
 
-  vector<string> messages;
-  vector<string> vcat;
-  vector<string> vdest;
+  std::vector<std::string> messages;
+  std::vector<std::string> vcat;
+  std::vector<std::string> vdest;
 
-  vector<string> vcat_def;
-  vector<string> vdest_def;
+  std::vector<std::string> vcat_def;
+  std::vector<std::string> vdest_def;
 
   vcat_def.push_back("");
   vdest_def.push_back("stdout");
@@ -77,27 +74,27 @@ int main(int ac, char* av[])
     cmdopt.add_options()
       ("help,h", "display help message")
       ("severity,s", 
-        po::value<string>(&severity)->default_value("info"), 
+        po::value<std::string>(&severity)->default_value("info"), 
         "severity of the message (error, warning, info, debug)")
       ("category,c", 
-        po::value< vector<string> >(&vcat)->default_value(vcat_def, "null"),
+        po::value< std::vector<std::string> >(&vcat)->default_value(vcat_def, "null"),
         "message id / categories")
       ("application,a", 
-        po::value<string>(&application)->default_value(""), 
+        po::value<std::string>(&application)->default_value(""), 
         "issuing application name")
       ("destination,d", 
-        po::value< vector<string> >(&vdest)->default_value(vdest_def, "stdout"),
+        po::value< std::vector<std::string> >(&vdest)->default_value(vdest_def, "stdout"),
         "logging destination(s) of the message (stdout, file, server)")
       //("partition,p",
       //  po::value<string>(&partition)->default_value(mf::MF_DDS_Types::NULL_PARTITION),
       //  "partition of the message, applicable only when a sever destination is specified (0 - 4)")
       ("filename,f",
-        po::value<string>(&filename)->default_value("logfile"),
+       po::value<std::string>(&filename)->default_value("logfile"),
         "specify the log file name");
 
     po::options_description hidden("Hidden options");
     hidden.add_options()
-      ("message", po::value< vector<string> >(&messages), "message text");
+      ("message", po::value< std::vector<std::string> >(&messages), "message text");
 
     po::options_description desc;
     desc.add(cmdopt).add(hidden);
@@ -111,35 +108,35 @@ int main(int ac, char* av[])
 
     if(vm.count("help"))
     {
-      cout << "Usage: msglogger [options] <message text>\n";
-      cout << cmdopt;
+      std::cout << "Usage: msglogger [options] <message text>\n";
+      std::cout << cmdopt;
       return 0;
     }
   } 
   catch(std::exception & e)
   {
-    cerr << "error: " << e.what() << "\n";
+    std::cerr << "error: " << e.what() << "\n";
     return 1;
   }
   catch(...) {
-    cerr << "Exception of unknown type!\n";
+    std::cerr << "Exception of unknown type!\n";
     return 1;
   }
     
-  vector<string>::iterator it;
+  std::vector<std::string>::iterator it;
 
   // must have message text
   if(messages.size()==0)
   {
-    cout << "Message text is missing!\n";
-    cout << "Use \"msglogger --help\" for help messages\n";
+    std::cout << "Message text is missing!\n";
+    std::cout << "Use \"msglogger --help\" for help messages\n";
     return 1;
   }
 
   if(application.empty())
   {
-    cout << "Application name is missing!\n";
-    cout << "Message cannot be issued without specifying the application name.\n";
+    std::cout << "Application name is missing!\n";
+    std::cout << "Message cannot be issued without specifying the application name.\n";
     return 1;
   }
 
@@ -156,7 +153,7 @@ int main(int ac, char* av[])
   if( (severity!="ERROR") && (severity!="WARNING")
       && (severity!="INFO") && (severity!="DEBUG") )
   {
-    cerr << "Unknown severity level!\n";
+    std::cerr << "Unknown severity level!\n";
     return 1;
   }
 

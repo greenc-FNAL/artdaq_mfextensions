@@ -891,7 +891,6 @@ void msgViewerDlg::setThrottling(QAction * act)
 
 void msgViewerDlg::closeEvent(QCloseEvent *event)
 {
-  //qtdds.stop();
   receivers_.stop();
   writeSettings();
   event->accept();

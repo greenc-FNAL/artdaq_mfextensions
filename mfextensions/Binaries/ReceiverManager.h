@@ -1,10 +1,11 @@
 #ifndef RECEIVER_MANAGER_H
 #define RECEIVER_MANAGER_H
 
-#include <fhiclcpp/ParameterSet.h>
+#include <fhiclcpp/fwd.h>
 #include <QObject>
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
 #include "mfextensions/Extensions/MFExtensions.h"
+#include "mfextensions/Receivers/MVReceiver.h"
 
 namespace mfviewer {
 
@@ -13,14 +14,17 @@ namespace mfviewer {
 
   public:
     ReceiverManager(fhicl::ParameterSet pset);
-    virtual ~ReceiverManager() {}
-    void start() {;}
-    void stop() {;}
+    virtual ~ReceiverManager();
+    void start();
+    void stop();
   signals:
-    void onNewMessage(mf::MessageFacilityMsg const &);
-    void onNewSysMessage(mfviewer::SysMsgCode, QString const &);
+    void newMessage(mf::MessageFacilityMsg const &);
+    void newSysMessage(mfviewer::SysMsgCode, QString const &);
+    private slots:
+    void onNewMessage(mf::MessageFacilityMsg const & mfmsg);
+    void onNewSysMessage(mfviewer::SysMsgCode code, QString const & msg);
   private:
-    fhicl::ParameterSet pset_;
+    std::vector<std::unique_ptr<mfviewer::MVReceiver>> receivers_;
   };
 
 }

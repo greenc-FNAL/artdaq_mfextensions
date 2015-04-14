@@ -45,7 +45,7 @@ protected:
 private slots:
 
   void onNewMsg(mf::MessageFacilityMsg const & mfmsg);
-  void onNewSysMsg(mfviewer::SysMsgCode, QString const & msg);
+  void onNewSysMsg(mfviewer::SysMsgCode code, QString const & msg);
 
   void setFilter();
   void resetFilter();
@@ -133,8 +133,6 @@ private:
 
 
   // filter strings for hosts, applications, and categories
-  // the value "##DEADBEAF##" indicates no filter condition has
-  // been set
   QStringList       hostFilter;
   QStringList       appFilter;
   QStringList       catFilter;
