@@ -16,7 +16,7 @@
 # use cmake 2.8 or later
 cmake_minimum_required (VERSION 2.8)
 
-project(artdaq-ganglia-plugin)
+project(artdaq-mfextensions)
 # cetbuildtools contains our cmake modules
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
 IF (NOT CETBUILDTOOLS_VERSION)
@@ -39,7 +39,6 @@ cet_set_compiler_flags(DIAGS VIGILANT
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-#find_ups_product( art             v1_11_00 )
 find_ups_product( messagefacility v1_14_00 )
 find_ups_product( cetbuildtools   v4_01_03 )
 find_ups_product( cetlib          v0_4_11 )
@@ -51,9 +50,6 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # macros for artdaq_dictionary and simple_plugin
-#include(ArtDictionary)
-#include(ArtMake)
-#include(BuildPlugins)
 include(BasicPlugin)
 
 # testing

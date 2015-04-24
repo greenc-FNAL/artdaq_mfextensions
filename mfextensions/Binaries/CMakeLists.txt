@@ -40,6 +40,6 @@ Qt5::Widgets
 Qt5::Core
 )
 
-install_source()
+#install_source()
 install_headers()
 
