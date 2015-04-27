@@ -1,8 +1,6 @@
-#include "LogReader.h"
+#include "LogReader_receiver.h"
 
-using namespace mf;
-
-LogReader::LogReader()
+mfviewer::LogReader::LogReader()
 : log_  ( )
 , size_ ( 0 )
 , metadata_1 
@@ -13,12 +11,59 @@ LogReader::LogReader()
 
 }
 
-LogReader::~LogReader()
+mfviewer::LogReader::~LogReader()
 {
   log_.close();
 }
 
-void LogReader::open( std::string const & filename )
+bool mfviewer::LogReader::init(fhicl::ParameterSet pset)
+{
+  try{
+    open(pset.get<std::string>("filename"));
+  }
+  catch(...) {
+    mf::LogError("LogReader") << "Unable to open log file or log file name not specified in parameter set: \"" << pset.to_string() << "\".";
+    return false;
+  }
+  setPartition(pset.get<std::string>("Partition","0"));
+
+  return true;
+}
+
+
+void mfviewer::LogReader::run()
+{
+  while(!stopRequested_) {
+    if(iseof()) {
+      usleep(5000);
+      continue;
+    }
+    
+    bool msgFound = false;
+    while(!msgFound)
+    {
+      if(iseof()) {
+        usleep(5000);
+        break;
+      }
+
+      std::string line;
+      size_t pos = log_.tellg();
+      getline(log_, line);
+      if(line.find("%MSG") != std::string::npos)
+	{
+	  msgFound = true;
+          log_.seekg(pos);
+	}
+    }
+
+    if(msgFound)
+      emit NewMessage(read_next());
+    
+  }
+}
+
+void mfviewer::LogReader::open( std::string const & filename )
 {
   if( log_.is_open() ) log_.close();
 
@@ -29,7 +74,7 @@ void LogReader::open( std::string const & filename )
 #include <iostream>
 #include <time.h>
 
-MessageFacilityMsg LogReader::read_next( )
+mf::MessageFacilityMsg mfviewer::LogReader::read_next( )
 {
   mf::MessageFacilityMsg msg;
   std::string line;
@@ -116,13 +161,13 @@ MessageFacilityMsg LogReader::read_next( )
   return msg;
 }
 
-bool LogReader::iseof( ) const
+bool mfviewer::LogReader::iseof( ) const
 {
   if( !log_.is_open() ) return true;
   return log_.eof();
 }
 
-size_t LogReader::size() const
+size_t mfviewer::LogReader::size() const
 {
   return size_;
 }

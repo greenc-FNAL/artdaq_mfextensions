@@ -10,6 +10,8 @@ cet_make(LIBRARY_NAME MFReceivers
 basic_plugin("UDP" "receiver"
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
+  ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
   ${FHICLCPP}
   ${CETLIB}
   pthread
@@ -23,6 +25,8 @@ basic_plugin("UDP" "receiver"
 #basic_plugin("LogReader" "receiver"
 #  ${Boost_SYSTEM_LIBRARY}
 #  ${Boost_REGEX_LIBRARY}
+#  ${MF_MESSAGELOGGER}
+#  ${MF_UTILITIES}
 #  ${FHICLCPP}
 #  ${CETLIB}
 #)

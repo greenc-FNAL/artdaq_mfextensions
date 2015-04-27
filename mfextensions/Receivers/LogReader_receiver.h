@@ -11,27 +11,34 @@
 #include <string>
 #include <fstream>
 
+#include <fhiclcpp/fwd.h>
 #include <messagefacility/MessageLogger/MessageLogger.h>
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
 
 #include <boost/regex.hpp>
+#include "MVReceiver.h"
 
 namespace mfviewer {
 
-  class LogReader : public MVReceiver
+class LogReader : public MVReceiver
 {
 
 public:
 
-  LogReader  ( );
-  ~LogReader ( );
+  LogReader  ();
+  virtual ~LogReader( );
+
+  // Receiver Method
+  bool init(fhicl::ParameterSet pset);
+  void run();
+  void stop();
 
   // access methods
   void   open ( std::string const & filename );
   bool   iseof( ) const;  // reaches the end of the log file
   size_t size ( ) const;
 
-  MessageFacilityMsg read_next( );   // read next log
+  mf::MessageFacilityMsg read_next( );   // read next log
 
 private:
 
