@@ -13,13 +13,12 @@ ${MF_UTILITIES}
 ${FHICLCPP}
 )
 
-cmake_minimum_required(VERSION 2.8.11)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTOUIC ON)
-find_package(Qt5Widgets)
-find_package(Qt5Core)
+#get_cmake_property(_variableNames VARIABLES)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
 
+# set(CMAKE_AUTOMOC_MOC_OPTIONS -p${CMAKE_CURRENT_SOURCE_DIR} -I${CMAKE_SOURCE_DIR}/Binaries)
 cet_make_exec(msgserver SOURCE msgserver.cc ReceiverManager.cc
 LIBRARIES
 MFExtensions
