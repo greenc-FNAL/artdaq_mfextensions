@@ -1,6 +1,6 @@
-#include "mfextensions/Receivers/makeMVReceiver.h"
+#include "mfextensions/Receivers/makeMVReceiver.hh"
 
-#include "mfextensions/Receivers/ReceiverMacros.h"
+#include "mfextensions/Receivers/ReceiverMacros.hh"
 #include "fhiclcpp/ParameterSet.h"
 #include "cetlib/BasicPluginFactory.h"
 

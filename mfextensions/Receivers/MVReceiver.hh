@@ -1,21 +1,24 @@
+#ifndef MFVIEWER_MVRECEIVER_H
+#define MFVIEWER_MVRECEIVER_H
+
 #include <string>
 
 #include <fhiclcpp/ParameterSet.h>
 
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
-#include "mfextensions/Extensions/MFExtensions.h"
+#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <QtCore/QThread>
+#include <iostream>
 
 namespace mfviewer {
   class MVReceiver : public QThread {
 Q_OBJECT
 
 public:
-  MVReceiver() : partition_("0") {};
-  virtual ~MVReceiver() =0;
-  virtual void run() =0;
-  virtual bool init(fhicl::ParameterSet pset) =0;
+    MVReceiver(fhicl::ParameterSet pset) : partition_(pset.get<std::string>("Partition","0")) {std::cout << "MVReceiver Constructor" << std::endl;}
+    virtual ~MVReceiver() {;}
+  
   void stop() {stopRequested_ = true;}
   const std::string& getPartition() { return partition_; }
   void setPartition(std::string const & partition) { partition_ = partition; }
@@ -28,3 +31,5 @@ signals:
 
 };
 }
+
+#endif //MVRECEIVER_H

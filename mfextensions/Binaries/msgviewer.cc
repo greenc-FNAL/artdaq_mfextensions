@@ -3,7 +3,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/qdesktopwidget.h>
 
-#include "mvdlg.h"
+#include "mfextensions/Binaries/mvdlg.hh"
 
 void print_usage()
 {

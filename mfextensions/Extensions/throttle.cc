@@ -1,6 +1,6 @@
 
 
-#include "throttle.h"
+#include "mfextensions/Extensions/throttle.hh"
 
 throttle::throttle( std::string const & name, int limit, long timespan )
 : name_     ( name )

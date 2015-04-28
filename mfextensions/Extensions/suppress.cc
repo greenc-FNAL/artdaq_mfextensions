@@ -1,6 +1,6 @@
 
 
-#include "suppress.h"
+#include "mfextensions/Extensions/suppress.hh"
 
 suppress::suppress( std::string const & name )
 : name_     ( name )

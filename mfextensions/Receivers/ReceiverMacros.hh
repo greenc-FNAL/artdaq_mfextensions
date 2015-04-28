@@ -1,8 +1,10 @@
-#ifndef mfextensions_Receivers_ReceiverMacros_h
-#define mfextensions_Receivers_ReceiverMacros_h
+#ifndef mfextensions_Receivers_ReceiverMacros_hh
+#define mfextensions_Receivers_ReceiverMacros_hh
 
-#include "mfextensions/Receivers/MVReceiver.h"
+#include "mfextensions/Receivers/MVReceiver.hh"
 #include "fhiclcpp/fwd.h"
+
+#include <memory>
 
 namespace mfviewer {
   typedef std::unique_ptr<mfviewer::MVReceiver>

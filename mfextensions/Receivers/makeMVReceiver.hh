@@ -1,5 +1,5 @@
-#ifndef mfextensions_Plugins_makeMVReceiver_h
-#define mfextensions_Plugins_makeMVReceiver_h
+#ifndef mfextensions_Plugins_makeMVReceiver_hh
+#define mfextensions_Plugins_makeMVReceiver_hh
 // Using LibraryManager, find the correct library and return an instance
 // of the specified generator.
 

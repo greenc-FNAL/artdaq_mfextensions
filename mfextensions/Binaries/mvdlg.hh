@@ -3,11 +3,11 @@
 
 #include "ui_msgviewerdlgui.h"
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
-#include "mfextensions/Extensions/throttle.h"
-#include "mfextensions/Extensions/suppress.h"
-#include "qt_mf_msg.h"
-#include "ReceiverManager.h"
-#include "mfextensions/Extensions/MFExtensions.h"
+#include "mfextensions/Extensions/throttle.hh"
+#include "mfextensions/Extensions/suppress.hh"
+#include "mfextensions/Binaries/qt_mf_msg.hh"
+#include "mfextensions/Binaries/ReceiverManager.hh"
+#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>

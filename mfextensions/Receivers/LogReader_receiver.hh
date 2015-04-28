@@ -16,22 +16,21 @@
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
 
 #include <boost/regex.hpp>
-#include "MVReceiver.h"
+
+#include "mfextensions/Receivers/MVReceiver.hh"
 
 namespace mfviewer {
 
 class LogReader : public MVReceiver
 {
-
+Q_OBJECT
 public:
 
-  LogReader  ();
+  LogReader  (fhicl::ParameterSet pset);
   virtual ~LogReader( );
 
   // Receiver Method
-  bool init(fhicl::ParameterSet pset);
   void run();
-  void stop();
 
   // access methods
   void   open ( std::string const & filename );
@@ -45,8 +44,11 @@ private:
   std::ifstream log_;
   size_t        size_;
 
+  std::string filename_;
+  int counter_;
+
   boost::regex  metadata_1;
-  boost::regex  metadata_2;
+  //boost::regex  metadata_2;
   boost::smatch what_;
 
 };

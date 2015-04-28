@@ -1,7 +1,7 @@
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "messagefacility/MessageLogger/MessageFacilityMsg.h"
-#include "mfextensions/Extensions/MFExtensions.h"
+#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>

@@ -7,7 +7,7 @@
 //
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "mfextensions/Extensions/MFExtensions.h"
+#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include "fhiclcpp/ParameterSet.h"
 

@@ -1,27 +1,30 @@
-#include "ReceiverManager.h"
+#include "mfextensions/Binaries/ReceiverManager.hh"
 
-#include "mfextensions/Receivers/makeMVReceiver.h"
+#include "mfextensions/Receivers/makeMVReceiver.hh"
 #include <fhiclcpp/ParameterSet.h>
 #include <iostream>
 
 mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
 {
+  qRegisterMetaType<mf::MessageFacilityMsg>( "mf::MessageFacilityMsg" );
+  qRegisterMetaType<mfviewer::SysMsgCode>( "mfviewer::SysMsgCode" );
   std::vector<std::string> names = pset.get_pset_keys();
   for(auto name : names)
     {
-      try {
+      std::string pluginType = "unknown";
+            try {
 	fhicl::ParameterSet plugin_pset = pset.get<fhicl::ParameterSet>(name);
-	std::unique_ptr<mfviewer::MVReceiver> rcvr = makeMVReceiver(plugin_pset.get<std::string>("receiverType",""), plugin_pset);
-        connect(rcvr.get(), SIGNAL(newMessage(mf::MessageFacilityMsg const &)), 
+        pluginType = plugin_pset.get<std::string>("receiverType","unknown");
+	std::unique_ptr<mfviewer::MVReceiver> rcvr = makeMVReceiver(pluginType, plugin_pset);
+        connect(rcvr.get(), SIGNAL(NewMessage(mf::MessageFacilityMsg const &)), 
                 this, SLOT(onNewMessage(mf::MessageFacilityMsg const &)));
-        connect(rcvr.get(), SIGNAL(newSysMessage(mfviewer::SysMsgCode, QString const & )), 
+        connect(rcvr.get(), SIGNAL(NewSysMessage(mfviewer::SysMsgCode, QString const & )), 
                 this, SLOT(onNewSysMessage(mfviewer::SysMsgCode, QString const & )));
         receivers_.push_back(std::move(rcvr));
-        
-      }
-      catch(...) {
-	std::cerr << "ReceiverManager: Unable to load receiver plugin with name " << name << std::endl;
-      }
+	}
+	catch(...) {
+	std::cerr << "ReceiverManager: Unable to load receiver plugin with name " << name << " and plugin type " << pluginType << std::endl;
+	}
     }
 }
 

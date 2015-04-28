@@ -1,35 +1,25 @@
-#include "LogReader_receiver.h"
+#include "mfextensions/Receivers/LogReader_receiver.hh"
+#include "mfextensions/Receivers/ReceiverMacros.hh"
+#include <iostream>
 
-mfviewer::LogReader::LogReader()
-: log_  ( )
-, size_ ( 0 )
+mfviewer::LogReader::LogReader(fhicl::ParameterSet pset)
+  : MVReceiver(pset), log_  ( )
+  , size_ ( 0 )
+  , filename_(pset.get<std::string>("filename"))
+  , counter_(0)
 , metadata_1 
-  ( "\\%MSG-([wide])\\s([^:]*):\\s\\s(.{24})\\s*([^\\s]*)\\s*\\(([\\d\\.]*)\\)" )
-, metadata_2 
-  ( "([^\\s]*)\\s([^\\s]*)\\s([^\\s]*)\\s(([^\\s]*)\\s)?([^:]*):(\\d*)" )
+  ( "\\%MSG-([wide])\\s([^:]*):\\s\\s([^\\s]*)\\s*(\\d\\d-[^-]*-\\d{4}\\s\\d+:\\d+:\\d+)\\s.[DS]T\\s\\s(\\w+)" )
+    //, metadata_2 
+    //  ( "([^\\s]*)\\s([^\\s]*)\\s([^\\s]*)\\s(([^\\s]*)\\s)?([^:]*):(\\d*)" )
 {
-
+  std::cout << "LogReader_receiver Constructor" << std::endl;
+  open(filename_);
 }
 
 mfviewer::LogReader::~LogReader()
 {
   log_.close();
 }
-
-bool mfviewer::LogReader::init(fhicl::ParameterSet pset)
-{
-  try{
-    open(pset.get<std::string>("filename"));
-  }
-  catch(...) {
-    mf::LogError("LogReader") << "Unable to open log file or log file name not specified in parameter set: \"" << pset.to_string() << "\".";
-    return false;
-  }
-  setPartition(pset.get<std::string>("Partition","0"));
-
-  return true;
-}
-
 
 void mfviewer::LogReader::run()
 {
@@ -57,8 +47,11 @@ void mfviewer::LogReader::run()
 	}
     }
 
-    if(msgFound)
-      emit NewMessage(read_next());
+    if(msgFound) {
+      std::cout << "Message found, emitting!" << std::endl;
+       emit NewMessage(read_next());
+       ++counter_;
+    }
     
   }
 }
@@ -66,8 +59,9 @@ void mfviewer::LogReader::run()
 void mfviewer::LogReader::open( std::string const & filename )
 {
   if( log_.is_open() ) log_.close();
-
+  std::cout << "Opening Log File" << std::endl;
   log_.open( filename.c_str() );
+  std::cout << "Log file Open" <<std::endl;
   size_ = 0;
 }
 
@@ -107,7 +101,7 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next( )
     time_t t;
     timeval tv;
 
-    value = std::string(what_[3].first, what_[3].second);
+    value = std::string(what_[4].first, what_[4].second);
     strptime(value.c_str(), "%d-%b-%Y %H:%M:%S", &tm);
 
     tm.tm_isdst = -1;
@@ -117,10 +111,12 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next( )
 
     msg.setCategory ( std::string(what_[2].first, what_[2].second) );
     msg.setTimestamp( tv );
-    msg.setHostname ( std::string(what_[4].first, what_[4].second) );
-    msg.setHostaddr ( std::string(what_[5].first, what_[5].second) );
+    msg.setApplication(std::string(what_[3].first, what_[3].second) );
+    msg.setProcess(std::string(what_[5].first, what_[5].second) );
+    //msg.setHostname ( std::string(what_[4].first, what_[4].second) );
+    //msg.setHostaddr ( std::string(what_[5].first, what_[5].second) );
   }
-
+  /*
   // meta data 2
   getline( log_, line );
 
@@ -146,7 +142,7 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next( )
     file = std::string(what_[6].first, what_[6].second);  
     no   = std::string(what_[7].first, what_[7].second);  
   }
-
+  */
   std::string body;
   getline( log_, line );
 
@@ -156,7 +152,20 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next( )
     getline( log_, line );
   }
 
-  msg.setMessage( file, no, body );
+  msg.setMessage( filename_, std::to_string(counter_), body );
+
+  std::cout <<
+    "Time: " << msg.timestr() <<
+    ", Severity: " << msg.severity() <<
+    ", Category: " << msg.category() <<
+    ", Hostname: " << msg.hostname() <<
+    ", Hostaddr: " << msg.hostaddr() <<
+    ", Process: " << msg.process() <<
+    ", Application: " << msg.application() <<
+    ", Module: " << msg.module() <<
+    ", Context: " << msg.context() <<
+    ", File: " << msg.file() <<
+    ", Message: " << msg.message() << std::endl;
 
   return msg;
 }
@@ -172,3 +181,6 @@ size_t mfviewer::LogReader::size() const
   return size_;
 }
 
+#include "moc_LogReader_receiver.cpp"
+
+DEFINE_MFVIEWER_RECEIVER(mfviewer::LogReader)

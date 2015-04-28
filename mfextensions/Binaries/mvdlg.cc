@@ -7,7 +7,7 @@
 #include <fhiclcpp/make_ParameterSet.h>
 #include <fhiclcpp/ParameterSet.h>
 
-#include "mvdlg.h"
+#include "mfextensions/Binaries/mvdlg.hh"
 
 const size_t msgViewerDlg::BUFFER_SIZE[4] = {500, 1000, 1000, 1000};
 const size_t msgViewerDlg::MAX_DISPLAY_MSGS = 10000;
@@ -160,7 +160,7 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
   connect ( &receivers_
 	    ,SIGNAL(newSysMessage(mfviewer::SysMsgCode, QString const & ))
 	    ,this
-	    ,SLOT(onNewSysMessage(mfviewer::SysMsgCode, QString const & )) );
+	    ,SLOT(onNewSysMsg(mfviewer::SysMsgCode, QString const & )) );
 
   connect( &timer, SIGNAL(timeout()), this, SLOT(updateDisplayMsgs()));
 

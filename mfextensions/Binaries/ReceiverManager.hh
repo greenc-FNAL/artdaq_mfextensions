@@ -4,8 +4,8 @@
 #include <fhiclcpp/fwd.h>
 #include <QObject>
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
-#include "mfextensions/Extensions/MFExtensions.h"
-#include "mfextensions/Receivers/MVReceiver.h"
+#include "mfextensions/Extensions/MFExtensions.hh"
+#include "mfextensions/Receivers/MVReceiver.hh"
 
 namespace mfviewer {
 

@@ -1,7 +1,7 @@
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
 
-#include "qt_mf_msg.h"
-#include "mfextensions/Extensions/MFExtensions.h"
+#include "mfextensions/Binaries/qt_mf_msg.hh"
+#include "mfextensions/Extensions/MFExtensions.hh"
 
 qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
     : text_()
