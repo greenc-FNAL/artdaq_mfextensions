@@ -18,4 +18,9 @@ throttle :
 # here is an example of throttling messages from application dcm-01
 # applications : [ { name:"dcm-01"  limit:20  timespan:60 } ]
 }
-    
+
+file:
+{
+receiverType: "LogReader"
+filename: "/tmp/eventbuilder/eventbuilder-20150424163410-ironwork-22507.log"
+}    
