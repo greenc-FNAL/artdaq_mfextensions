@@ -52,10 +52,6 @@ private slots:
 
   void renderMode();
 
-  void clearHostSelection();
-  void clearAppSelection();
-  void clearCatSelection();
-
   void setSevError();
   void setSevWarning();
   void setSevInfo();

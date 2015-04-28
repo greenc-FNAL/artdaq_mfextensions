@@ -128,10 +128,6 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
   connect( btnFilter   , SIGNAL( clicked() ), this, SLOT( setFilter()   ) );
   connect( btnReset    , SIGNAL( clicked() ), this, SLOT( resetFilter() ) );
 
-  connect( btnClearHost, SIGNAL( clicked() ), this, SLOT( clearHostSelection() ) );
-  connect( btnClearApp , SIGNAL( clicked() ), this, SLOT( clearAppSelection()  ) );
-  connect( btnClearCat , SIGNAL( clicked() ), this, SLOT( clearCatSelection()  ) );
-
   connect( btnError    , SIGNAL( clicked() ), this, SLOT( setSevError()   ) );
   connect( btnWarning  , SIGNAL( clicked() ), this, SLOT( setSevWarning() ) );
   connect( btnInfo     , SIGNAL( clicked() ), this, SLOT( setSevInfo()    ) );
@@ -639,10 +635,12 @@ void list_intersect( msg_iters_t & l1, msg_iters_t const & l2 )
 void msgViewerDlg::setFilter() 
 {
   hostFilter = toQStringList(lwHost->selectedItems());
-
   appFilter  = toQStringList(lwApplication->selectedItems());
-
   catFilter  = toQStringList(lwCategory->selectedItems());
+
+  if(hostFilter.isEmpty()) { lwHost->setCurrentRow(-1,QItemSelectionModel::Clear); }
+  if(appFilter.isEmpty()) { lwApplication->setCurrentRow(-1,QItemSelectionModel::Clear); }
+  if(catFilter.isEmpty()) { lwCategory->setCurrentRow(-1,QItemSelectionModel::Clear); }
 
   if(    hostFilter.isEmpty()
 	 && appFilter.isEmpty()
@@ -705,18 +703,14 @@ void msgViewerDlg::resetFilter()
   appFilter.clear();
   catFilter.clear();
 
-  lwHost->setCurrentRow(-1);
-  lwApplication->setCurrentRow(-1);
-  lwCategory->setCurrentRow(-1);
+  lwHost->setCurrentRow(-1,QItemSelectionModel::Clear);
+  lwApplication->setCurrentRow(-1,QItemSelectionModel::Clear);
+  lwCategory->setCurrentRow(-1,QItemSelectionModel::Clear);
 
   // Update the view
   txtMessages->clear();
   displayMsg();
 }
-
-void msgViewerDlg::clearHostSelection() { lwHost->setCurrentRow(-1); }
-void msgViewerDlg::clearAppSelection()  { lwApplication->setCurrentRow(-1); }
-void msgViewerDlg::clearCatSelection()  { lwCategory->setCurrentRow(-1); }
 
 void msgViewerDlg::pause()
 {
