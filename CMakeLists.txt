@@ -14,7 +14,9 @@
 # ======================================================================
 
 # use cmake 2.8 or later
-cmake_minimum_required (VERSION 2.8)
+# cmake_minimum_required (VERSION 2.8)
+# cmake 2.8.11 or later is required for Qt
+cmake_minimum_required(VERSION 2.8.11)
 
 project(artdaq-mfextensions)
 # cetbuildtools contains our cmake modules
@@ -42,6 +44,15 @@ cet_report_compiler_flags()
 find_ups_product( messagefacility v1_14_00 )
 find_ups_product( cetbuildtools   v4_01_03 )
 find_ups_product( cetlib          v0_4_11 )
+
+
+# Qt
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC_RELAXED_MODE ON)
+find_package(Qt5Widgets)
+find_package(Qt5Core)
 
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
