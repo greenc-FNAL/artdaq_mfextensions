@@ -19,8 +19,16 @@ throttle :
 # applications : [ { name:"dcm-01"  limit:20  timespan:60 } ]
 }
 
-file:
+receivers:
 {
-receiverType: "LogReader"
-filename: "/tmp/eventbuilder/eventbuilder-20150424163410-ironwork-22507.log"
-}    
+  #file:
+  #{
+    #receiverType: "LogReader"
+    #filename: "/tmp/eventbuilder/eventbuilder-20150424163410-ironwork-22507.log"
+  #} 
+
+  syslog:
+  {
+    receiverType: "UDP"
+  }   
+}

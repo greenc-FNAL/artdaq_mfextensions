@@ -13,15 +13,16 @@ cet_make(LIBRARY_NAME MFReceivers
   Qt5::Core
 )
 
-#basic_plugin("UDP" "receiver"
-#  ${Boost_SYSTEM_LIBRARY}
-#  ${Boost_THREAD_LIBRARY}
-#  ${MF_MESSAGELOGGER}
-#  ${MF_UTILITIES}
-#  ${FHICLCPP}
-#  ${CETLIB}
-#  pthread
-#)
+basic_plugin("UDP" "receiver"
+  MFReceivers
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
+  ${FHICLCPP}
+  ${CETLIB}
+  Qt5::Core
+)
  
 #get_cmake_property(_variableNames VARIABLES)
 #foreach (_variableName ${_variableNames})

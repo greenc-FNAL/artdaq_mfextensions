@@ -94,7 +94,7 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
 , timer         ( this  )
 , sup_menu      ( new QMenu(this) )
 , thr_menu      ( new QMenu(this) )
-, receivers_    ( readConf(conf) )
+  , receivers_    ( readConf(conf).get<fhicl::ParameterSet>("receivers",fhicl::ParameterSet()) )
 {
   setupUi(this);
 

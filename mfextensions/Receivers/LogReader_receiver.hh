@@ -32,9 +32,6 @@ public:
   // Receiver Method
   void run();
 
-  // access methods
-  size_t size ( ) const;
-
   mf::MessageFacilityMsg read_next( );   // read next log
 
 private:
