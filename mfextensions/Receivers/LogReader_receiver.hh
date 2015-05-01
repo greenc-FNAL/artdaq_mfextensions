@@ -33,8 +33,6 @@ public:
   void run();
 
   // access methods
-  void   open ( std::string const & filename );
-  bool   iseof( ) const;  // reaches the end of the log file
   size_t size ( ) const;
 
   mf::MessageFacilityMsg read_next( );   // read next log
@@ -42,7 +40,7 @@ public:
 private:
 
   std::ifstream log_;
-  size_t        size_;
+  size_t        pos_;
 
   std::string filename_;
   int counter_;

@@ -16,7 +16,7 @@ namespace mfviewer {
 Q_OBJECT
 
 public:
-    MVReceiver(fhicl::ParameterSet pset) : partition_(pset.get<std::string>("Partition","0")) {std::cout << "MVReceiver Constructor" << std::endl;}
+    MVReceiver(fhicl::ParameterSet pset) : partition_(pset.get<std::string>("Partition","0")), stopRequested_(false) {std::cout << "MVReceiver Constructor" << std::endl;}
     virtual ~MVReceiver() {;}
   
   void stop() {stopRequested_ = true;}
