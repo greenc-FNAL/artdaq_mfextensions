@@ -16,7 +16,7 @@ cet_make(LIBRARY_NAME MFReceivers
 basic_plugin("UDP" "receiver"
   MFReceivers
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY}
+  ${Boost_REGEX_LIBRARY}
   ${MF_MESSAGELOGGER}
   ${MF_UTILITIES}
   ${FHICLCPP}

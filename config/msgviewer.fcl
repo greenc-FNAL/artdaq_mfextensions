@@ -30,5 +30,6 @@ receivers:
   syslog:
   {
     receiverType: "UDP"
+    port: 30000
   }   
 }
