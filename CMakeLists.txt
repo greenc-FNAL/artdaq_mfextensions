@@ -63,7 +63,10 @@ endif()
 # macros for artdaq_dictionary and simple_plugin
 include(BasicPlugin)
 
-# testing
+# Configuration Files
+add_subdirectory(config)
+
+# MFExtensions Library
 add_subdirectory(mfextensions)
 
 # ups - table and config files
