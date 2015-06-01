@@ -10,8 +10,9 @@
 #include <iostream>
 #include <memory>
 
-// Boost asio
+// Boost includes
 #include <boost/asio.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace mfplugins {
 
@@ -58,16 +59,24 @@ namespace mfplugins {
     , socket_(io_service_)
     , remote_endpoint_()
   {
+    boost::system::error_code ec;
+    socket_.open(udp::v4());
     int port = pset.get<int>("port", 5140);
-    std::string host = pset.get<std::string>("host", "NULL");
-    if(host == "NULL") {
-    socket_.set_option(boost::asio::socket_base::reuse_address(true));
-    socket_.set_option(boost::asio::socket_base::broadcast(true));
-    remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::broadcast(), port);
+    socket_.set_option(boost::asio::socket_base::reuse_address(true),ec);
+    std::string host = pset.get<std::string>("host", "227.128.12.27");
+    
+    if(boost::iequals(host, "Broadcast") || host == "255.255.255.255") {
+      socket_.set_option(boost::asio::socket_base::broadcast(true),ec);
+      remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::broadcast(), port);
     }
     else
     {
       remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::from_string(host), port);
+    }
+    socket_.bind(remote_endpoint_, ec);
+ 
+    if(ec) { 
+      std::cerr << "An Error occurred in bind(): " << ec.message() << std::endl;
     }
   }
 
@@ -83,6 +92,7 @@ namespace mfplugins {
     oss << xid.severity.getName()+ELstring("|");                // severity
     oss << xid.id+ELstring("|");                                // category
     oss << xid.application+ELstring("|");                       // application
+    oss << xid.process+ELstring("|");
     oss << xid.pid<<ELstring("|");                              // process id
     oss << mf::MessageDrop::instance()->runEvent+ELstring("|"); // run/event no
     oss << xid.module+ELstring("|");                            // module name
@@ -107,7 +117,7 @@ namespace mfplugins {
   //======================================================================
   void ELUDP::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
     auto pid = msg.xid().pid;
-    auto message = boost::asio::buffer(std::to_string(pid) + oss.str());
+    auto message = boost::asio::buffer("UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str());
     socket_.send_to(message, remote_endpoint_);
   }
 } // end namespace mfplugins

@@ -734,17 +734,15 @@ void msgViewerDlg::exit()
 
 void msgViewerDlg::changeSeverity(int sev)
 {
-  mfviewer::SeverityCode s = mfviewer::GetSeverityCode(sev);
-
-  switch(s) 
+  switch(sev) 
   {
-  case mfviewer::SeverityCode::ERROR  :
+  case SERROR  :
       setSevError();   break;
 
-    case mfviewer::SeverityCode::WARNING:
+    case SWARNING:
       setSevWarning(); break;
 
-    case mfviewer::SeverityCode::INFO   :
+    case SINFO   :
       setSevInfo();    break;
 
     default: setSevDebug();

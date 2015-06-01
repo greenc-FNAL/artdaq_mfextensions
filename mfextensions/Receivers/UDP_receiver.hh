@@ -28,7 +28,7 @@ Q_OBJECT
   boost::asio::io_service io_service_;
   udp::socket socket_;
     long count_;
-    char buffer_[1024];
+    char buffer_[0x10000];
   };
 }
 

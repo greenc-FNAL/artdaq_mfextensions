@@ -2,6 +2,7 @@
 #include "mfextensions/Receivers/ReceiverMacros.hh"
 #include <boost/tokenizer.hpp>
 #include <boost/regex.hpp>
+#include <sstream>
 
 mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
 							     , port_(pset.get<int>("port",5140))
@@ -9,20 +10,39 @@ mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
 							     , socket_(io_service_)
                                                              , count_(0)
 {
-  std::cout << "UDPReceiver Constructor" << std::endl;
+  //std::cout << "UDPReceiver Constructor" << std::endl;
   boost::system::error_code ec;
-  socket_.open(udp::v4());
+  udp::endpoint listen_endpoint ( boost::asio::ip::address::from_string("0.0.0.0"), port_);
+  socket_.open(listen_endpoint.protocol());
   boost::asio::socket_base::reuse_address option(true);
   socket_.set_option(option, ec);
   if(ec) {
-    std::cout << "An error occurred in set_option(): " << ec.message() << std::endl;
+    std::cerr << "An error occurred setting reuse_address: " << ec.message() << std::endl;
   }
-  socket_.bind(udp::endpoint(udp::v4(), port_),ec);
+  socket_.bind(listen_endpoint,ec);
 
   if(ec) {
-    std::cout << "An error occurred in bind(): " << ec.message() << std::endl;
+    std::cerr << "An error occurred in bind(): " << ec.message() << std::endl;
   }
-  std::cout << "UDPReceiver Constructor Done" << std::endl;
+
+  if(pset.get<bool>("multicast_enable",false)) {
+    std::string multicast_address_string = pset.get<std::string>("multicast_address","227.128.12.27");
+    auto multicast_address = boost::asio::ip::address::from_string(multicast_address_string);
+    boost::asio::ip::multicast::join_group group_option(multicast_address);
+    socket_.set_option(group_option, ec);
+    if(ec) {
+      std::cerr << "An error occurred joining the multicast group " << multicast_address_string 
+		<< ": " << ec.message() << std::endl;
+    }
+
+    boost::asio::ip::multicast::enable_loopback loopback_option(true);
+    socket_.set_option(loopback_option, ec);
+
+    if(ec) {
+      std::cerr << "An error occurred setting the multicast loopback option: " << ec.message() << std::endl;
+    }
+  }
+  //std::cout << "UDPReceiver Constructor Done" << std::endl;
 }
 
 mfviewer::UDPReceiver::~UDPReceiver()
@@ -36,19 +56,20 @@ void mfviewer::UDPReceiver::run()
     {
       while(socket_.available() > 0) 
       {
-        usleep(500000);
+        //usleep(500000);
         udp::endpoint remote_endpoint;
 	boost::system::error_code ec;
         size_t packetSize = socket_.receive_from(boost::asio::buffer(buffer_), remote_endpoint, 0, ec);
-	std::cout << "Recieved message; validating...(packetSize=" << packetSize << ")" << std::endl;
+	//std::cout << "Recieved message; validating...(packetSize=" << packetSize << ")" << std::endl;
 	std::string message(buffer_, buffer_ + packetSize);
         if(ec) {
-	  std::cout << "Recieved error code: " << ec.message() << std::endl;
+	  std::cerr << "Recieved error code: " << ec.message() << std::endl;
         }
         else if(packetSize > 0 && validate_packet(message))
 	{
-	  std::cout << "Valid UDP Message received! Sending to GUI!" << std::endl;
-	    emit NewMessage(read_msg(message));
+	  //std::cout << "Valid UDP Message received! Sending to GUI!" << std::endl;
+	  emit NewMessage(read_msg(message));
+	  //std::cout << std::endl << std::endl;
 	}
       }
     }
@@ -58,7 +79,7 @@ void mfviewer::UDPReceiver::run()
 mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
 {
   mf::MessageFacilityMsg msg;
-  std::cout << "Recieved MF/Syslog message with contents: " << input << std::endl;
+  //std::cout << "Recieved MF/Syslog message with contents: " << input << std::endl;
 
   boost::char_separator<char> sep("|");
   typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
@@ -89,9 +110,17 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
     if(++it != tokens.end()) { msg.setCategory(*it); }
     if(++it != tokens.end()) { msg.setApplication(*it); }
     if(++it != tokens.end()) { msg.setProcess(*it); }
+    if(++it != tokens.end()) { msg.setPid(std::stol(*it)); }
     if(++it != tokens.end()) { msg.setContext(*it); }
     if(++it != tokens.end()) { msg.setModule(*it); }
-    if(++it != tokens.end()) { msg.setMessage(std::string("UDPMessage"), std::to_string(count_), *it); }
+    std::ostringstream oss;
+    bool first = true;
+    while(++it != tokens.end()) {
+      if(!first) { oss << "|"; } else { first = false; }
+      oss << *it;
+    }
+    //std::cout << "Message content: " << oss.str() << std::endl;
+    msg.setMessage(std::string("UDPMessage"), std::to_string(count_), oss.str());
     ++count_;
   }
 

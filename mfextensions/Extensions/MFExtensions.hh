@@ -10,6 +10,9 @@ namespace mfviewer {
        UNKNOWN,
   };
 
+  const std::string NULL_PARTITION = "NULL_PARTITION";
+
+  /*
   enum class SeverityCode {
     DEBUG,
     INFO,
@@ -17,8 +20,6 @@ namespace mfviewer {
       ERROR,
       UNKNOWN,
   };
-
-  const std::string NULL_PARTITION = "NULL_PARTITION";
 
   inline SeverityCode GetSeverityCode(std::string input) {
     if(input == "DEBUG") { return SeverityCode::DEBUG; }
@@ -54,7 +55,7 @@ namespace mfviewer {
   default: return SeverityCode::UNKNOWN;
   }
   }
-
+*/
   inline SysMsgCode StringToSysMsgCode(std::string input) {
     if(input == "NEW_MESSAGE") { return SysMsgCode::NEW_MESSAGE; }
     else if(input == "SWITCH_PARTITION") { return SysMsgCode::SWITCH_PARTITION; }
