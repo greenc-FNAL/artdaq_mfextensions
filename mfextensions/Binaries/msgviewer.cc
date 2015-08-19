@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <iostream>
-#include <QtGui/QApplication>
-#include <QtGui/qdesktopwidget.h>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/qdesktopwidget.h>
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
