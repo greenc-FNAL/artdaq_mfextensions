@@ -11,7 +11,6 @@
 #  make test
 #  make install
 #  make package
-
 # ======================================================================
 
 # use cmake 2.8 or later
