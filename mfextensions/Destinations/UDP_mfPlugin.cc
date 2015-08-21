@@ -75,7 +75,9 @@ namespace mfplugins {
     }
     else
     {
-      remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::from_string(host), port);
+      udp::resolver resolver(io_service_);
+      udp::resolver::query query(udp::v4(), host, std::to_string(port));
+	remote_endpoint_ = *resolver.resolve(query);
     }
 
     socket_.connect(remote_endpoint_, ec);
