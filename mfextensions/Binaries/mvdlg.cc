@@ -360,12 +360,12 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const & mfmsg)
   if( flag & LIST_CAT )  updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
   if( flag & LIST_HOST ) updateList<msg_iters_map_t>(lwHost, host_msgs_);
 
-  bool hostMatch = hostFilter.contains(it->host(), Qt::CaseInsensitive);
-  bool appMatch  = appFilter.contains(it->app(), Qt::CaseInsensitive);
-  bool catMatch  = catFilter.contains(it->cat(), Qt::CaseInsensitive);
+  bool hostMatch = hostFilter.contains(it->host(), Qt::CaseInsensitive) || hostFilter.size() == 0;
+  bool appMatch  = appFilter.contains(it->app(), Qt::CaseInsensitive) || appFilter.size() == 0;
+  bool catMatch  = catFilter.contains(it->cat(), Qt::CaseInsensitive) || catFilter.size() == 0;
 
   // Check to display the message
-  if(  !(hostMatch || appMatch || catMatch)   ) 
+  if(hostMatch && appMatch && catMatch) 
   {
     displayMsg(it);
   }
