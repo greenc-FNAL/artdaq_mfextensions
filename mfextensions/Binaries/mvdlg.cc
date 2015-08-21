@@ -331,6 +331,15 @@ void msgViewerDlg::readSettings()
 
 void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const & mfmsg) 
 {
+  // 21-Aug-2015, KAB: copying the incrementing (and displaying) of the number
+  // of messages from the onNewSysMsg() method to here. I'm not sure what the
+  // difference between system and normal messages is. (Maybe system messages
+  // are an obsolete carry-over from NOvA?) I'm also not sure if we want to
+  // count all messages or just non-suppressed ones or what. But, at least this
+  // change gets the counter incrementing on the display.
+  ++nMsgs;
+  lcdMsgs->display( nMsgs );
+
   // test if the message is suppressed or throttled
   if( msg_throttled(mfmsg) ) 
   {
