@@ -42,6 +42,10 @@ namespace mfplugins {
     boost::asio::io_service io_service_;
     udp::socket socket_;
     udp::endpoint remote_endpoint_;
+    int consecutive_success_count_;
+    int error_count_;
+    int next_error_report_;
+    int error_report_backoff_factor_;
   };
 
   // END DECLARATION
@@ -58,6 +62,10 @@ namespace mfplugins {
     , io_service_()
     , socket_(io_service_)
     , remote_endpoint_()
+    , consecutive_success_count_(0)
+    , error_count_(0)
+    , next_error_report_(1)
+    , error_report_backoff_factor_()
   {
     boost::system::error_code ec;
     socket_.open(udp::v4());
@@ -68,6 +76,7 @@ namespace mfplugins {
                 << ec.message() << std::endl;
     }
     std::string host = pset.get<std::string>("host", "227.128.12.27");
+    error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
 
     if(boost::iequals(host, "Broadcast") || host == "255.255.255.255") {
       socket_.set_option(boost::asio::socket_base::broadcast(true),ec);
@@ -131,12 +140,23 @@ namespace mfplugins {
     auto message = boost::asio::buffer("UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str());
     try {
       socket_.send_to(message, remote_endpoint_);
+      ++consecutive_success_count_;
+      if (consecutive_success_count_ >= 5) {
+        error_count_ = 0;
+        next_error_report_ = 1;
+      }
     }
     catch (boost::system::system_error& err) {
-      std::cerr << "An exception occurred when trying to send a message to "
-                << remote_endpoint_ << std::endl
-                << "  message = " << oss.str() << std::endl
-                << "  exception = " << err.what() << std::endl;
+      consecutive_success_count_ = 0;
+      ++error_count_;
+        next_error_report_ << " " << error_report_backoff_factor_ << std::endl;
+      if (error_count_ == next_error_report_) {
+        std::cerr << "An exception occurred when trying to send a message to "
+                  << remote_endpoint_ << std::endl
+                  << "  message = " << oss.str() << std::endl
+                  << "  exception = " << err.what() << std::endl;
+        next_error_report_ *= error_report_backoff_factor_;
+      }
     }
   }
 } // end namespace mfplugins
