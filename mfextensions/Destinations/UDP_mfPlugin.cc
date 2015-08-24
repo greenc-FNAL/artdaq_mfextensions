@@ -149,7 +149,6 @@ namespace mfplugins {
     catch (boost::system::system_error& err) {
       consecutive_success_count_ = 0;
       ++error_count_;
-        next_error_report_ << " " << error_report_backoff_factor_ << std::endl;
       if (error_count_ == next_error_report_) {
         std::cerr << "An exception occurred when trying to send a message to "
                   << remote_endpoint_ << std::endl
