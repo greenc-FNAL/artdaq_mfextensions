@@ -3,6 +3,7 @@ basic_plugin( "UDP" "mfPlugin"
   ${Boost_SYSTEM_LIBRARY}
   ${FHICLCPP}
   ${CETLIB}
+  pthread
 )
 
 install_headers()

@@ -63,21 +63,32 @@ namespace mfplugins {
     socket_.open(udp::v4());
     int port = pset.get<int>("port", 5140);
     socket_.set_option(boost::asio::socket_base::reuse_address(true),ec);
+    if(ec) {
+      std::cerr << "An error occurred setting reuse_address to true: "
+                << ec.message() << std::endl;
+    }
     std::string host = pset.get<std::string>("host", "227.128.12.27");
-    
+
     if(boost::iequals(host, "Broadcast") || host == "255.255.255.255") {
       socket_.set_option(boost::asio::socket_base::broadcast(true),ec);
       remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::broadcast(), port);
     }
     else
     {
-      remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::from_string(host), port);
+      udp::resolver resolver(io_service_);
+      udp::resolver::query query(udp::v4(), host, std::to_string(port));
+	remote_endpoint_ = *resolver.resolve(query);
     }
-    socket_.bind(remote_endpoint_, ec);
- 
+
+    socket_.connect(remote_endpoint_, ec);
     if(ec) { 
-      std::cerr << "An Error occurred in bind(): " << ec.message() << std::endl;
+      std::cerr << "An Error occurred in connect(): " << ec.message() << std::endl
+                << "  endpoint = " << remote_endpoint_ << std::endl;
     }
+    //else {
+    //  std::cout << "Successfully connected to remote endpoint = " << remote_endpoint_
+    //            << std::endl;
+    //}
   }
 
   //======================================================================
@@ -118,7 +129,15 @@ namespace mfplugins {
   void ELUDP::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
     auto pid = msg.xid().pid;
     auto message = boost::asio::buffer("UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str());
-    socket_.send_to(message, remote_endpoint_);
+    try {
+      socket_.send_to(message, remote_endpoint_);
+    }
+    catch (boost::system::system_error& err) {
+      std::cerr << "An exception occurred when trying to send a message to "
+                << remote_endpoint_ << std::endl
+                << "  message = " << oss.str() << std::endl
+                << "  exception = " << err.what() << std::endl;
+    }
   }
 } // end namespace mfplugins
 

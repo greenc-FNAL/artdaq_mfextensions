@@ -331,6 +331,15 @@ void msgViewerDlg::readSettings()
 
 void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const & mfmsg) 
 {
+  // 21-Aug-2015, KAB: copying the incrementing (and displaying) of the number
+  // of messages from the onNewSysMsg() method to here. I'm not sure what the
+  // difference between system and normal messages is. (Maybe system messages
+  // are an obsolete carry-over from NOvA?) I'm also not sure if we want to
+  // count all messages or just non-suppressed ones or what. But, at least this
+  // change gets the counter incrementing on the display.
+  ++nMsgs;
+  lcdMsgs->display( nMsgs );
+
   // test if the message is suppressed or throttled
   if( msg_throttled(mfmsg) ) 
   {
@@ -351,12 +360,12 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const & mfmsg)
   if( flag & LIST_CAT )  updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
   if( flag & LIST_HOST ) updateList<msg_iters_map_t>(lwHost, host_msgs_);
 
-  bool hostMatch = hostFilter.contains(it->host(), Qt::CaseInsensitive);
-  bool appMatch  = appFilter.contains(it->app(), Qt::CaseInsensitive);
-  bool catMatch  = catFilter.contains(it->cat(), Qt::CaseInsensitive);
+  bool hostMatch = hostFilter.contains(it->host(), Qt::CaseInsensitive) || hostFilter.size() == 0;
+  bool appMatch  = appFilter.contains(it->app(), Qt::CaseInsensitive) || appFilter.size() == 0;
+  bool catMatch  = catFilter.contains(it->cat(), Qt::CaseInsensitive) || catFilter.size() == 0;
 
   // Check to display the message
-  if(  !(hostMatch || appMatch || catMatch)   ) 
+  if(hostMatch && appMatch && catMatch) 
   {
     displayMsg(it);
   }
