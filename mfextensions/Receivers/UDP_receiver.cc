@@ -52,28 +52,26 @@ mfviewer::UDPReceiver::~UDPReceiver()
 
 void mfviewer::UDPReceiver::run()
 {
-  while(!stopRequested_)
-    {
-      while(socket_.available() > 0) 
-      {
-        //usleep(500000);
-        udp::endpoint remote_endpoint;
+  while(!stopRequested_) {
+	while(socket_.available() <= 0) {
+	  usleep(1000);
+	}
+	//usleep(500000);
+	udp::endpoint remote_endpoint;
 	boost::system::error_code ec;
-        size_t packetSize = socket_.receive_from(boost::asio::buffer(buffer_), remote_endpoint, 0, ec);
+	size_t packetSize = socket_.receive_from(boost::asio::buffer(buffer_), remote_endpoint, 0, ec);
 	//std::cout << "Recieved message; validating...(packetSize=" << packetSize << ")" << std::endl;
 	std::string message(buffer_, buffer_ + packetSize);
-        if(ec) {
+	if(ec) {
 	  std::cerr << "Recieved error code: " << ec.message() << std::endl;
-        }
-        else if(packetSize > 0 && validate_packet(message))
-	{
+	}
+	else if(packetSize > 0 && validate_packet(message)) {
 	  //std::cout << "Valid UDP Message received! Sending to GUI!" << std::endl;
 	  emit NewMessage(read_msg(message));
 	  //std::cout << std::endl << std::endl;
 	}
-      }
-    }
-  std::cout << "UDPReceiver shutting down!" << std::endl;
+  }
+  std::cout<< "UDPReceiver shutting down!" << std::endl;
 }
 
 mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
