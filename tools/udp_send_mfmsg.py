@@ -26,6 +26,7 @@ def main(argv):
     buf+="|WARNING"
     buf+="|Test Message"
     buf+="|UDP Send MFMSG"
+    buf+="|udp_send_mfmsg.py"
     buf+="|1"
     buf+="|Run 0, Subrun 0, Event 0"
     buf+="|UDP Test program"
