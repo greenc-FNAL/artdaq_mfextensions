@@ -69,6 +69,9 @@ add_subdirectory(config)
 # MFExtensions Library
 add_subdirectory(mfextensions)
 
+# tools - utility scripts
+add_subdirectory(tools)
+
 # ups - table and config files
 add_subdirectory(ups)
 
