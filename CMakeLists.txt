@@ -44,6 +44,7 @@ cet_report_compiler_flags()
 find_ups_product( messagefacility v1_14_00 )
 find_ups_product( cetbuildtools   v4_01_03 )
 find_ups_product( cetlib          v0_4_11 )
+find_ups_product( TRACE           v3_06_00 )
 
 
 # Qt

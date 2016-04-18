@@ -6,5 +6,13 @@ basic_plugin( "UDP" "mfPlugin"
   pthread
 )
 
+basic_plugin( "TRACE" "mfPlugin"
+    ${MF_MESSAGELOGGER}
+    ${FHICLCPP}
+    ${CETLIB}
+    trace
+)
+
+install_fhicl(SUBDIRS fcl)
 install_headers()
 install_source()

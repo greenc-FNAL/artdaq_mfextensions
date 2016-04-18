@@ -28,37 +28,38 @@ messagefacility    v1_16_21     s28
 messagefacility    v1_16_22     s30
 messagefacility    v1_16_23     s31
 qt              v5_4_2a
+TRACE           v3_06_06
 cetbuildtools	v4_18_02	-	only_for_build
 end_product_list
 
 # e6 - with gcc 4.9.1 and -std=c++1y
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
-qualifier		messagefacility  	  qt    	notes
-e9:s31:debug      	        e9:debug    	          e9      	-std=c++14
-e9:s31:prof      	        e9:prof    	          e9      	-std=c++14
-e9:s30:debug      	        e9:debug    	          e9      	-std=c++14
-e9:s30:prof      	        e9:prof    	          e9      	-std=c++14
-e9:s28:debug      	        e9:debug    	          e9      	-std=c++14
-e9:s28:prof      	        e9:prof    	          e9      	-std=c++14
-e9:s26:debug      	        e9:debug    	          e9      	-std=c++14
-e9:s26:prof      	        e9:prof    	          e9      	-std=c++14
-e9:s21:debug      	        e9:debug    	          e9      	-std=c++14
-e9:s21:prof      	        e9:prof    	          e9      	-std=c++14
-e9:s15:debug      	        e9:debug    	          e9      	-std=c++14
-e9:s15:prof      	        e9:prof    	          e9      	-std=c++14
-e7:s15:debug      	        e7:debug    	          e7      	-std=c++1y
-e7:s15:prof      	        e7:prof    	          e7      	-std=c++1y
-e6:s15:debug      	        e6:debug    	          e6      	-std=c++1y
-e6:s15:prof      	        e6:prof    	          e6      	-std=c++1y
-e7:s11:debug      	        e7:debug    	          e7      	-std=c++1y
-e7:s11:prof      	        e7:prof    	          e7      	-std=c++1y
-e6:s11:debug      	        e6:debug    	          e6      	-std=c++1y
-e6:s11:prof      	        e6:prof    	          e6      	-std=c++1y
-e7:s8:debug      	        e7:debug    	          e7      	-std=c++1y
-e7:s8:prof      	        e7:prof    	          e7      	-std=c++1y
-e6:s8:debug      	        e6:debug    	          e6      	-std=c++1y
-e6:s8:prof      	        e6:prof    	          e6      	-std=c++1y
+qualifier		messagefacility  	  qt    TRACE	   notes
+e9:s31:debug      	e9:debug    	          e9    e9:debug   -std=c++14
+e9:s31:prof      	e9:prof    	          e9    e9:prof    -std=c++14
+e9:s30:debug      	e9:debug    	          e9    e9:debug   -std=c++14
+e9:s30:prof             e9:prof    	          e9    e9:prof    -std=c++14
+e9:s28:debug            e9:debug    	          e9    e9:debug   -std=c++14
+e9:s28:prof             e9:prof    	          e9    e9:prof    -std=c++14
+e9:s26:debug            e9:debug    	          e9    e9:debug   -std=c++14
+e9:s26:prof             e9:prof    	          e9    e9:prof    -std=c++14
+e9:s21:debug            e9:debug    	          e9    e9:debug   -std=c++14
+e9:s21:prof             e9:prof    	          e9    e9:prof    -std=c++14
+e9:s15:debug            e9:debug    	          e9    e9:debug   -std=c++14
+e9:s15:prof             e9:prof    	          e9    e9:prof    -std=c++14
+e7:s15:debug            e7:debug    	          e7    e7:debug   -std=c++1y
+e7:s15:prof             e7:prof    	          e7    e7:prof    -std=c++1y
+e6:s15:debug    	e6:debug    	          e6    e6:debug   -std=c++1y
+e6:s15:prof             e6:prof    	          e6    e6:prof    -std=c++1y
+e7:s11:debug     	e7:debug    	          e7    e7:debug   -std=c++1y
+e7:s11:prof             e7:prof    	          e7    e7:prof    -std=c++1y
+e6:s11:debug     	e6:debug    	          e6    e6:debug   -std=c++1y
+e6:s11:prof             e6:prof    	          e6    e6:prof    -std=c++1y
+e7:s8:debug             e7:debug    	          e7    e7:debug   -std=c++1y
+e7:s8:prof              e7:prof    	          e7    e7:prof    -std=c++1y
+e6:s8:debug             e6:debug    	          e6    e6:debug   -std=c++1y
+e6:s8:prof              e6:prof    	          e6    e6:prof    -std=c++1y
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
