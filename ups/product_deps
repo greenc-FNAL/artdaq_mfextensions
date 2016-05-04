@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_0_5
+parent artdaq_mfextensions	v1_0_6
 defaultqual	e9:s21
 
 # These optional lines define the installed directories where
