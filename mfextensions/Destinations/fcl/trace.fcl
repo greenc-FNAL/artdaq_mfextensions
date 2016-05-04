@@ -1,0 +1,6 @@
+trace: {
+  type: TRACE
+  threshold: DEBUG
+  level_offset: 0
+}
+
