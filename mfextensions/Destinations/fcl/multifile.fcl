@@ -1,0 +1,6 @@
+multifile: {
+    type: MultiFile
+    threshold: DEBUG
+    append: true
+    base_directory: "/tmp"
+}
