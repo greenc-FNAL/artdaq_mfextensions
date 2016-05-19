@@ -3,4 +3,12 @@ multifile: {
     threshold: DEBUG
     append: true
     base_directory: "/tmp"
+
+    // The following lines control how files are split.
+    // A file will be created for each unique combination of enabled attributes
+    // File name: [<module>-][<category>-][<application>-][<hostname>-]<pid>.log
+    use_hostname: true
+    use_application: true
+    use_category: false
+    use_module: false
 }

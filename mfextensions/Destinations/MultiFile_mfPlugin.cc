@@ -35,6 +35,11 @@ namespace mfplugins {
     std::string baseDir_;
     bool append_;
     std::unordered_map<std::string, std::unique_ptr<cet::ostream_handle> > outputs_;
+
+    bool useHost_;
+    bool useApplication_;
+    bool useCategory_;
+    bool useModule_;
   };
 
   // END DECLARATION
@@ -50,6 +55,10 @@ namespace mfplugins {
     : ELdestination( pset )
     , baseDir_(pset.get<std::string>("base_directory","/tmp"))
     , append_(pset.get<bool>("append",true))
+    , useHost_(pset.get<bool>("use_hostname",true))
+    , useApplication_(pset.get<bool>("use_application", true))
+    , useCategory_(pset.get<bool>("use_category", false))
+    , useModule_(pset.get<bool>("use_module",false))
   {
   }
 
@@ -58,7 +67,12 @@ namespace mfplugins {
   //======================================================================
   void ELMultiFileOutput::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
 	const auto& xid = msg.xid();
-	std::string fileName = baseDir_ + "/" + xid.application + "-" + std::to_string(xid.pid) + ".log";
+	std::string fileName = baseDir_ + "/";
+	if(useModule_) { fileName += xid.module + "-"; }
+        if(useCategory_) { fileName += xid.id + "-"; }
+        if(useApplication_) {fileName += xid.application + "-"; }
+	if(useHost_) { fileName += xid.hostname +"-";}
+        fileName += std::to_string(xid.pid) + ".log";
 	if(outputs_.count(fileName) == 0) {
 	  outputs_[fileName] = std::make_unique<cet::ostream_owner>(fileName.c_str(), append_ ? std::ios::app : std::ios::trunc);
 	}
