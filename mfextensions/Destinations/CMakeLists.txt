@@ -13,6 +13,14 @@ basic_plugin( "TRACE" "mfPlugin"
     trace
 )
 
+basic_plugin( "MultiFile" "mfPlugin"
+    ${MF_MESSAGELOGGER}
+    ${FHICLCPP}
+    ${CETLIB}
+)
+    
+
+
 install_fhicl(SUBDIRS fcl)
 install_headers()
 install_source()
