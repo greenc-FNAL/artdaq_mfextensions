@@ -1,6 +1,7 @@
 
 #include <QtGui>
 #include <QMenu>
+#include <QMessageBox>
 #include <QProgressDialog>
 
 #include <cetlib/filepath_maker.h>
@@ -76,6 +77,7 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
   : QDialog(parent)
 , updating      ( false )
 , paused        ( false )
+, shortMode_    ( false )
 , nMsgs         ( 0     )
 , nSupMsgs      ( 0     )
 , nThrMsgs      ( 0     )
@@ -114,12 +116,14 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
   // slots
   connect( btnPause    , SIGNAL( clicked() ), this, SLOT( pause() ) );
   connect( btnExit     , SIGNAL( clicked() ), this, SLOT( exit()  ) );
+  connect( btnClear    , SIGNAL( clicked() ), this, SLOT( clear() ) );
 
   //connect( btnSwitchChannel, 
   //                       SIGNAL( clicked() ), this, SLOT( switchChannel() ) );
   btnSwitchChannel->setEnabled(false);
 
   connect( btnRMode    , SIGNAL( clicked() ), this, SLOT( renderMode()  ) );
+  connect( btnDisplayMode, SIGNAL(clicked()), this, SLOT(shortMode()));
 
   connect( btnSearch   , SIGNAL( clicked() ), this, SLOT( searchMsg()   ) );
   connect( btnSearchClear, 
@@ -264,6 +268,12 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const & conf)
   thr_menu->addSeparator();
 
   pset_to_throttle(thr_cat , e_thr_cat , thr_menu);
+
+  auto lvl = conf.get<std::string>("threshold", "INFO");
+  if(lvl == "DEBUG" || lvl == "debug" || lvl == "0") { sevThresh = SDEBUG; }
+  if(lvl == "INFO"  || lvl == "info"  || lvl == "1") { sevThresh = SINFO; }
+  if(lvl == "WARN"  || lvl == "warn"  || lvl == "2") { sevThresh = SWARNING; }
+  if(lvl == "ERROR" || lvl == "error" || lvl == "3") { sevThresh = SERROR; }
 }
 
 bool msgViewerDlg::msg_throttled(mf::MessageFacilityMsg const & mfmsg)
@@ -464,7 +474,7 @@ void msgViewerDlg::displayMsg( msgs_t::const_iterator it )
   if( it->sev() < sevThresh ) return;
 
   buf_lock.lock();
-  buffer += it->text();
+  buffer += it->text(shortMode_);
   buf_lock.unlock();
 }
 
@@ -501,7 +511,7 @@ void msgViewerDlg::displayMsg( msg_iters_t const & msgs )
   {
     if( it->get()->sev() >= sevThresh )
     {
-      txt += it->get()->text();
+      txt += it->get()->text(shortMode_);
     }
 
     if( i==1000 )
@@ -557,15 +567,15 @@ void msgViewerDlg::displayMsg()
   {
     if( it->sev() >= sevThresh )
     {
-      txt += it->text();
+      txt += it->text(shortMode_);
     }
 
     if( i==1000 )
     {
       i=0; ++prog;
       progress.setValue(prog);
-
-      txtMessages->append(txt);
+ 
+     txtMessages->append(txt);
       txt.clear();
     }
 
@@ -587,7 +597,7 @@ void msgViewerDlg::updateDisplayMsgs()
   {
     if( !buffer.isEmpty() )
     {
-      txtMessages->append(buffer);
+  txtMessages->append(buffer);
       buffer.clear();
     }
   }
@@ -739,6 +749,51 @@ void msgViewerDlg::pause()
 void msgViewerDlg::exit()
 {
   close();
+}
+
+void msgViewerDlg::clear()
+{
+  int ret = QMessageBox::question(this, tr("Message Viewer"), tr("Are you sure you want to clear all received messages?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+  switch(ret)
+    {
+    case QMessageBox::Yes:
+      nMsgs      = 0;
+      nSupMsgs   = 0;
+      nThrMsgs   = 0;
+      hostFilter = QStringList();
+      appFilter  = QStringList();
+      catFilter  = QStringList();
+      msg_pool_.clear();
+      host_msgs_.clear();
+      cat_msgs_.clear();
+      app_sev_msgs_.clear();
+  updateList<msg_sevs_map_t>(lwApplication, app_sev_msgs_);
+ updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
+ updateList<msg_iters_map_t>(lwHost, host_msgs_);
+  txtMessages->clear();
+  lcdMsgs->display( nMsgs );
+      break;
+    case QMessageBox::No:
+    default:
+      break;
+    }
+}
+
+void msgViewerDlg::shortMode()
+{
+  if( !shortMode_ )
+  {
+    shortMode_ = true;
+    btnDisplayMode->setText("Long View");
+  }
+  else
+  {
+    shortMode_ = false;
+    btnDisplayMode->setText("Compact View");
+  }
+
+  txtMessages->clear();
+  displayMsg();
 }
 
 void msgViewerDlg::changeSeverity(int sev)

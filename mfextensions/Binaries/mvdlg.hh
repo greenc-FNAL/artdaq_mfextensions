@@ -36,6 +36,8 @@ public slots:
 
   void pause();
   void exit();
+  void clear();
+  void shortMode();
   void changeSeverity(int sev);
   void switchChannel();
 
@@ -105,6 +107,7 @@ private:
 
   bool              updating;
   bool              paused;
+  bool              shortMode_;
 
   // # of received messages
   int               nMsgs;
