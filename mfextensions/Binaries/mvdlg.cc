@@ -183,6 +183,12 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
   receivers_.start();
 }
 
+msgViewerDlg::~msgViewerDlg()
+{
+  receivers_.stop();
+  writeSettings();
+}
+
 static void str_to_suppress( std::vector<std::string> const & vs, std::vector<suppress> & s, QMenu * menu )
 {
   QAction * act;
@@ -947,8 +953,6 @@ void msgViewerDlg::setThrottling(QAction * act)
 
 void msgViewerDlg::closeEvent(QCloseEvent *event)
 {
-  receivers_.stop();
-  writeSettings();
   event->accept();
 }
 

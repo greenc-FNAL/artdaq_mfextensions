@@ -63,6 +63,7 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
     shortText_ = QString(text_);
     shortText_ += QString("<p style=\"margin-top: 0; margin-bottom: 0;\">");
     shortText_ += QString(msg.message().c_str()).toHtmlEscaped();
+    shortText_ += QString("</p></font>");
 
     //std::cout << "qt_mf_msg.cc:" << msg.message() << std::endl;
     text_ += QString("<p>")
