@@ -108,7 +108,10 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
     if(++it != tokens.end()) { msg.setCategory(*it); }
     if(++it != tokens.end()) { msg.setApplication(*it); }
     if(++it != tokens.end()) { msg.setProcess(*it); }
+    try {
     if(++it != tokens.end()) { msg.setPid(std::stol(*it)); }
+    }
+    catch(std::invalid_argument e) { ; }
     if(++it != tokens.end()) { msg.setContext(*it); }
     if(++it != tokens.end()) { msg.setModule(*it); }
     std::ostringstream oss;
