@@ -7,6 +7,7 @@
 
 qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
     : text_()
+    , shortText_()
     , color_()
     , sev_()
     , host_(QString(msg.hostname().substr(0, msg.hostname().find_first_of('.')).c_str()))
@@ -58,6 +59,11 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
 
     default: break;
     }
+
+    shortText_ = QString(text_);
+    shortText_ += QString("<p style=\"margin-top: 0; margin-bottom: 0;\">");
+    shortText_ += QString(msg.message().c_str()).toHtmlEscaped();
+    shortText_ += QString("</p></font>");
 
     //std::cout << "qt_mf_msg.cc:" << msg.message() << std::endl;
     text_ += QString("<p>")

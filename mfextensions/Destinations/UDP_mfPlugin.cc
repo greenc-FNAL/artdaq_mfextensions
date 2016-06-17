@@ -9,6 +9,7 @@
 // C/C++ includes
 #include <iostream>
 #include <memory>
+#include <algorithm>
 
 // Boost includes
 #include <boost/asio.hpp>
@@ -106,16 +107,25 @@ namespace mfplugins {
   void ELUDP::fillPrefix( std::ostringstream& oss,const ErrorObj & msg ) {
     const auto& xid = msg.xid();
 
+    auto id = xid.id;
+    auto app = xid.application;
+    auto process = xid.process;
+    auto module = xid.module; 
+    std::replace(id.begin(), id.end(), '|', '!');
+    std::replace(app.begin(), app.end(), '|', '!');
+    std::replace(process.begin(), process.end(), '|', '!');
+    std::replace(module.begin(), module.end(), '|', '!');
+
     oss << format.timestamp( msg.timestamp() )+ELstring("|");   // timestamp
     oss << xid.hostname+ELstring("|");                          // host name
     oss << xid.hostaddr+ELstring("|");                          // host address
     oss << xid.severity.getName()+ELstring("|");                // severity
-    oss << xid.id+ELstring("|");                                // category
-    oss << xid.application+ELstring("|");                       // application
-    oss << xid.process+ELstring("|");
+    oss << id+ELstring("|");                                // category
+    oss << app+ELstring("|");                       // application
+    oss << process+ELstring("|");
     oss << xid.pid<<ELstring("|");                              // process id
     oss << mf::MessageDrop::instance()->runEvent+ELstring("|"); // run/event no
-    oss << xid.module+ELstring("|");                            // module name
+    oss << module+ELstring("|");                            // module name
   }
 
   //======================================================================

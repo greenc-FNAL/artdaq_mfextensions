@@ -30,12 +30,15 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
 
 public:
   msgViewerDlg( std::string const & part, std::string const & conf, QDialog *parent = 0 );
+  virtual ~msgViewerDlg();
 
 
 public slots:
 
   void pause();
   void exit();
+  void clear();
+  void shortMode();
   void changeSeverity(int sev);
   void switchChannel();
 
@@ -105,6 +108,7 @@ private:
 
   bool              updating;
   bool              paused;
+  bool              shortMode_;
 
   // # of received messages
   int               nMsgs;

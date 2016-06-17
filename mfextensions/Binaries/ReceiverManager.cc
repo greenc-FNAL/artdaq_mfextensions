@@ -45,6 +45,10 @@ void mfviewer::ReceiverManager::stop()
     {
       receiver->stop();
     }
+  for(auto & receiver : receivers_)
+    {
+      receiver->wait();
+    }
 }
 
 void mfviewer::ReceiverManager::start()

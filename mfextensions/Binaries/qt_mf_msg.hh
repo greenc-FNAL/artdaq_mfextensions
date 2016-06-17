@@ -29,7 +29,7 @@ public:
   qt_mf_msg( mf::MessageFacilityMsg const & msg );
 
   // get method
-  QString const & text()  const { return text_; }
+  QString const & text(bool mode)  const { return mode ? shortText_ : text_; }
   QColor  const & color() const { return color_; }
   sev_code_t      sev()   const { return sev_; }
   QString const & host() const { return host_; }
@@ -40,6 +40,7 @@ public:
 private:
 
   QString     text_;
+  QString     shortText_;
   QColor      color_;
   sev_code_t  sev_;
   QString host_;
