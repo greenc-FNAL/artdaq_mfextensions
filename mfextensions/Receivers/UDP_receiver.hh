@@ -29,6 +29,7 @@ Q_OBJECT
   udp::socket socket_;
     long count_;
     char buffer_[0x10000];
+    bool debug_;
   };
 }
 
