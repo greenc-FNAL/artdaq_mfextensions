@@ -9,6 +9,7 @@ mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
 							     , io_service_()
 							     , socket_(io_service_)
                                                              , count_(0)
+							     , debug_(pset.get<bool>("debug_mode",false))
 {
   //std::cout << "UDPReceiver Constructor" << std::endl;
   boost::system::error_code ec;
@@ -42,33 +43,36 @@ mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
       std::cerr << "An error occurred setting the multicast loopback option: " << ec.message() << std::endl;
     }
   }
-  //std::cout << "UDPReceiver Constructor Done" << std::endl;
+  if(debug_) { std::cout << "UDPReceiver Constructor Done" << std::endl; }
 }
 
 mfviewer::UDPReceiver::~UDPReceiver()
 {
+  if(debug_) { std::cout << "Closing UDP Socket" << std::endl; }
   socket_.close();
 }
 
 void mfviewer::UDPReceiver::run()
 {
   while(!stopRequested_) {
-	while(socket_.available() <= 0) {
-	  usleep(1000);
+	if(socket_.available() <= 0) {
+	  usleep(10000);
 	}
+	else {
 	//usleep(500000);
 	udp::endpoint remote_endpoint;
 	boost::system::error_code ec;
 	size_t packetSize = socket_.receive_from(boost::asio::buffer(buffer_), remote_endpoint, 0, ec);
-	//std::cout << "Recieved message; validating...(packetSize=" << packetSize << ")" << std::endl;
+	if(debug_) { std::cout << "Recieved message; validating...(packetSize=" << packetSize << ")" << std::endl; }
 	std::string message(buffer_, buffer_ + packetSize);
 	if(ec) {
 	  std::cerr << "Recieved error code: " << ec.message() << std::endl;
 	}
 	else if(packetSize > 0 && validate_packet(message)) {
-	  //std::cout << "Valid UDP Message received! Sending to GUI!" << std::endl;
+	  if(debug_) { std::cout << "Valid UDP Message received! Sending to GUI!" << std::endl; }
 	  emit NewMessage(read_msg(message));
 	  //std::cout << std::endl << std::endl;
+	}
 	}
   }
   std::cout<< "UDPReceiver shutting down!" << std::endl;
@@ -77,7 +81,7 @@ void mfviewer::UDPReceiver::run()
 mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
 {
   mf::MessageFacilityMsg msg;
-  //std::cout << "Recieved MF/Syslog message with contents: " << input << std::endl;
+  if(debug_) { std::cout << "Recieved MF/Syslog message with contents: " << input << std::endl; }
 
   boost::char_separator<char> sep("|");
   typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
@@ -120,7 +124,7 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
       if(!first) { oss << "|"; } else { first = false; }
       oss << *it;
     }
-    //std::cout << "Message content: " << oss.str() << std::endl;
+    if(debug_) { std::cout << "Message content: " << oss.str() << std::endl; }
     msg.setMessage(std::string("UDPMessage"), std::to_string(count_), oss.str());
     ++count_;
   }
