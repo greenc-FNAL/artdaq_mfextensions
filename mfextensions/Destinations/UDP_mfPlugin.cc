@@ -40,6 +40,8 @@ namespace mfplugins {
     virtual void routePayload( const std::ostringstream&, const ErrorObj& ) override;
 
   private:
+    void reconnect_(bool quiet = false);
+
     boost::asio::io_service io_service_;
     udp::socket socket_;
     udp::endpoint remote_endpoint_;
@@ -47,6 +49,9 @@ namespace mfplugins {
     int error_count_;
     int next_error_report_;
     int error_report_backoff_factor_;
+    int error_max_;
+    std::string host_;
+    int port_;
   };
 
   // END DECLARATION
@@ -66,34 +71,42 @@ namespace mfplugins {
     , consecutive_success_count_(0)
     , error_count_(0)
     , next_error_report_(1)
-    , error_report_backoff_factor_()
+    , error_report_backoff_factor_(pset.get<int>("error_report_backoff_factor", 10))
+    , error_max_(pset.get<int>("error_turnoff_threshold", 1))
+    , host_(pset.get<std::string>("host", "227.128.12.27"))
+    , port_(pset.get<int>("port",5140))
+  {
+    reconnect_();
+  }
+
+  void ELUDP::reconnect_(bool quiet)
   {
     boost::system::error_code ec;
     socket_.open(udp::v4());
-    int port = pset.get<int>("port", 5140);
     socket_.set_option(boost::asio::socket_base::reuse_address(true),ec);
-    if(ec) {
+    if(ec && !quiet) {
       std::cerr << "An error occurred setting reuse_address to true: "
                 << ec.message() << std::endl;
     }
-    std::string host = pset.get<std::string>("host", "227.128.12.27");
-    error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
 
-    if(boost::iequals(host, "Broadcast") || host == "255.255.255.255") {
+    if(boost::iequals(host_, "Broadcast") || host_ == "255.255.255.255") {
       socket_.set_option(boost::asio::socket_base::broadcast(true),ec);
-      remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::broadcast(), port);
+      remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::broadcast(), port_);
     }
     else
     {
       udp::resolver resolver(io_service_);
-      udp::resolver::query query(udp::v4(), host, std::to_string(port));
+      udp::resolver::query query(udp::v4(), host_, std::to_string(port_));
 	remote_endpoint_ = *resolver.resolve(query);
     }
 
     socket_.connect(remote_endpoint_, ec);
     if(ec) { 
+      if(!quiet) {
       std::cerr << "An Error occurred in connect(): " << ec.message() << std::endl
                 << "  endpoint = " << remote_endpoint_ << std::endl;
+      }
+      error_count_++;
     }
     //else {
     //  std::cout << "Successfully connected to remote endpoint = " << remote_endpoint_
@@ -146,8 +159,10 @@ namespace mfplugins {
   // Message router ( overriddes ELdestination::routePayload )
   //======================================================================
   void ELUDP::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
+    if(error_count_ < error_max_) {
     auto pid = msg.xid().pid;
     auto message = boost::asio::buffer("UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str());
+    bool error = true;
     try {
       socket_.send_to(message, remote_endpoint_);
       ++consecutive_success_count_;
@@ -155,6 +170,7 @@ namespace mfplugins {
         error_count_ = 0;
         next_error_report_ = 1;
       }
+      error = false;
     }
     catch (boost::system::system_error& err) {
       consecutive_success_count_ = 0;
@@ -167,6 +183,14 @@ namespace mfplugins {
         next_error_report_ *= error_report_backoff_factor_;
       }
     }
+    if(error) {
+      try{
+	reconnect_(true);
+      }
+      catch(...)
+	{}
+    }
+  }
   }
 } // end namespace mfplugins
 
