@@ -161,7 +161,10 @@ namespace mfplugins {
   void ELUDP::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
     if(error_count_ < error_max_) {
     auto pid = msg.xid().pid;
-    auto message = boost::asio::buffer("UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str());
+	//std::cout << oss.str() << std::endl;
+	auto string = "UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str();
+	//std::cout << string << std::endl;
+    auto message = boost::asio::buffer(string);
     bool error = true;
     try {
       socket_.send_to(message, remote_endpoint_);
