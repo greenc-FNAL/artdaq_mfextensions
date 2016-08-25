@@ -30,7 +30,7 @@ def main(argv):
     buf+="|1"
     buf+="|Run 0, Subrun 0, Event 0"
     buf+="|UDP Test program"
-    buf+="|This is the ARTDAQ UDP test string. It contains exactly 109 characters, making for a total size of 111 bytes."
+    buf+="|This is the ARTDAQ UDP test string.\n\t It contains exactly 111 characters, making for a total size of 113 bytes."
     s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
     s.sendto( buf, (node,int(port)) )
     pass

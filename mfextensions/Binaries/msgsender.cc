@@ -9,44 +9,19 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "mfextensions/Extensions/MFExtensions.hh"
 
+#include "fhiclcpp/make_ParameterSet.h"
 #include "fhiclcpp/ParameterSet.h"
 
 #include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace boost;
+namespace BFS = boost::filesystem;
 namespace po = boost::program_options;
 
 #include <iostream>
 #include <algorithm>
 #include <iterator>
-
-std::string trim_copy(std::string const src)
-{
-  std::string::size_type len = src.length();
-  std::string::size_type i    = 0;
-  std::string::size_type j    = len-1;
-
-  while( (i < len) && (src[i] == ' ') ) ++i;
-  while( (j > 0  ) && (src[j] == ' ') ) --j;
-
-  return src.substr(i,j-i+1);
-}
-
-void parseDestinations (std::string const & s, std::vector<std::string> & dests)
-{
-  dests.clear();
-
-  const std::string::size_type npos = s.length();
-        std::string::size_type i    = 0;
-  while ( i < npos ) {    
-    std::string::size_type j = s.find('|',i); 
-    std::string dest = trim_copy(s.substr(i,j-i));  
-    dests.push_back (dest);
-    i = j;
-    while ( (i < npos) && (s[i] == '|') ) ++i; 
-    // the above handles cases of || and also | at end of string
-  } 
-}
 
 int main(int ac, char* av[])
 {
@@ -54,20 +29,15 @@ int main(int ac, char* av[])
   std::string         application;
   std::string         message;
   std::string         cat;
-  std::string         dest;
-  std::string         filename;
-
-  std::string         partition(mfviewer::NULL_PARTITION);
+  std::string         conf;
+  bool dump;
 
   std::vector<std::string> messages;
   std::vector<std::string> vcat;
-  std::vector<std::string> vdest;
 
   std::vector<std::string> vcat_def;
-  std::vector<std::string> vdest_def;
 
   vcat_def.push_back("");
-  vdest_def.push_back("stdout");
 
   try {
     po::options_description cmdopt("Allowed options");
@@ -76,21 +46,16 @@ int main(int ac, char* av[])
       ("severity,s", 
         po::value<std::string>(&severity)->default_value("info"), 
         "severity of the message (error, warning, info, debug)")
-      ("category,c", 
+      ("category,g", 
         po::value< std::vector<std::string> >(&vcat)->default_value(vcat_def, "null"),
         "message id / categories")
       ("application,a", 
-        po::value<std::string>(&application)->default_value(""), 
+        po::value<std::string>(&application)->default_value("msgsenderApplication"), 
         "issuing application name")
-      ("destination,d", 
-        po::value< std::vector<std::string> >(&vdest)->default_value(vdest_def, "stdout"),
-        "logging destination(s) of the message (stdout, file, server)")
-      //("partition,p",
-      //  po::value<string>(&partition)->default_value(mf::MF_DDS_Types::NULL_PARTITION),
-      //  "partition of the message, applicable only when a sever destination is specified (0 - 4)")
-      ("filename,f",
-       po::value<std::string>(&filename)->default_value("logfile"),
-        "specify the log file name");
+	  ("config,c",
+	   po::value<std::string>(&conf)->default_value(""),
+	   "MessageFacility configuration file")
+	  ("dump,d",po::bool_switch(&dump)->default_value(false));
 
     po::options_description hidden("Hidden options");
     hidden.add_options()
@@ -165,58 +130,27 @@ int main(int ac, char* av[])
     ++it;
   }
 
-  // checking destiantions...
-  it = vdest.begin();
-  while(it!=vdest.end())
-  {
-    transform((*it).begin(), (*it).end(), (*it).begin(), ::toupper);
-    dest += *it + "|";
-    ++it;
-  }
-
-  // parsing destinations...
-  parseDestinations(dest, vdest);
-  int flag = 0x00;
-  it = vdest.begin();
-  while(it!=vdest.end())
-  {
-    if( (*it) == "STDOUT" )      flag = flag | 0x01;
-    else if( (*it) == "FILE" )   flag = flag | 0x02;
-    else if( (*it) == "SERVER")  flag = flag | 0x04;
-    ++it;
-  }
-
   // preparing parameterset for detinations...
   fhicl::ParameterSet pset;
-  switch(flag)
-  {
-    case 0x01:
-      pset = mf::MessageFacilityService::logConsole();
-      break;
-    case 0x02:
-      pset = mf::MessageFacilityService::logFile(filename, true);
-      break;
-    case 0x03:
-      pset = mf::MessageFacilityService::logCF(filename, true);
-      break;
-    case 0x04:
-      pset = mf::MessageFacilityService::logServer();
-      break;
-    case 0x05:
-      pset = mf::MessageFacilityService::logCS();
-      break;
-    case 0x06:
-      pset = mf::MessageFacilityService::logFS(filename, true);
-      break;
-    case 0x07:
-      pset = mf::MessageFacilityService::logCFS(filename, true);
-      break;
-    default:
-      pset = mf::MessageFacilityService::logConsole();
-  }
 
-  // start up message facility service
-  mf::StartMessageFacility( mf::MessageFacilityService::MultiThread, pset );
+  std::ifstream logfhicl( conf );
+  if ( logfhicl.is_open() ) {
+	std::stringstream fhiclstream;
+	fhiclstream << logfhicl.rdbuf();
+	std::string pstr(fhiclstream.str());
+	fhicl::make_ParameterSet(pstr, pset);
+  } 
+  else {
+    pset = mf::MessageFacilityService::logConsole();
+  }
+  
+	// start up message facility service
+	mf::StartMessageFacility( mf::MessageFacilityService::MultiThread, pset );
+  if(dump) {
+	std::cout << pset.to_indented_string() << std::endl;
+  }
+  mf::SetModuleName("msgsenderModule");
+  mf::SetContext("msgsenderContext");
   mf::SetApplicationName(application);
   
   // logging message...

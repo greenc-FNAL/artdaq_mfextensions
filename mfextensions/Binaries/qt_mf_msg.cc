@@ -61,12 +61,12 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
     }
 
     shortText_ = QString(text_);
-    shortText_ += QString("<p style=\"margin-top: 0; margin-bottom: 0;\">");
-    shortText_ += QString(msg.message().c_str()).toHtmlEscaped();
-    shortText_ += QString("</p></font>");
+    shortText_ += QString("<pre style=\"margin-top: 0; margin-bottom: 0;\">");
+    shortText_ += QString(msg.message().c_str()).trimmed().toHtmlEscaped();
+    shortText_ += QString("</pre></font>");
 
     //std::cout << "qt_mf_msg.cc:" << msg.message() << std::endl;
-    text_ += QString("<p>")
+    text_ += QString("<pre>")
       + QString(severity.getName().c_str()).toHtmlEscaped()  + " / "
         + QString(msg.category().c_str()).toHtmlEscaped()  + "<br>"
         + QString(msg.timestr().c_str()).toHtmlEscaped()  + "<br>"
@@ -84,7 +84,7 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
         + QString(msg.module().c_str()).toHtmlEscaped()  + " / "
         + QString(msg.context().c_str()).toHtmlEscaped()  + "<br>"
       + QString(msg.message().c_str()).toHtmlEscaped()    // + "<br>"
-        + QString("</p>");
+        + QString("</pre>");
 
     text_ += QString("</font>");
 }

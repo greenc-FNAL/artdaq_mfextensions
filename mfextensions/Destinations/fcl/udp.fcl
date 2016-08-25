@@ -3,4 +3,7 @@ udp: {
   threshold: INFO
   port: 30000
   host: localhost
+
+  error_report_backoff_factor: 10 # Supress repeated error messages by this factor
+  error_turnoff_threshold: 100 # Maximum number of errors before shutting down the plugin
 }

@@ -48,6 +48,7 @@ int main( int argc, char ** argv )
   }
 
   msgViewerDlg dialog(p, conf);
+  dialog.setWindowFlags(Qt::Window);
   dialog.show();
 
   return app.exec();
