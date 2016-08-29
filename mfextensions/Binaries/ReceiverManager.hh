@@ -3,7 +3,11 @@
 
 #include <fhiclcpp/fwd.h>
 #include <QObject>
+#ifdef NO_MF_UTILITIES
 #include <messagefacility/MessageLogger/MessageFacilityMsg.h>
+#else
+#include <messagefacility/Utilities/MessageFacilityMsg.h>
+#endif
 #include "mfextensions/Extensions/MFExtensions.hh"
 #include "mfextensions/Receivers/MVReceiver.hh"
 

@@ -1,5 +1,7 @@
 basic_plugin( "UDP" "mfPlugin"
   ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
+${MF_MESSAGESERVICE}
   ${Boost_SYSTEM_LIBRARY}
   ${FHICLCPP}
   ${CETLIB}
@@ -8,6 +10,8 @@ basic_plugin( "UDP" "mfPlugin"
 
 basic_plugin( "TRACE" "mfPlugin"
     ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
+${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
     trace
@@ -15,6 +19,8 @@ basic_plugin( "TRACE" "mfPlugin"
 
 basic_plugin( "MultiFile" "mfPlugin"
     ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
+${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
 )

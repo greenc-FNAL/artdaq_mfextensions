@@ -2,7 +2,12 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
+#ifdef NO_MF_UTILITIES
 #include "messagefacility/MessageLogger/ELseverityLevel.h"
+#else
+#include "messagefacility/MessageService/ELcontextSupplier.h"
+#include "messagefacility/Utilities/ELseverityLevel.h"
+#endif
 #include "messagefacility/MessageLogger/MessageDrop.h"
 #include "messagefacility/Utilities/exception.h"
 
@@ -14,7 +19,9 @@ namespace mfplugins {
 
   using mf::service::ELdestination;
   using mf::ELseverityLevel;
-  using mf::ELstring;
+#ifndef NO_MF_UTILITIES
+  using mf::service::ELcontextSupplier;
+#endif
   using mf::ErrorObj;
 
   //======================================================================
@@ -28,10 +35,18 @@ namespace mfplugins {
 
     ELTRACE( const fhicl::ParameterSet& pset );
 
-    virtual void fillPrefix  (       std::ostringstream&, const ErrorObj& ) override;
+    virtual void fillPrefix  (       std::ostringstream&, const ErrorObj&
+#ifndef NO_MF_UTILITIES
+							   , const ELcontextSupplier&
+#endif
+ ) override;
     virtual void fillUsrMsg  (       std::ostringstream&, const ErrorObj& ) override;
     virtual void fillSuffix  (       std::ostringstream&, const ErrorObj& ) override {}
-    virtual void routePayload( const std::ostringstream&, const ErrorObj& ) override;
+    virtual void routePayload( const std::ostringstream&, const ErrorObj&
+#ifndef NO_MF_UTILITIES
+							   , const ELcontextSupplier&
+#endif
+ ) override;
 
   private:
 	int trace_level_offset_;
@@ -65,11 +80,15 @@ namespace mfplugins {
   //======================================================================
   // Message prefix filler ( overriddes ELdestination::fillPrefix )
   //======================================================================
-  void ELTRACE::fillPrefix( std::ostringstream& oss,const ErrorObj & msg ) {
+  void ELTRACE::fillPrefix( std::ostringstream& oss,const ErrorObj & msg
+#ifndef NO_MF_UTILITIES
+							   , ELcontextSupplier const&
+#endif
+ ) {
     const auto& xid = msg.xid();
 
-    oss << xid.application + ELstring(", ");                       // application
-    oss << xid.id + ELstring(": ");                                // category
+    oss << xid.application << ", ";                       // application
+    oss << xid.id << ": ";                                // category
 	// oss << mf::MessageDrop::instance()->runEvent + ELstring(" "); // run/event no
     // oss << xid.module+ELstring(": ");                            // module name
   }
@@ -91,7 +110,11 @@ namespace mfplugins {
   //======================================================================
   // Message router ( overriddes ELdestination::routePayload )
   //======================================================================
-  void ELTRACE::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
+  void ELTRACE::routePayload( const std::ostringstream& oss, const ErrorObj& msg
+#ifndef NO_MF_UTILITIES
+							   , ELcontextSupplier const&
+#endif
+) {
     auto message = oss.str();
 	const auto& xid = msg.xid();
 	auto level = trace_level_offset_ + xid.severity.getLevel();
