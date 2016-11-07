@@ -1,6 +1,10 @@
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
+#ifdef NO_MF_UTILITIES
+#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
+#else
+#include <messagefacility/Utilities/MessageFacilityMsg.h>
+#endif
 #include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <boost/program_options.hpp>

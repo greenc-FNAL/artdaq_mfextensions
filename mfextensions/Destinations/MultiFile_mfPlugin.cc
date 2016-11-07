@@ -3,7 +3,12 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
+#ifdef NO_MF_UTILITIES
 #include "messagefacility/MessageLogger/ELseverityLevel.h"
+#else
+#include "messagefacility/Utilities/ELseverityLevel.h"
+#include "messagefacility/MessageService/ELcontextSupplier.h"
+#endif
 #include "messagefacility/MessageLogger/MessageDrop.h"
 #include "messagefacility/Utilities/exception.h"
 
@@ -13,8 +18,10 @@ namespace mfplugins {
 
   using mf::service::ELdestination;
   using mf::ELseverityLevel;
-  using mf::ELstring;
   using mf::ErrorObj;
+#ifndef NO_MF_UTILITIES
+  using mf::service::ELcontextSupplier;
+#endif
 
   //======================================================================
   //
@@ -28,8 +35,16 @@ namespace mfplugins {
     ELMultiFileOutput( const fhicl::ParameterSet& pset );
     virtual ~ELMultiFileOutput() {}
 
-    virtual void routePayload( const std::ostringstream&, const ErrorObj& ) override;
-    virtual void flush() override;
+    virtual void routePayload( const std::ostringstream&, const ErrorObj&
+#ifndef NO_MF_UTILITIES
+							   , const ELcontextSupplier&
+#endif
+ ) override;
+    virtual void flush(
+#ifndef NO_MF_UTILITIES
+							   const ELcontextSupplier&
+#endif
+) override;
 
   private:
     std::string baseDir_;
@@ -65,7 +80,11 @@ namespace mfplugins {
   //======================================================================
   // Message router ( overriddes ELdestination::routePayload )
   //======================================================================
-  void ELMultiFileOutput::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
+  void ELMultiFileOutput::routePayload( const std::ostringstream& oss, const ErrorObj& msg
+#ifndef NO_MF_UTILITIES
+							   , ELcontextSupplier const& sup
+#endif
+) {
 	const auto& xid = msg.xid();
 	std::string fileName = baseDir_ + "/";
 	if(useModule_) { fileName += xid.module + "-"; }
@@ -77,10 +96,18 @@ namespace mfplugins {
 	  outputs_[fileName] = std::make_unique<cet::ostream_owner>(fileName.c_str(), append_ ? std::ios::app : std::ios::trunc);
 	}
 	*outputs_[fileName] << oss.str();
-	flush();
+	flush(
+#ifndef NO_MF_UTILITIES
+							   sup
+#endif
+);
   }
 
-  void ELMultiFileOutput::flush() {
+  void ELMultiFileOutput::flush(
+#ifndef NO_MF_UTILITIES
+							   ELcontextSupplier const&
+#endif
+) {
     for(auto i = outputs_.begin(); i != outputs_.end(); ++i) {
       (*i).second->stream().flush();
     }

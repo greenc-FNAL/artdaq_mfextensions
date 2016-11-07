@@ -22,6 +22,7 @@ namespace po = boost::program_options;
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <fstream>
 
 int main(int ac, char* av[])
 {

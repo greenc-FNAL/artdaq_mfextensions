@@ -8,11 +8,7 @@ mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
 {
   qRegisterMetaType<mf::MessageFacilityMsg>( "mf::MessageFacilityMsg" );
   qRegisterMetaType<mfviewer::SysMsgCode>( "mfviewer::SysMsgCode" );
-#ifdef GET_PSET_KEYS_MSG
   std::vector<std::string> names = pset.get_pset_names();
-#else
-  std::vector<std::string> names = pset.get_pset_keys();
-#endif
   for(auto name : names)
     {
       std::string pluginType = "unknown";

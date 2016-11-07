@@ -2,7 +2,12 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
+#ifdef NO_MF_UTILITIES
 #include "messagefacility/MessageLogger/ELseverityLevel.h"
+#else
+#include "messagefacility/Utilities/ELseverityLevel.h"
+#include "messagefacility/MessageService/ELcontextSupplier.h"
+#endif
 #include "messagefacility/MessageLogger/MessageDrop.h"
 #include "messagefacility/Utilities/exception.h"
 
@@ -19,8 +24,10 @@ namespace mfplugins {
 
   using mf::service::ELdestination;
   using mf::ELseverityLevel;
-  using mf::ELstring;
   using mf::ErrorObj;
+#ifndef NO_MF_UTILITIES
+  using mf::service::ELcontextSupplier;
+#endif
   using boost::asio::ip::udp;
 
   //======================================================================
@@ -34,10 +41,18 @@ namespace mfplugins {
 
     ELUDP( const fhicl::ParameterSet& pset );
 
-    virtual void fillPrefix  (       std::ostringstream&, const ErrorObj& ) override;
+    virtual void fillPrefix  (       std::ostringstream&, const ErrorObj&
+#ifndef NO_MF_UTILITIES
+							   , const ELcontextSupplier&
+#endif
+ ) override;
     virtual void fillUsrMsg  (       std::ostringstream&, const ErrorObj& ) override;
     virtual void fillSuffix  (       std::ostringstream&, const ErrorObj& ) override {}
-    virtual void routePayload( const std::ostringstream&, const ErrorObj& ) override;
+    virtual void routePayload( const std::ostringstream&, const ErrorObj&
+#ifndef NO_MF_UTILITIES
+							   , const ELcontextSupplier&
+#endif
+ ) override;
 
   private:
     void reconnect_(bool quiet = false);
@@ -117,7 +132,11 @@ namespace mfplugins {
   //======================================================================
   // Message prefix filler ( overriddes ELdestination::fillPrefix )
   //======================================================================
-  void ELUDP::fillPrefix( std::ostringstream& oss,const ErrorObj & msg ) {
+  void ELUDP::fillPrefix( std::ostringstream& oss,const ErrorObj & msg
+#ifndef NO_MF_UTILITIES
+							   , ELcontextSupplier const&
+#endif
+						  ) {
     const auto& xid = msg.xid();
 
     auto id = xid.id;
@@ -129,16 +148,16 @@ namespace mfplugins {
     std::replace(process.begin(), process.end(), '|', '!');
     std::replace(module.begin(), module.end(), '|', '!');
 
-    oss << format.timestamp( msg.timestamp() )+ELstring("|");   // timestamp
-    oss << xid.hostname+ELstring("|");                          // host name
-    oss << xid.hostaddr+ELstring("|");                          // host address
-    oss << xid.severity.getName()+ELstring("|");                // severity
-    oss << id+ELstring("|");                                // category
-    oss << app+ELstring("|");                       // application
-    oss << process+ELstring("|");
-    oss << xid.pid<<ELstring("|");                              // process id
-    oss << mf::MessageDrop::instance()->runEvent+ELstring("|"); // run/event no
-    oss << module+ELstring("|");                            // module name
+    oss << format.timestamp( msg.timestamp() )+"|";   // timestamp
+    oss << xid.hostname+"|";                          // host name
+    oss << xid.hostaddr+"|";                          // host address
+    oss << xid.severity.getName()+"|";                // severity
+    oss << id+"|";                                // category
+    oss << app+"|";                       // application
+    oss << process+"|";
+    oss << xid.pid<<"|";                              // process id
+    oss << mf::MessageDrop::instance()->runEvent+"|"; // run/event no
+    oss << module+"|";                            // module name
   }
 
   //======================================================================
@@ -158,7 +177,11 @@ namespace mfplugins {
   //======================================================================
   // Message router ( overriddes ELdestination::routePayload )
   //======================================================================
-  void ELUDP::routePayload( const std::ostringstream& oss, const ErrorObj& msg) {
+  void ELUDP::routePayload( const std::ostringstream& oss, const ErrorObj& msg
+#ifndef NO_MF_UTILITIES
+							   , ELcontextSupplier const&
+#endif
+) {
     if(error_count_ < error_max_) {
     auto pid = msg.xid().pid;
 	//std::cout << oss.str() << std::endl;

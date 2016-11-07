@@ -55,6 +55,12 @@ set(CMAKE_AUTOMOC_RELAXED_MODE ON)
 find_package(Qt5Widgets)
 find_package(Qt5Core)
 
+
+check_ups_version(art "$ENV{MESSAGEFACILITY_VERSION}" v1_17_00 PRODUCT_OLDER_VAR NO_MF_UTILITIES)
+if (NO_MF_UTILITIES)
+  add_definitions(-DNO_MF_UTILITIES)
+endif()
+
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
 if(BTYPE_UC STREQUAL DEBUG)
