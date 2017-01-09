@@ -1,4 +1,4 @@
-threshold: DEBUG # DEBUG, INFO, WARN, ERROR
+threshold: INFO # DEBUG, INFO, WARN, ERROR
 
 suppress :
 {
