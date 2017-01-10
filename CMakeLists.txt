@@ -31,6 +31,7 @@ set(CMAKE_MODULE_PATH #$ENV{ART_DIR}/Modules
 
 include(CetCMakeEnv)
 cet_cmake_env()
+set(CMAKE_CXX_STANDARD 14)
 
 cet_set_compiler_flags(DIAGS VIGILANT
   WERROR
