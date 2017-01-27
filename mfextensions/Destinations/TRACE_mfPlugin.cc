@@ -11,7 +11,7 @@
 #include "messagefacility/MessageLogger/MessageDrop.h"
 #include "messagefacility/Utilities/exception.h"
 
-#include "tracelib.h"
+#include "trace.h"
 
 #define TRACE_NAME "MessageFacility"
 
