@@ -25,7 +25,13 @@ ${MF_MESSAGESERVICE}
     ${CETLIB}
 )
     
-
+basic_plugin( "ANSI" "mfPlugin"
+     ${MF_MESSAGELOGGER}
+     ${MF_UTILITIES}
+     ${MF_MESSAGESERVICE}
+     ${FHICLCPP}
+     ${CETLIB}
+     )
 
 install_fhicl(SUBDIRS fcl)
 install_headers()

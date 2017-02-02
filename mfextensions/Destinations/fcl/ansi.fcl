@@ -1,0 +1,4 @@
+ansi: {
+	  type: ANSI
+	  threshold: INFO
+}
