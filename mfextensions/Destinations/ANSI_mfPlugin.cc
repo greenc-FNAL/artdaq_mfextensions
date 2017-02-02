@@ -39,6 +39,8 @@ namespace mfplugins {
  ) override;
 
   private:
+	bool bellError_;
+	bool blinkError_;
   };
 
   // END DECLARATION
@@ -52,8 +54,10 @@ namespace mfplugins {
 
   ELANSI::ELANSI( const fhicl::ParameterSet& pset )
     : ELdestination( pset )
+	, bellError_(pset.get<bool>("bell_on_error", true))
+	, blinkError_(pset.get<bool>("blink_error_messages", false))
   {
-	std::cout << "ANSI Plugin configured with ParameterSet: " << pset.to_string() << std::endl;
+	//std::cout << "ANSI Plugin configured with ParameterSet: " << pset.to_string() << std::endl;
   }
 
   //======================================================================
@@ -84,7 +88,7 @@ namespace mfplugins {
 
     case mf::ELseverityLevel::ELsev_warning:
     case mf::ELseverityLevel::ELsev_warning2:
-   	  std::cout << "\033[93m";
+   	  std::cout << "\033[1m\033[93m";
         break;
 
     case mf::ELseverityLevel::ELsev_error:
@@ -94,12 +98,15 @@ namespace mfplugins {
     case mf::ELseverityLevel::ELsev_abort:
     case mf::ELseverityLevel::ELsev_fatal:
     case mf::ELseverityLevel::ELsev_highestSeverity:
-	  std::cout << "\033[91m";
+	  if(bellError_) { std::cout << "\007"; }
+	  if(blinkError_) { std::cout << "\033[5m"; }
+	  std::cout << "\033[1m\033[91m";
         break;
 
     default: break;
     }
-	std::cout << oss.str()	<< "\033[0m" << std::endl;
+	std::cout << oss.str();
+	std::cout << "\033[0m" << std::endl;
   
   }
 } // end namespace mfplugins
