@@ -1,0 +1,6 @@
+ansi: {
+	  type: ANSI
+	  threshold: INFO
+	  bell_on_error: true
+	  blink_error_messages: false
+}
