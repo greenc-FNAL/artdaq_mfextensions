@@ -14,7 +14,6 @@ basic_plugin( "TRACE" "mfPlugin"
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
-    trace
 )
 
 basic_plugin( "MultiFile" "mfPlugin"
