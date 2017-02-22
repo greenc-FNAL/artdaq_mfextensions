@@ -14,6 +14,13 @@
 
 #include <fstream>
 
+#define CET_DETAIL 1
+#if CET_DETAIL
+#define CET_NS cet::detail
+#else
+#define CET_NS cet
+#endif
+
 namespace mfplugins {
 
   using mf::service::ELdestination;
@@ -93,7 +100,7 @@ namespace mfplugins {
 	if(useHost_) { fileName += xid.hostname +"-";}
         fileName += std::to_string(xid.pid) + ".log";
 	if(outputs_.count(fileName) == 0) {
-	  outputs_[fileName] = std::make_unique<cet::ostream_owner>(fileName.c_str(), append_ ? std::ios::app : std::ios::trunc);
+	  outputs_[fileName] = std::make_unique<CET_NS::ostream_owner>(fileName.c_str(), append_ ? std::ios::app : std::ios::trunc);
 	}
 	*outputs_[fileName] << oss.str();
 	flush(
