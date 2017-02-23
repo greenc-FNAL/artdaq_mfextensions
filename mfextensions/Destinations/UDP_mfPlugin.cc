@@ -67,6 +67,7 @@ namespace mfplugins {
     int error_max_;
     std::string host_;
     int port_;
+	int seqNum_;
   };
 
   // END DECLARATION
@@ -90,6 +91,7 @@ namespace mfplugins {
     , error_max_(pset.get<int>("error_turnoff_threshold", 1))
     , host_(pset.get<std::string>("host", "227.128.12.27"))
     , port_(pset.get<int>("port",5140))
+	  , seqNum_(0)
   {
     reconnect_();
   }
@@ -149,6 +151,7 @@ namespace mfplugins {
     std::replace(module.begin(), module.end(), '|', '!');
 
     oss << format.timestamp( msg.timestamp() )+"|";   // timestamp
+	oss << std::to_string(++seqNum_) + "|";	          // sequence number
     oss << xid.hostname+"|";                          // host name
     oss << xid.hostaddr+"|";                          // host address
     oss << xid.severity.getName()+"|";                // severity
@@ -202,7 +205,7 @@ namespace mfplugins {
       consecutive_success_count_ = 0;
       ++error_count_;
       if (error_count_ == next_error_report_) {
-        std::cerr << "An exception occurred when trying to send a message to "
+        std::cerr << "An exception occurred when trying to send message " << std::to_string(seqNum_) << " to "
                   << remote_endpoint_ << std::endl
                   << "  message = " << oss.str() << std::endl
                   << "  exception = " << err.what() << std::endl;

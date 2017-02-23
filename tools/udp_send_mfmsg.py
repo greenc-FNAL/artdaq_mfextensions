@@ -21,6 +21,7 @@ def main(argv):
     if len(argv) != 2: print(USAGE); sys.exit()
     node,port = argv[1].split(':')
     buf='MF: 01-Jan-1970 01:01:01'
+    buf+="|0"
     buf+="|" + node
     buf+="|" + node
     buf+="|WARNING"
