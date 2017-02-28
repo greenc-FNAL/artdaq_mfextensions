@@ -8,6 +8,7 @@ cet_make(LIBRARY_NAME MFReceivers
   LIBRARIES
   ${FHICLCPP}
   ${CETLIB}
+  ${CETLIB_EXCEPT}
   ${MF_MESSAGELOGGER}
   ${MF_UTILITIES}
   Qt5::Core
@@ -21,6 +22,7 @@ basic_plugin("UDP" "receiver"
   ${MF_UTILITIES}
   ${FHICLCPP}
   ${CETLIB}
+  ${CETLIB_EXCEPT}
   Qt5::Core
 )
  
@@ -37,6 +39,7 @@ basic_plugin("LogReader" "receiver"
   ${MF_UTILITIES}
   ${FHICLCPP}
   ${CETLIB}
+  ${CETLIB_EXCEPT}
   Qt5::Core
 )
 

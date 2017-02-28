@@ -57,7 +57,12 @@ find_package(Qt5Widgets)
 find_package(Qt5Core)
 
 
-check_ups_version(art "$ENV{MESSAGEFACILITY_VERSION}" v1_17_00 PRODUCT_OLDER_VAR NO_MF_UTILITIES)
+check_ups_version(cetlib "$ENV{CETLIB_VERSION}" v2_02_00 PRODUCT_OLDER_VAR CETLIB_EXPOSES_OSTREAM_OWNER)
+if (CETLIB_EXPOSES_OSTREAM_OWNER)
+   add_definitions(-DCETLIB_EXPOSES_OSTREAM_OWNER)
+endif()
+
+check_ups_version(messagefacility "$ENV{MESSAGEFACILITY_VERSION}" v1_17_00 PRODUCT_OLDER_VAR NO_MF_UTILITIES)
 if (NO_MF_UTILITIES)
   add_definitions(-DNO_MF_UTILITIES)
 endif()
