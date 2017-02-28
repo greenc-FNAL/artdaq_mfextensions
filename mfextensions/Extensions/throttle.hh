@@ -1,6 +1,7 @@
+#ifndef artdaq_mfextensions_extensions_throttle_hh
+#define artdaq_mfextensions_extensions_throttle_hh
 
 #include <string>
-#include <list>
 
 #include <sys/time.h>
 
@@ -26,3 +27,5 @@ private:
   int      count_;
   bool     in_use_;
 };
+
+#endif //artdaq_mfextensions_extensions_throttle_hh
