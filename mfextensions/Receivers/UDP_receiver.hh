@@ -31,7 +31,6 @@ Q_OBJECT
   int port_;
   boost::asio::io_service io_service_;
   udp::socket socket_;
-    long count_;
     char buffer_[0x10000];
     bool debug_;
   };

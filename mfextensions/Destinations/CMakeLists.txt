@@ -5,6 +5,7 @@ ${MF_MESSAGESERVICE}
   ${Boost_SYSTEM_LIBRARY}
   ${FHICLCPP}
   ${CETLIB}
+	${CETLIB_EXCEPT}
   pthread
 )
 
@@ -14,7 +15,7 @@ basic_plugin( "TRACE" "mfPlugin"
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
-    trace
+	${CETLIB_EXCEPT}
 )
 
 basic_plugin( "MultiFile" "mfPlugin"
@@ -23,6 +24,7 @@ basic_plugin( "MultiFile" "mfPlugin"
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
+	${CETLIB_EXCEPT}
 )
     
 basic_plugin( "ANSI" "mfPlugin"
@@ -31,6 +33,7 @@ basic_plugin( "ANSI" "mfPlugin"
      ${MF_MESSAGESERVICE}
      ${FHICLCPP}
      ${CETLIB}
+	${CETLIB_EXCEPT}
      )
 
 install_fhicl(SUBDIRS fcl)

@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_01_04
+parent artdaq_mfextensions	v1_01_05
 defaultqual	e10:s41
 
 # These optional lines define the installed directories where
@@ -17,23 +17,12 @@ bindir      fq_dir      bin
 
 #
 product		version		optional
-messagefacility    v1_14_00     s7
-messagefacility    v1_14_00     s8
-messagefacility    v1_14_05     s10
-messagefacility    v1_14_05     s11
-messagefacility    v1_14_07     s15
-messagefacility    v1_16_07     s21
-messagefacility    v1_16_17     s26
-messagefacility    v1_16_21     s28
-messagefacility    v1_16_22     s30
-messagefacility    v1_16_23     s31
-messagefacility v1_16_22a       s34
-messagefacility v1_16_28        s35
 messagefacility v1_17_01        s41
 messagefacility v1_18_00        s43
 messagefacility v1_17_02        s44
-qt              v5_7_0
-TRACE           v3_07_00
+messagefacility v1_18_03        s46
+qt              v5_7_1
+TRACE           v3_07_01
 cetbuildtools	v5_06_06	-	only_for_build
 end_product_list
 
@@ -41,40 +30,14 @@ end_product_list
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier		messagefacility  	  qt    TRACE   notes
+e10:s46:debug      	e10:debug    	          e10   -nq-    -std=c++14
+e10:s46:prof      	e10:prof    	          e10   -nq-    -std=c++14
 e10:s44:debug      	e10:debug    	          e10   -nq-    -std=c++14
 e10:s44:prof      	e10:prof    	          e10   -nq-    -std=c++14
 e10:s43:debug      	e10:debug    	          e10   -nq-    -std=c++14
 e10:s43:prof      	e10:prof    	          e10   -nq-    -std=c++14
 e10:s41:debug      	e10:debug    	          e10   -nq-    -std=c++14
 e10:s41:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e10:s35:debug      	e10:debug    	          e10   -nq-    -std=c++14
-e10:s35:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e10:s34:debug      	e10:debug    	          e10   -nq-    -std=c++14
-e10:s34:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e9:s31:debug      	e9:debug    	          e9    -nq-    -std=c++14
-e9:s31:prof      	e9:prof    	          e9    -nq-    -std=c++14
-e9:s30:debug      	e9:debug    	          e9    -nq-    -std=c++14
-e9:s30:prof             e9:prof    	          e9    -nq-    -std=c++14
-e9:s28:debug            e9:debug    	          e9    -nq-    -std=c++14
-e9:s28:prof             e9:prof    	          e9    -nq-    -std=c++14
-e9:s26:debug            e9:debug    	          e9    -nq-    -std=c++14
-e9:s26:prof             e9:prof    	          e9    -nq-    -std=c++14
-e9:s21:debug            e9:debug    	          e9    -nq-    -std=c++14
-e9:s21:prof             e9:prof    	          e9    -nq-    -std=c++14
-e9:s15:debug            e9:debug    	          e9    -nq-    -std=c++14
-e9:s15:prof             e9:prof    	          e9    -nq-    -std=c++14
-e7:s15:debug            e7:debug    	          e7    -nq-    -std=c++1y
-e7:s15:prof             e7:prof    	          e7    -nq-    -std=c++1y
-e6:s15:debug    	e6:debug    	          e6    -nq-    -std=c++1y
-e6:s15:prof             e6:prof    	          e6    -nq-    -std=c++1y
-e7:s11:debug     	e7:debug    	          e7    -nq-    -std=c++1y
-e7:s11:prof             e7:prof    	          e7    -nq-    -std=c++1y
-e6:s11:debug     	e6:debug    	          e6    -nq-    -std=c++1y
-e6:s11:prof             e6:prof    	          e6    -nq-    -std=c++1y
-e7:s8:debug             e7:debug    	          e7    -nq-    -std=c++1y
-e7:s8:prof              e7:prof    	          e7    -nq-    -std=c++1y
-e6:s8:debug             e6:debug    	          e6    -nq-    -std=c++1y
-e6:s8:prof              e6:prof    	          e6    -nq-    -std=c++1y
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:

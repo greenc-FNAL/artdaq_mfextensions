@@ -8,7 +8,6 @@ mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
 							     , port_(pset.get<int>("port",5140))
 							     , io_service_()
 							     , socket_(io_service_)
-                                                             , count_(0)
 							     , debug_(pset.get<bool>("debug_mode",false))
 {
   //std::cout << "UDPReceiver Constructor" << std::endl;
@@ -106,6 +105,8 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
     tv.tv_usec = 0;
     msg.setTimestamp( tv );
   
+	int seqNum = 0;
+	if (++it != tokens.end()) { seqNum = std::stoi(*it); }
     if(++it != tokens.end()) { msg.setHostname(*it); }
     if(++it != tokens.end()) { msg.setHostaddr(*it); }
     if(++it != tokens.end()) { msg.setSeverity(*it); }
@@ -125,8 +126,7 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
       oss << *it;
     }
     if(debug_) { std::cout << "Message content: " << oss.str() << std::endl; }
-    msg.setMessage(std::string("UDPMessage"), std::to_string(count_), oss.str());
-    ++count_;
+    msg.setMessage(std::string("UDPMessage"), std::to_string(seqNum), oss.str());
   }
 
   return msg;
