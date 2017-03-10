@@ -38,7 +38,6 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
         break;
 
     case mf::ELseverityLevel::ELsev_info:
-    case mf::ELseverityLevel::ELsev_severe:
         sev_ = SINFO;
         text_ += QString("#008000>");
         color_.setRgb(0, 128, 0);
@@ -54,6 +53,7 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const & msg)
     case mf::ELseverityLevel::ELsev_error:
     case mf::ELseverityLevel::ELsev_error2:
     case mf::ELseverityLevel::ELsev_next:
+    case mf::ELseverityLevel::ELsev_severe:
     case mf::ELseverityLevel::ELsev_severe2:
     case mf::ELseverityLevel::ELsev_abort:
     case mf::ELseverityLevel::ELsev_fatal:
