@@ -19,17 +19,17 @@ namespace mfviewer
 	{
 		Q_OBJECT
 	public:
-		UDPReceiver(fhicl::ParameterSet pset);
+		explicit UDPReceiver(fhicl::ParameterSet pset);
 
 		virtual ~UDPReceiver();
 
 		//Reciever Method
-		void run();
+		void run() override;
 
 		// Message Parser
 		mf::MessageFacilityMsg read_msg(std::string input);
 
-		bool validate_packet(std::string input);
+		static bool validate_packet(std::string input);
 
 	private:
 		int port_;

@@ -21,16 +21,12 @@ namespace mfviewer
 		Q_OBJECT
 
 	public:
-		MVReceiver(fhicl::ParameterSet pset) : partition_(pset.get<std::string>("Partition", "0"))
-		                                     , stopRequested_(false) { std::cout << "MVReceiver Constructor" << std::endl; }
+		explicit MVReceiver(fhicl::ParameterSet pset);
 
 		virtual ~MVReceiver() { ; }
 
 		void stop() { stopRequested_ = true; }
-		const std::string& getPartition() { return partition_; }
-		void setPartition(std::string const& partition) { partition_ = partition; }
 	protected:
-		std::string partition_;
 		bool stopRequested_;
 		signals :
 		void NewMessage(mf::MessageFacilityMsg const&);

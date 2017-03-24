@@ -5,10 +5,10 @@
 #include <sstream>
 
 mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
-                                                             , port_(pset.get<int>("port", 5140))
-                                                             , io_service_()
-                                                             , socket_(io_service_)
-                                                             , debug_(pset.get<bool>("debug_mode", false))
+															 , port_(pset.get<int>("port", 5140))
+															 , io_service_()
+															 , socket_(io_service_)
+															 , debug_(pset.get<bool>("debug_mode", false))
 {
 	//std::cout << "UDPReceiver Constructor" << std::endl;
 	boost::system::error_code ec;
