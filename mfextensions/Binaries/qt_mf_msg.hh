@@ -4,10 +4,8 @@
 // Wrapped mf message type to be used by msgviewer for
 // the purpose of fast processing
 
-#include "mfextensions/Extensions/MFExtensions.hh"
-
 #include <QtCore/QString>
-#include <QColor>
+#include <QtGui/QColor>
 
 #include <string>
 #include <vector>

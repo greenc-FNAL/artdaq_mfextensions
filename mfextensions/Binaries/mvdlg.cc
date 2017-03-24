@@ -23,8 +23,8 @@ process_fname(std::string& fname)
 	const size_t npos = std::string::npos;
 
 	if ((sub_start == npos && sub_end != npos)
-	    || (sub_start != npos && sub_end == npos)
-	    || (sub_start > sub_end))
+		|| (sub_start != npos && sub_end == npos)
+		|| (sub_start > sub_end))
 	{
 		throw std::runtime_error("Unrecognized configuration file. Use default configuration instead.");
 	}
@@ -72,7 +72,7 @@ readConf(std::string const& fname)
 	return pset;
 }
 
-msgViewerDlg::msgViewerDlg(std::string const& part, std::string const& conf, QDialog* parent)
+msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	: QDialog(parent)
 	, updating(false)
 	, paused(false)
@@ -116,17 +116,13 @@ msgViewerDlg::msgViewerDlg(std::string const& part, std::string const& conf, QDi
 	connect(btnPause, SIGNAL(clicked()), this, SLOT(pause()));
 	connect(btnExit, SIGNAL(clicked()), this, SLOT(exit()));
 	connect(btnClear, SIGNAL(clicked()), this, SLOT(clear()));
-
-	//connect( btnSwitchChannel, 
-	//                       SIGNAL( clicked() ), this, SLOT( switchChannel() ) );
-	btnSwitchChannel->setEnabled(false);
-
+	
 	connect(btnRMode, SIGNAL(clicked()), this, SLOT(renderMode()));
 	connect(btnDisplayMode, SIGNAL(clicked()), this, SLOT(shortMode()));
 
 	connect(btnSearch, SIGNAL(clicked()), this, SLOT(searchMsg()));
 	connect(btnSearchClear,
-	        SIGNAL(clicked()), this, SLOT(searchClear()));
+			SIGNAL(clicked()), this, SLOT(searchClear()));
 
 	connect(btnFilter, SIGNAL(clicked()), this, SLOT(setFilter()));
 	connect(btnReset, SIGNAL(clicked()), this, SLOT(resetFilter()));
@@ -137,35 +133,27 @@ msgViewerDlg::msgViewerDlg(std::string const& part, std::string const& conf, QDi
 	connect(btnDebug, SIGNAL(clicked()), this, SLOT(setSevDebug()));
 
 	connect(sup_menu
-	        , SIGNAL(triggered(QAction*))
-	        , this
-	        , SLOT(setSuppression(QAction*)));
+			, SIGNAL(triggered(QAction*))
+			, this
+			, SLOT(setSuppression(QAction*)));
 
 	connect(thr_menu
-	        , SIGNAL(triggered(QAction*))
-	        , this
-	        , SLOT(setThrottling(QAction*)));
+			, SIGNAL(triggered(QAction*))
+			, this
+			, SLOT(setThrottling(QAction*)));
 
 	connect(vsSeverity
-	        , SIGNAL(valueChanged(int))
-	        , this
-	        , SLOT(changeSeverity(int)));
+			, SIGNAL(valueChanged(int))
+			, this
+			, SLOT(changeSeverity(int)));
 
 	connect(&receivers_
-	        , SIGNAL(newMessage(mf::MessageFacilityMsg const &))
-	        , this
-	        , SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
-
-	connect(&receivers_
-	        , SIGNAL(newSysMessage(mfviewer::SysMsgCode, QString const &))
-	        , this
-	        , SLOT(onNewSysMsg(mfviewer::SysMsgCode, QString const &)));
+			, SIGNAL(newMessage(mf::MessageFacilityMsg const &))
+			, this
+			, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
 
 	connect(&timer, SIGNAL(timeout()), this, SLOT(updateDisplayMsgs()));
-
-	QString partStr = QString(part.c_str());
-	btnSwitchChannel->setText(partStr);
-
+	
 	if (simpleRender) btnRMode->setChecked(true);
 	else btnRMode->setChecked(false);
 
@@ -229,8 +217,8 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const& ps, std::ve
 	{
 		std::string name = ps[i].get<std::string>("name");
 		t.push_back(throttle(name
-		                     , ps[i].get<int>("limit", -1)
-		                     , ps[i].get<long>("timespan", -1)));
+							 , ps[i].get<int>("limit", -1)
+							 , ps[i].get<long>("timespan", -1)));
 		act = menu->addAction(QString(name.c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
@@ -347,9 +335,7 @@ void msgViewerDlg::readSettings()
 void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
 {
 	// 21-Aug-2015, KAB: copying the incrementing (and displaying) of the number
-	// of messages from the onNewSysMsg() method to here. I'm not sure what the
-	// difference between system and normal messages is. (Maybe system messages
-	// are an obsolete carry-over from NOvA?) I'm also not sure if we want to
+	// of messages to here. I'm also not sure if we want to
 	// count all messages or just non-suppressed ones or what. But, at least this
 	// change gets the counter incrementing on the display.
 	++nMsgs;
@@ -383,23 +369,6 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
 	if (hostMatch && appMatch && catMatch)
 	{
 		displayMsg(it);
-	}
-}
-
-void msgViewerDlg::onNewSysMsg(mfviewer::SysMsgCode syscode
-                               , QString const& msg
-)
-{
-	if (syscode == mfviewer::SysMsgCode::NEW_MESSAGE)
-	{
-		++nMsgs;
-		lcdMsgs->display(nMsgs);
-	}
-	else
-	{
-		QString qtmsg = "SYSTEM: " + msg + "\n";
-		txtMessages->setTextColor(QColor(0, 0, 128));
-		txtMessages->append(qtmsg);
 	}
 }
 
@@ -502,7 +471,7 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 	}
 
 	QProgressDialog progress("Fetching data...", "Cancel"
-	                         , 0, n / 1000, this);
+							 , 0, n / 1000, this);
 
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000); // 2 seconds
@@ -559,7 +528,7 @@ void msgViewerDlg::displayMsg()
 	}
 
 	QProgressDialog progress("Fetching data...", "Cancel"
-	                         , 0, n / 1000, this);
+							 , 0, n / 1000, this);
 
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000); // 2 seconds
@@ -613,7 +582,7 @@ void msgViewerDlg::updateDisplayMsgs()
 
 template <typename M>
 bool msgViewerDlg::updateList(QListWidget* lw
-                              , M const& map
+							  , M const& map
 )
 {
 	bool nonSelectedBefore = (lw->currentRow() == -1);
@@ -673,8 +642,8 @@ void msgViewerDlg::setFilter()
 	if (catFilter.isEmpty()) { lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear); }
 
 	if (hostFilter.isEmpty()
-	    && appFilter.isEmpty()
-	    && catFilter.isEmpty())
+		&& appFilter.isEmpty()
+		&& catFilter.isEmpty())
 	{
 		resetFilter();
 		return;
@@ -867,26 +836,6 @@ void msgViewerDlg::setSevDebug()
 	btnInfo->setChecked(false);
 	btnDebug->setChecked(true);
 	vsSeverity->setValue(sevThresh);
-}
-
-void msgViewerDlg::switchChannel()
-{
-#if 0
-	bool ok;
-	int partition = QInputDialog::getInteger(this,
-		"Partition",
-		"Please enter a partition number:",
-		qtdds.getPartition(),
-		-1, 9, 1, &ok);
-
-	if (ok)
-	{
-		qtdds.switchPartition(partition);
-
-		QString partStr = "Partition " + QString::number(qtdds.getPartition());
-		btnSwitchChannel->setText(partStr);
-	}
-#endif
 }
 
 void msgViewerDlg::renderMode()

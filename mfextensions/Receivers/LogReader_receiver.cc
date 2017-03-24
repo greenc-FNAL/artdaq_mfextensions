@@ -82,11 +82,11 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next()
 	if (boost::regex_search(line, what_, metadata_1))
 	{
 #if 0
-    std::cout << ">> " << std::string(what_[1].first, what_[1].second) << "\n";
-    std::cout << ">> " << std::string(what_[2].first, what_[2].second) << "\n";
-    std::cout << ">> " << std::string(what_[3].first, what_[3].second) << "\n";
-    std::cout << ">> " << std::string(what_[4].first, what_[4].second) << "\n";
-    std::cout << ">> " << std::string(what_[5].first, what_[5].second) << "\n";
+	std::cout << ">> " << std::string(what_[1].first, what_[1].second) << "\n";
+	std::cout << ">> " << std::string(what_[2].first, what_[2].second) << "\n";
+	std::cout << ">> " << std::string(what_[3].first, what_[3].second) << "\n";
+	std::cout << ">> " << std::string(what_[4].first, what_[4].second) << "\n";
+	std::cout << ">> " << std::string(what_[5].first, what_[5].second) << "\n";
 #endif
 
 		std::string value = std::string(what_[1].first, what_[1].second);

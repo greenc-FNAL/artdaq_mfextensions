@@ -10,7 +10,6 @@
 #else
 #include <messagefacility/Utilities/MessageFacilityMsg.h>
 #endif
-#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <QtCore/QThread>
 #include <iostream>
@@ -35,8 +34,6 @@ namespace mfviewer
 		bool stopRequested_;
 		signals :
 		void NewMessage(mf::MessageFacilityMsg const&);
-
-		void NewSysMessage(mfviewer::SysMsgCode const&, QString const&);
 	};
 }
 

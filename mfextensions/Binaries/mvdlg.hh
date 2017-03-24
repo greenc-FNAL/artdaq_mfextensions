@@ -11,7 +11,6 @@
 #include "mfextensions/Extensions/suppress.hh"
 #include "mfextensions/Binaries/qt_mf_msg.hh"
 #include "mfextensions/Binaries/ReceiverManager.hh"
-#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
@@ -33,7 +32,7 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
 	Q_OBJECT
 
 public:
-	msgViewerDlg(std::string const& part, std::string const& conf, QDialog* parent = 0);
+	msgViewerDlg(std::string const& conf, QDialog* parent = 0);
 
 	virtual ~msgViewerDlg();
 
@@ -50,16 +49,12 @@ public slots:
 
 	void changeSeverity(int sev);
 
-	void switchChannel();
-
 protected:
 	void closeEvent(QCloseEvent* event);
 
 private slots:
 
 	void onNewMsg(mf::MessageFacilityMsg const& mfmsg);
-
-	void onNewSysMsg(mfviewer::SysMsgCode code, QString const& msg);
 
 	void setFilter();
 

@@ -4,18 +4,18 @@
 #else
 #include <messagefacility/Utilities/MessageFacilityMsg.h>
 #endif
-#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>
 
 #include <iostream>
 #include <string>
+#include <mfextensions/Binaries/ReceiverManager.hh>
+#include <fhiclcpp/make_ParameterSet.h>
 
 namespace po = boost::program_options;
 
 bool cmdline = false;
-std::string Partition(mfviewer::NULL_PARTITION);
 int z = 0;
 
 void printmsg(mf::MessageFacilityMsg const& mfmsg)
@@ -54,34 +54,18 @@ void printnull(mf::MessageFacilityMsg const& mfmsg)
 	mf::LogErrorObj(eop);
 }
 
-void printsysmsg(mfviewer::SysMsgCode syscode, std::string const& msg)
-{
-	std::cout << SysMsgCodeToString(syscode) << msg << "\n";
-}
-
-
 int main(int argc, char* argv[])
 {
 	// checking options
 	std::string filename;
-
-	// silent mode
-	int silent = 0;
-
-	// non interactive mode
-	int noninteractive = 0;
-
+	std::string configFile;
+	
 	try
 	{
 		po::options_description cmdopt("Allowed options");
 		cmdopt.add_options()
 			("help,h", "display help message")
-			("noninteractive,i", "run the msgserver in non-interactive mode")
-			//("partition,p", 
-			//  po::value<std::string>(&Partition)->default_value(mf::DDSReciever::NULL_PARTITION), 
-			//  "Partition number the msgserver will listen to (0 - 4)")
-			("silent,s",
-			 "run the msgserver in silent mode.")
+		("config,c", po::value<std::string>(&configFile)->default_value(""),"Specify the FHiCL configuration file to use")
 			("filename,f",
 			 po::value<std::string>(&filename)->default_value("msg_archive"),
 			 "specify the message archive file name");
@@ -98,14 +82,6 @@ int main(int argc, char* argv[])
 			std::cout << "Usage: msglogger [options] <message text>\n";
 			std::cout << cmdopt;
 			return 0;
-		}
-		if (vm.count("silent"))
-		{
-			silent = 1;
-		}
-		if (vm.count("noninteractive"))
-		{
-			noninteractive = 1;
 		}
 	}
 	catch (std::exception& e)
@@ -125,40 +101,20 @@ int main(int argc, char* argv[])
 		mf::MessageFacilityService::SingleThread,
 		mf::MessageFacilityService::logArchive(filename));
 
-	// Start MessageFacility DDS Receiver
-	// void (*print)(mf::MessageFacilityMsg const & mfmsg);
-	//if(silent) print = printnull;
-	//else       print = printmsg;
-
-	//mf::DDSReceiver dds("msgserver", Partition, print, printsysmsg);
-
-	// silent mode
-	while (silent) { sleep(10); }
-
+	fhicl::ParameterSet pset;
+	auto maker = cet::filepath_maker();
+	fhicl::make_ParameterSet(configFile, maker, pset);
+	mfviewer::ReceiverManager rm(pset);
+	
+	
 	// Welcome message
-	std::cout << "Message Facility MsgServer is up and listening in partition '"
-		<< Partition << "'.\n";
-
-	// noninteractive mode
-	while (noninteractive) { sleep(10); }
-
+	std::cout << "Message Facility MsgServer is up and listening to configured Receivers" <<std::endl;
+	
 	// Command line message loop
 	std::string cmd;
 
 	while (true)
 	{
-		if (silent)
-		{
-			getline(std::cin, cmd);
-			if (cmd == "q")
-			{
-				//dds.stop();
-				return 0;
-			}
-			continue;
-		}
-
-
 		if (cmdline) std::cout << "> ";
 		getline(std::cin, cmd);
 
@@ -187,29 +143,8 @@ int main(int argc, char* argv[])
 		}
 		else if (cmdline && (cmd == "s" || cmd == "stat"))
 		{
-			std::cout << "Currently listening in partition "
-				<< "\"" << Partition << "\".\n"
-				<< "Total " << z << " messages has been received.\n";
+			std::cout << "Currently listening, " << z << " messages have been received." << std::endl;
 		}
-#if 0
-        else if( cmdline && (cmd == "p" || cmd == "partition") )
-        {
-            std::cout << "Please enter a partition number (0-4): ";
-
-            getline(std::cin, cmd);
-            std::istringstream ss(cmd);
-
-            if( ss >> PartitionNumber )
-            {
-		//dds.switchPartition(PartitionNumber);
-                cmdline = false;
-            }
-            else
-            {
-                std::cout << "Please use an integer value for the partition!\n";
-            }
-        }
-#endif
 		else if (cmdline)
 		{
 			std::cout << "Command " << cmd << " not found. "

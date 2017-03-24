@@ -18,7 +18,6 @@ int main(int argc, char** argv)
 {
 	QApplication app(argc, argv);
 
-	std::string p = mfviewer::NULL_PARTITION;
 	std::string conf = std::string();
 
 	if (argc > 1)
@@ -47,7 +46,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	msgViewerDlg dialog(p, conf);
+	msgViewerDlg dialog(conf);
 	dialog.setWindowFlags(Qt::Window);
 	dialog.show();
 

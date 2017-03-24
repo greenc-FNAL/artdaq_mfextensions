@@ -7,7 +7,6 @@
 mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
 {
 	qRegisterMetaType<mf::MessageFacilityMsg>("mf::MessageFacilityMsg");
-	qRegisterMetaType<mfviewer::SysMsgCode>("mfviewer::SysMsgCode");
 	std::vector<std::string> names = pset.get_pset_names();
 	for (auto name : names)
 	{
@@ -19,8 +18,6 @@ mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
 			std::unique_ptr<mfviewer::MVReceiver> rcvr = makeMVReceiver(pluginType, plugin_pset);
 			connect(rcvr.get(), SIGNAL(NewMessage(mf::MessageFacilityMsg const &)),
 			        this, SLOT(onNewMessage(mf::MessageFacilityMsg const &)));
-			connect(rcvr.get(), SIGNAL(NewSysMessage(mfviewer::SysMsgCode, QString const & )),
-			        this, SLOT(onNewSysMessage(mfviewer::SysMsgCode, QString const & )));
 			receivers_.push_back(std::move(rcvr));
 		}
 		catch (...)
@@ -60,9 +57,4 @@ void mfviewer::ReceiverManager::start()
 void mfviewer::ReceiverManager::onNewMessage(mf::MessageFacilityMsg const& mfmsg)
 {
 	emit newMessage(mfmsg);
-}
-
-void mfviewer::ReceiverManager::onNewSysMessage(mfviewer::SysMsgCode code, QString const& msg)
-{
-	emit newSysMessage(code, msg);
 }

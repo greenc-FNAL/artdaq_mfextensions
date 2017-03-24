@@ -8,7 +8,6 @@
 #else
 #include <messagefacility/Utilities/MessageFacilityMsg.h>
 #endif
-#include "mfextensions/Extensions/MFExtensions.hh"
 #include "mfextensions/Receivers/MVReceiver.hh"
 
 namespace mfviewer
@@ -29,12 +28,8 @@ namespace mfviewer
 		signals :
 		void newMessage(mf::MessageFacilityMsg const&);
 
-		void newSysMessage(mfviewer::SysMsgCode, QString const&);
-
 	private slots:
 		void onNewMessage(mf::MessageFacilityMsg const& mfmsg);
-
-		void onNewSysMessage(mfviewer::SysMsgCode code, QString const& msg);
 
 	private:
 		std::vector<std::unique_ptr<mfviewer::MVReceiver>> receivers_;
