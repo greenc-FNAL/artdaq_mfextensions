@@ -11,7 +11,6 @@
 #include "mfextensions/Extensions/suppress.hh"
 #include "mfextensions/Binaries/qt_mf_msg.hh"
 #include "mfextensions/Binaries/ReceiverManager.hh"
-#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
@@ -25,154 +24,164 @@
 
 namespace fhicl
 {
-  class ParameterSet;
+	class ParameterSet;
 }
 
 class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  msgViewerDlg( std::string const & part, std::string const & conf, QDialog *parent = 0 );
-  virtual ~msgViewerDlg();
+	msgViewerDlg(std::string const& conf, QDialog* parent = 0);
+
+	virtual ~msgViewerDlg();
 
 
 public slots:
 
-  void pause();
-  void exit();
-  void clear();
-  void shortMode();
-  void changeSeverity(int sev);
-  void switchChannel();
+	void pause();
+
+	void exit();
+
+	void clear();
+
+	void shortMode();
+
+	void changeSeverity(int sev);
 
 protected:
-  void closeEvent(QCloseEvent *event);
+	void closeEvent(QCloseEvent* event);
 
 private slots:
 
-  void onNewMsg(mf::MessageFacilityMsg const & mfmsg);
-  void onNewSysMsg(mfviewer::SysMsgCode code, QString const & msg);
+	void onNewMsg(mf::MessageFacilityMsg const& mfmsg);
 
-  void setFilter();
-  void resetFilter();
+	void setFilter();
 
-  void renderMode();
+	void resetFilter();
 
-  void setSevError();
-  void setSevWarning();
-  void setSevInfo();
-  void setSevDebug();
+	void renderMode();
 
-  void searchMsg();
-  void searchClear();
+	void setSevError();
 
-  void setSuppression(QAction * act);
-  void setThrottling(QAction * act);
+	void setSevWarning();
 
-  // Trim the leading lines of messages in message box to avoid overwhelming
-  void updateDisplayMsgs();
+	void setSevInfo();
 
-//---------------------------------------------------------------------------
+	void setSevDebug();
 
-private:
+	void searchMsg();
 
-  // Display all messages stored in the buffer
-  void displayMsg();
+	void searchClear();
 
-  // test if the message is suppressed or throttled
-  bool msg_throttled(mf::MessageFacilityMsg const & mfmsg);
+	void setSuppression(QAction* act);
 
-  unsigned int update_index( msgs_t::iterator it );
+	void setThrottling(QAction* act);
 
-  // Update the list. Returns true if there's a change in the selection
-  // before and after the update. e.g., the selected entry has been deleted
-  // during the process of updateMap(); otherwise it returns a false.
-  template<typename M>
-  bool updateList(QListWidget * lw, M const & map);
+	// Trim the leading lines of messages in message box to avoid overwhelming
+	void updateDisplayMsgs();
 
-  void displayMsg( msgs_t::const_iterator it );
-  void displayMsg( msg_iters_t const & msgs );
-
-  void readSettings();
-  void writeSettings();
-
-  void parseConf(fhicl::ParameterSet const & conf);
-
-  QStringList toQStringList(QList<QListWidgetItem *> in);
-
-//---------------------------------------------------------------------------
+	//---------------------------------------------------------------------------
 
 private:
 
+	// Display all messages stored in the buffer
+	void displayMsg();
 
-  // buffer size
-  static const size_t  BUFFER_SIZE[4];
-  static const size_t  MAX_DISPLAY_MSGS;
+	// test if the message is suppressed or throttled
+	bool msg_throttled(mf::MessageFacilityMsg const& mfmsg);
 
-  bool              updating;
-  bool              paused;
-  bool              shortMode_;
+	unsigned int update_index(msgs_t::iterator it);
 
-  // # of received messages
-  int               nMsgs;
-  int               nSupMsgs;  // suppressed msgs
-  int               nThrMsgs;  // throttled msgs
+	// Update the list. Returns true if there's a change in the selection
+	// before and after the update. e.g., the selected entry has been deleted
+	// during the process of updateMap(); otherwise it returns a false.
+	template <typename M>
+	bool updateList(QListWidget* lw, M const& map);
 
-  // Rendering messages in speed mode or full mode
-  bool              simpleRender;
+	void displayMsg(msgs_t::const_iterator it);
 
-  // severity threshold
-  sev_code_t        sevThresh;
+	void displayMsg(msg_iters_t const& msgs);
 
-  // suppression regex
-  std::vector<suppress>        e_sup_host;
-  std::vector<suppress>        e_sup_app;
-  std::vector<suppress>        e_sup_cat;
+	void readSettings();
 
-  // throttling regex
-  std::vector<throttle>         e_thr_host;
-  std::vector<throttle>         e_thr_app;
-  std::vector<throttle>         e_thr_cat;
+	void writeSettings();
+
+	void parseConf(fhicl::ParameterSet const& conf);
+
+	QStringList toQStringList(QList<QListWidgetItem *> in);
+
+	//---------------------------------------------------------------------------
+
+private:
 
 
-  // filter strings for hosts, applications, and categories
-  QStringList       hostFilter;
-  QStringList       appFilter;
-  QStringList       catFilter;
+	// buffer size
+	static const size_t BUFFER_SIZE[4];
+	static const size_t MAX_DISPLAY_MSGS;
 
-  // search string
-  QString           searchStr;
+	bool updating;
+	bool paused;
+	bool shortMode_;
 
-  // msg pool storing the formatted text body
-  msgs_t            msg_pool_;
+	// # of received messages
+	int nMsgs;
+	int nSupMsgs; // suppressed msgs
+	int nThrMsgs; // throttled msgs
 
-  // map of a key to a list of msg iters
-  msg_iters_map_t   host_msgs_;
-  msg_iters_map_t   cat_msgs_;
+	// Rendering messages in speed mode or full mode
+	bool simpleRender;
 
-  msg_sevs_map_t    app_sev_msgs_;
+	// severity threshold
+	sev_code_t sevThresh;
 
-  QString           buffer;
-  QMutex            buf_lock;
+	// suppression regex
+	std::vector<suppress> e_sup_host;
+	std::vector<suppress> e_sup_app;
+	std::vector<suppress> e_sup_cat;
 
-  // Qt timer for purging the over displayed messages
-  QTimer            timer;
+	// throttling regex
+	std::vector<throttle> e_thr_host;
+	std::vector<throttle> e_thr_app;
+	std::vector<throttle> e_thr_cat;
 
-  // context menu for "suppression" and "throttling" button
-  QMenu           * sup_menu;
-  QMenu           * thr_menu;
 
-  //Receiver Plugin Manager
-  mfviewer::ReceiverManager receivers_;
-  
+	// filter strings for hosts, applications, and categories
+	QStringList hostFilter;
+	QStringList appFilter;
+	QStringList catFilter;
+
+	// search string
+	QString searchStr;
+
+	// msg pool storing the formatted text body
+	msgs_t msg_pool_;
+
+	// map of a key to a list of msg iters
+	msg_iters_map_t host_msgs_;
+	msg_iters_map_t cat_msgs_;
+
+	msg_sevs_map_t app_sev_msgs_;
+
+	QString buffer;
+	QMutex buf_lock;
+
+	// Qt timer for purging the over displayed messages
+	QTimer timer;
+
+	// context menu for "suppression" and "throttling" button
+	QMenu* sup_menu;
+	QMenu* thr_menu;
+
+	//Receiver Plugin Manager
+	mfviewer::ReceiverManager receivers_;
 };
 
 enum list_mask_t
 {
-  LIST_APP  = 0x01
-, LIST_CAT  = 0x02
-, LIST_HOST = 0x04
+	LIST_APP = 0x01,
+	LIST_CAT = 0x02,
+	LIST_HOST = 0x04
 };
 
 #endif

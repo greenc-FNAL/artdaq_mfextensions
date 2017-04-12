@@ -12,8 +12,8 @@
 #include "messagefacility/Utilities/exception.h"
 #include "messagefacility/Utilities/formatTime.h"
 
-namespace mfplugins {
-
+namespace mfplugins
+{
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
 #ifndef NO_MF_UTILITIES
@@ -27,14 +27,15 @@ namespace mfplugins {
 	//
 	//======================================================================
 
-	class ELANSI : public ELdestination {
+	class ELANSI : public ELdestination
+	{
 	public:
 
 		ELANSI(const fhicl::ParameterSet& pset);
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
-								  , const ELcontextSupplier&
+		                          , const ELcontextSupplier&
 #endif
 		) override;
 
@@ -65,10 +66,10 @@ namespace mfplugins {
 	//======================================================================
 	void ELANSI::routePayload(const std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
-							  , ELcontextSupplier const&
+	                          , ELcontextSupplier const&
 #endif
-	) {
-
+	)
+	{
 		const auto& xid = msg.xid();
 		auto level = xid.severity.getLevel();
 
@@ -107,7 +108,6 @@ namespace mfplugins {
 		}
 		std::cout << oss.str();
 		std::cout << "\033[0m" << std::endl;
-
 	}
 } // end namespace mfplugins
 
@@ -117,14 +117,13 @@ namespace mfplugins {
 //
 //======================================================================
 
-extern "C" {
-
+extern "C"
+{
 	auto makePlugin(const std::string&,
-					const fhicl::ParameterSet& pset) {
-
+	                const fhicl::ParameterSet& pset)
+	{
 		return std::make_unique<mfplugins::ELANSI>(pset);
-
 	}
-
 }
+
 DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)

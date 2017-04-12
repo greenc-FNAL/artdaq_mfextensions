@@ -1,4 +1,3 @@
-
 #include <QtGui>
 #include <QMenu>
 #include <QMessageBox>
@@ -10,13 +9,13 @@
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
-const size_t msgViewerDlg::BUFFER_SIZE[4] = { 500, 1000, 1000, 1000 };
+const size_t msgViewerDlg::BUFFER_SIZE[4] = {500, 1000, 1000, 1000};
 const size_t msgViewerDlg::MAX_DISPLAY_MSGS = 10000;
 
 // replace the ${..} part in the filename with env variable
 // throw if the env does not exist
 static void
-process_fname(std::string & fname)
+process_fname(std::string& fname)
 {
 	size_t sub_start = fname.find("${");
 	size_t sub_end = fname.find("}");
@@ -39,7 +38,7 @@ process_fname(std::string & fname)
 }
 
 static fhicl::ParameterSet
-readConf(std::string const & fname)
+readConf(std::string const& fname)
 {
 	if (fname.empty()) return fhicl::ParameterSet();
 
@@ -57,7 +56,7 @@ readConf(std::string const & fname)
 		env.append(".");
 	}
 
-	char * mfe_path = getenv("MFEXTENSIONS_DIR");
+	char* mfe_path = getenv("MFEXTENSIONS_DIR");
 	if (mfe_path) env.append(":").append(mfe_path).append("/config");
 
 	putenv((char *)env.c_str());
@@ -73,7 +72,7 @@ readConf(std::string const & fname)
 	return pset;
 }
 
-msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, QDialog * parent)
+msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	: QDialog(parent)
 	, updating(false)
 	, paused(false)
@@ -117,17 +116,13 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
 	connect(btnPause, SIGNAL(clicked()), this, SLOT(pause()));
 	connect(btnExit, SIGNAL(clicked()), this, SLOT(exit()));
 	connect(btnClear, SIGNAL(clicked()), this, SLOT(clear()));
-
-	//connect( btnSwitchChannel, 
-	//                       SIGNAL( clicked() ), this, SLOT( switchChannel() ) );
-	btnSwitchChannel->setEnabled(false);
-
+	
 	connect(btnRMode, SIGNAL(clicked()), this, SLOT(renderMode()));
 	connect(btnDisplayMode, SIGNAL(clicked()), this, SLOT(shortMode()));
 
 	connect(btnSearch, SIGNAL(clicked()), this, SLOT(searchMsg()));
 	connect(btnSearchClear,
-		SIGNAL(clicked()), this, SLOT(searchClear()));
+			SIGNAL(clicked()), this, SLOT(searchClear()));
 
 	connect(btnFilter, SIGNAL(clicked()), this, SLOT(setFilter()));
 	connect(btnReset, SIGNAL(clicked()), this, SLOT(resetFilter()));
@@ -138,43 +133,35 @@ msgViewerDlg::msgViewerDlg(std::string const & part, std::string const & conf, Q
 	connect(btnDebug, SIGNAL(clicked()), this, SLOT(setSevDebug()));
 
 	connect(sup_menu
-		, SIGNAL(triggered(QAction*))
-		, this
-		, SLOT(setSuppression(QAction*)));
+			, SIGNAL(triggered(QAction*))
+			, this
+			, SLOT(setSuppression(QAction*)));
 
 	connect(thr_menu
-		, SIGNAL(triggered(QAction*))
-		, this
-		, SLOT(setThrottling(QAction*)));
+			, SIGNAL(triggered(QAction*))
+			, this
+			, SLOT(setThrottling(QAction*)));
 
 	connect(vsSeverity
-		, SIGNAL(valueChanged(int))
-		, this
-		, SLOT(changeSeverity(int)));
+			, SIGNAL(valueChanged(int))
+			, this
+			, SLOT(changeSeverity(int)));
 
 	connect(&receivers_
-		, SIGNAL(newMessage(mf::MessageFacilityMsg const &))
-		, this
-		, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
-
-	connect(&receivers_
-		, SIGNAL(newSysMessage(mfviewer::SysMsgCode, QString const &))
-		, this
-		, SLOT(onNewSysMsg(mfviewer::SysMsgCode, QString const &)));
+			, SIGNAL(newMessage(mf::MessageFacilityMsg const &))
+			, this
+			, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
 
 	connect(&timer, SIGNAL(timeout()), this, SLOT(updateDisplayMsgs()));
-
-	QString partStr = QString(part.c_str());
-	btnSwitchChannel->setText(partStr);
-
-	if (simpleRender)  btnRMode->setChecked(true);
-	else              btnRMode->setChecked(false);
+	
+	if (simpleRender) btnRMode->setChecked(true);
+	else btnRMode->setChecked(false);
 
 	btnRMode->setEnabled(false);
 
 	changeSeverity(sevThresh);
 
-	QTextDocument * doc = new QTextDocument(txtMessages);
+	QTextDocument* doc = new QTextDocument(txtMessages);
 	doc->setMaximumBlockCount(1 * MAX_DISPLAY_MSGS);
 	txtMessages->setDocument(doc);
 
@@ -189,9 +176,9 @@ msgViewerDlg::~msgViewerDlg()
 	writeSettings();
 }
 
-static void str_to_suppress(std::vector<std::string> const & vs, std::vector<suppress> & s, QMenu * menu)
+static void str_to_suppress(std::vector<std::string> const& vs, std::vector<suppress>& s, QMenu* menu)
 {
-	QAction * act;
+	QAction* act;
 
 	if (vs.empty())
 	{
@@ -213,9 +200,9 @@ static void str_to_suppress(std::vector<std::string> const & vs, std::vector<sup
 	}
 }
 
-static void pset_to_throttle(std::vector<fhicl::ParameterSet> const & ps, std::vector<throttle> & t, QMenu * menu)
+static void pset_to_throttle(std::vector<fhicl::ParameterSet> const& ps, std::vector<throttle>& t, QMenu* menu)
 {
-	QAction * act;
+	QAction* act;
 
 	if (ps.empty())
 	{
@@ -230,8 +217,8 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const & ps, std::v
 	{
 		std::string name = ps[i].get<std::string>("name");
 		t.push_back(throttle(name
-			, ps[i].get<int>("limit", -1)
-			, ps[i].get<long>("timespan", -1)));
+							 , ps[i].get<int>("limit", -1)
+							 , ps[i].get<long>("timespan", -1)));
 		act = menu->addAction(QString(name.c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
@@ -240,7 +227,7 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const & ps, std::v
 	}
 }
 
-void msgViewerDlg::parseConf(fhicl::ParameterSet const & conf)
+void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 {
 	fhicl::ParameterSet nulp;
 	//QAction * act;
@@ -282,7 +269,7 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const & conf)
 	if (lvl == "ERROR" || lvl == "error" || lvl == "3") { sevThresh = SERROR; }
 }
 
-bool msgViewerDlg::msg_throttled(mf::MessageFacilityMsg const & mfmsg)
+bool msgViewerDlg::msg_throttled(mf::MessageFacilityMsg const& mfmsg)
 {
 	// suppression list
 
@@ -345,12 +332,10 @@ void msgViewerDlg::readSettings()
 	settings.endGroup();
 }
 
-void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const & mfmsg)
+void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
 {
 	// 21-Aug-2015, KAB: copying the incrementing (and displaying) of the number
-	// of messages from the onNewSysMsg() method to here. I'm not sure what the
-	// difference between system and normal messages is. (Maybe system messages
-	// are an obsolete carry-over from NOvA?) I'm also not sure if we want to
+	// of messages to here. I'm also not sure if we want to
 	// count all messages or just non-suppressed ones or what. But, at least this
 	// change gets the counter incrementing on the display.
 	++nMsgs;
@@ -372,8 +357,8 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const & mfmsg)
 	unsigned int flag = update_index(it);
 
 	// update gui list
-	if (flag & LIST_APP)  updateList<msg_sevs_map_t>(lwApplication, app_sev_msgs_);
-	if (flag & LIST_CAT)  updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
+	if (flag & LIST_APP) updateList<msg_sevs_map_t>(lwApplication, app_sev_msgs_);
+	if (flag & LIST_CAT) updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
 	if (flag & LIST_HOST) updateList<msg_iters_map_t>(lwHost, host_msgs_);
 
 	bool hostMatch = hostFilter.contains(it->host(), Qt::CaseInsensitive) || hostFilter.size() == 0;
@@ -387,29 +372,12 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const & mfmsg)
 	}
 }
 
-void msgViewerDlg::onNewSysMsg(mfviewer::SysMsgCode syscode
-	, QString const & msg
-)
-{
-	if (syscode == mfviewer::SysMsgCode::NEW_MESSAGE)
-	{
-		++nMsgs;
-		lcdMsgs->display(nMsgs);
-	}
-	else
-	{
-		QString qtmsg = "SYSTEM: " + msg + "\n";
-		txtMessages->setTextColor(QColor(0, 0, 128));
-		txtMessages->append(qtmsg);
-	}
-}
-
 unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 {
-	sev_code_t      sev = it->sev();
-	QString const & app = it->app();
-	QString const & cat = it->cat();
-	QString const & host = it->host();
+	sev_code_t sev = it->sev();
+	QString const& app = it->app();
+	QString const& cat = it->cat();
+	QString const& host = it->host();
 
 	unsigned int update = 0x0;
 
@@ -421,7 +389,7 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 
 	msg_sevs_map_t::iterator ait = app_sev_msgs_.find(app);
 
-	if (ait == app_sev_msgs_.end())  // new app
+	if (ait == app_sev_msgs_.end()) // new app
 	{
 		msg_sevs_t msg_sevs(4);
 		msg_sevs[sev].push_back(it);
@@ -429,7 +397,7 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 
 		update |= LIST_APP;
 	}
-	else  // already existing app
+	else // already existing app
 	{
 		// push to corresponding list
 		ait->second[sev].push_back(it);
@@ -484,7 +452,7 @@ void msgViewerDlg::displayMsg(msgs_t::const_iterator it)
 	buf_lock.unlock();
 }
 
-void msgViewerDlg::displayMsg(msg_iters_t const & msgs)
+void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 {
 	int n = 0;
 
@@ -503,7 +471,7 @@ void msgViewerDlg::displayMsg(msg_iters_t const & msgs)
 	}
 
 	QProgressDialog progress("Fetching data...", "Cancel"
-		, 0, n / 1000, this);
+							 , 0, n / 1000, this);
 
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000); // 2 seconds
@@ -513,7 +481,7 @@ void msgViewerDlg::displayMsg(msg_iters_t const & msgs)
 
 	updating = true;
 
-	for (; it != msgs.end(); ++it, ++i)
+	for (; it != msgs.end(); ++it , ++i)
 	{
 		if (it->get()->sev() >= sevThresh)
 		{
@@ -522,7 +490,8 @@ void msgViewerDlg::displayMsg(msg_iters_t const & msgs)
 
 		if (i == 1000)
 		{
-			i = 0; ++prog;
+			i = 0;
+			++prog;
 			progress.setValue(prog);
 
 			txtMessages->append(txt);
@@ -559,7 +528,7 @@ void msgViewerDlg::displayMsg()
 	}
 
 	QProgressDialog progress("Fetching data...", "Cancel"
-		, 0, n / 1000, this);
+							 , 0, n / 1000, this);
 
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000); // 2 seconds
@@ -569,7 +538,7 @@ void msgViewerDlg::displayMsg()
 
 	updating = true;
 
-	for (; it != msg_pool_.end(); ++it, ++i)
+	for (; it != msg_pool_.end(); ++it , ++i)
 	{
 		if (it->sev() >= sevThresh)
 		{
@@ -578,7 +547,8 @@ void msgViewerDlg::displayMsg()
 
 		if (i == 1000)
 		{
-			i = 0; ++prog;
+			i = 0;
+			++prog;
 			progress.setValue(prog);
 
 			txtMessages->append(txt);
@@ -611,8 +581,8 @@ void msgViewerDlg::updateDisplayMsgs()
 }
 
 template <typename M>
-bool msgViewerDlg::updateList(QListWidget * lw
-	, M const & map
+bool msgViewerDlg::updateList(QListWidget* lw
+							  , M const& map
 )
 {
 	bool nonSelectedBefore = (lw->currentRow() == -1);
@@ -639,21 +609,25 @@ bool msgViewerDlg::updateList(QListWidget * lw
 		++it;
 	}
 
-	if (!nonSelectedBefore && nonSelectedAfter)  return true;
+	if (!nonSelectedBefore && nonSelectedAfter) return true;
 
 	return false;
 }
 
-void list_intersect(msg_iters_t & l1, msg_iters_t const & l2)
+void list_intersect(msg_iters_t& l1, msg_iters_t const& l2)
 {
-	msg_iters_t::iterator       it1 = l1.begin();
+	msg_iters_t::iterator it1 = l1.begin();
 	msg_iters_t::const_iterator it2 = l2.begin();
 
 	while (it1 != l1.end() && it2 != l2.end())
 	{
 		if (*it1 < *it2) { it1 = l1.erase(it1); }
 		else if (*it2 < *it1) { ++it2; }
-		else { ++it1; ++it2; }
+		else
+		{
+			++it1;
+			++it2;
+		}
 	}
 }
 
@@ -807,13 +781,16 @@ void msgViewerDlg::changeSeverity(int sev)
 	switch (sev)
 	{
 	case SERROR:
-		setSevError();   break;
+		setSevError();
+		break;
 
 	case SWARNING:
-		setSevWarning(); break;
+		setSevWarning();
+		break;
 
 	case SINFO:
-		setSevInfo();    break;
+		setSevInfo();
+		break;
 
 	default: setSevDebug();
 	}
@@ -859,26 +836,6 @@ void msgViewerDlg::setSevDebug()
 	btnInfo->setChecked(false);
 	btnDebug->setChecked(true);
 	vsSeverity->setValue(sevThresh);
-}
-
-void msgViewerDlg::switchChannel()
-{
-#if 0
-	bool ok;
-	int partition = QInputDialog::getInteger(this,
-		"Partition",
-		"Please enter a partition number:",
-		qtdds.getPartition(),
-		-1, 9, 1, &ok);
-
-	if (ok)
-	{
-		qtdds.switchPartition(partition);
-
-		QString partStr = "Partition " + QString::number(qtdds.getPartition());
-		btnSwitchChannel->setText(partStr);
-	}
-#endif
 }
 
 void msgViewerDlg::renderMode()
@@ -937,21 +894,21 @@ void msgViewerDlg::searchClear()
 	txtMessages->moveCursor(QTextCursor::End);
 }
 
-void msgViewerDlg::setSuppression(QAction * act)
+void msgViewerDlg::setSuppression(QAction* act)
 {
 	bool status = act->isChecked();
-	suppress * sup = (suppress *)act->data().value<void*>();
+	suppress* sup = (suppress *)act->data().value<void*>();
 	sup->use(status);
 }
 
-void msgViewerDlg::setThrottling(QAction * act)
+void msgViewerDlg::setThrottling(QAction* act)
 {
 	bool status = act->isChecked();
-	throttle * thr = (throttle *)act->data().value<void*>();
+	throttle* thr = (throttle *)act->data().value<void*>();
 	thr->use(status);
 }
 
-void msgViewerDlg::closeEvent(QCloseEvent *event)
+void msgViewerDlg::closeEvent(QCloseEvent* event)
 {
 	event->accept();
 }
@@ -960,7 +917,8 @@ QStringList msgViewerDlg::toQStringList(QList<QListWidgetItem *> in)
 {
 	QStringList out;
 
-	for (auto i = 0; i < in.size(); ++i) {
+	for (auto i = 0; i < in.size(); ++i)
+	{
 		out << in[i]->text();
 	}
 

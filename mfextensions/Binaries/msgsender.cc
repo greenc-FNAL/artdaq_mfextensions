@@ -7,7 +7,6 @@
 //
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "mfextensions/Extensions/MFExtensions.hh"
 
 #include "fhiclcpp/make_ParameterSet.h"
 #include "fhiclcpp/ParameterSet.h"
@@ -26,144 +25,149 @@ namespace po = boost::program_options;
 
 int main(int ac, char* av[])
 {
-  std::string         severity;
-  std::string         application;
-  std::string         message;
-  std::string         cat;
-  std::string         conf;
-  bool dump;
+	std::string severity;
+	std::string application;
+	std::string message;
+	std::string cat;
+	std::string conf;
+	bool dump;
 
-  std::vector<std::string> messages;
-  std::vector<std::string> vcat;
+	std::vector<std::string> messages;
+	std::vector<std::string> vcat;
 
-  std::vector<std::string> vcat_def;
+	std::vector<std::string> vcat_def;
 
-  vcat_def.push_back("");
+	vcat_def.push_back("");
 
-  try {
-    po::options_description cmdopt("Allowed options");
-    cmdopt.add_options()
-      ("help,h", "display help message")
-      ("severity,s", 
-        po::value<std::string>(&severity)->default_value("info"), 
-        "severity of the message (error, warning, info, debug)")
-      ("category,g", 
-        po::value< std::vector<std::string> >(&vcat)->default_value(vcat_def, "null"),
-        "message id / categories")
-      ("application,a", 
-        po::value<std::string>(&application)->default_value("msgsenderApplication"), 
-        "issuing application name")
-	  ("config,c",
-	   po::value<std::string>(&conf)->default_value(""),
-	   "MessageFacility configuration file")
-	  ("dump,d",po::bool_switch(&dump)->default_value(false));
+	try
+	{
+		po::options_description cmdopt("Allowed options");
+		cmdopt.add_options()
+			("help,h", "display help message")
+			("severity,s",
+			 po::value<std::string>(&severity)->default_value("info"),
+			 "severity of the message (error, warning, info, debug)")
+			("category,g",
+			 po::value<std::vector<std::string>>(&vcat)->default_value(vcat_def, "null"),
+			 "message id / categories")
+			("application,a",
+			 po::value<std::string>(&application)->default_value("msgsenderApplication"),
+			 "issuing application name")
+			("config,c",
+			 po::value<std::string>(&conf)->default_value(""),
+			 "MessageFacility configuration file")
+			("dump,d", po::bool_switch(&dump)->default_value(false));
 
-    po::options_description hidden("Hidden options");
-    hidden.add_options()
-      ("message", po::value< std::vector<std::string> >(&messages), "message text");
+		po::options_description hidden("Hidden options");
+		hidden.add_options()
+			("message", po::value<std::vector<std::string>>(&messages), "message text");
 
-    po::options_description desc;
-    desc.add(cmdopt).add(hidden);
+		po::options_description desc;
+		desc.add(cmdopt).add(hidden);
 
-    po::positional_options_description p;
-    p.add("message", -1);
-        
-    po::variables_map vm;
-    po::store(po::command_line_parser(ac, av).options(desc).positional(p).run(), vm);
-    po::notify(vm);
+		po::positional_options_description p;
+		p.add("message", -1);
 
-    if(vm.count("help"))
-    {
-      std::cout << "Usage: msglogger [options] <message text>\n";
-      std::cout << cmdopt;
-      return 0;
-    }
-  } 
-  catch(std::exception & e)
-  {
-    std::cerr << "error: " << e.what() << "\n";
-    return 1;
-  }
-  catch(...) {
-    std::cerr << "Exception of unknown type!\n";
-    return 1;
-  }
-    
-  std::vector<std::string>::iterator it;
+		po::variables_map vm;
+		po::store(po::command_line_parser(ac, av).options(desc).positional(p).run(), vm);
+		po::notify(vm);
 
-  // must have message text
-  if(messages.size()==0)
-  {
-    std::cout << "Message text is missing!\n";
-    std::cout << "Use \"msglogger --help\" for help messages\n";
-    return 1;
-  }
+		if (vm.count("help"))
+		{
+			std::cout << "Usage: msglogger [options] <message text>\n";
+			std::cout << cmdopt;
+			return 0;
+		}
+	}
+	catch (std::exception& e)
+	{
+		std::cerr << "error: " << e.what() << "\n";
+		return 1;
+	}
+	catch (...)
+	{
+		std::cerr << "Exception of unknown type!\n";
+		return 1;
+	}
 
-  if(application.empty())
-  {
-    std::cout << "Application name is missing!\n";
-    std::cout << "Message cannot be issued without specifying the application name.\n";
-    return 1;
-  }
+	std::vector<std::string>::iterator it;
 
-  // build message text string
-  it = messages.begin();
-  while(it!=messages.end())
-  {
-    message += *it + " ";
-    ++it;
-  }
+	// must have message text
+	if (messages.size() == 0)
+	{
+		std::cout << "Message text is missing!\n";
+		std::cout << "Use \"msglogger --help\" for help messages\n";
+		return 1;
+	}
 
-  // checking severity...
-  transform(severity.begin(), severity.end(), severity.begin(), ::toupper);
-  if( (severity!="ERROR") && (severity!="WARNING")
-      && (severity!="INFO") && (severity!="DEBUG") )
-  {
-    std::cerr << "Unknown severity level!\n";
-    return 1;
-  }
+	if (application.empty())
+	{
+		std::cout << "Application name is missing!\n";
+		std::cout << "Message cannot be issued without specifying the application name.\n";
+		return 1;
+	}
 
-  // checking categories..
-  it = vcat.begin();
-  while(it!=vcat.end())
-  {
-    cat += *it + ((it==vcat.end()-1) ? "" : "|");
-    ++it;
-  }
+	// build message text string
+	it = messages.begin();
+	while (it != messages.end())
+	{
+		message += *it + " ";
+		++it;
+	}
 
-  // preparing parameterset for detinations...
-  fhicl::ParameterSet pset;
+	// checking severity...
+	transform(severity.begin(), severity.end(), severity.begin(), ::toupper);
+	if ((severity != "ERROR") && (severity != "WARNING")
+	    && (severity != "INFO") && (severity != "DEBUG"))
+	{
+		std::cerr << "Unknown severity level!\n";
+		return 1;
+	}
 
-  std::ifstream logfhicl( conf );
-  if ( logfhicl.is_open() ) {
-	std::stringstream fhiclstream;
-	fhiclstream << logfhicl.rdbuf();
-	std::string pstr(fhiclstream.str());
-	fhicl::make_ParameterSet(pstr, pset);
-  } 
-  else {
-    pset = mf::MessageFacilityService::logConsole();
-  }
-  
+	// checking categories..
+	it = vcat.begin();
+	while (it != vcat.end())
+	{
+		cat += *it + ((it == vcat.end() - 1) ? "" : "|");
+		++it;
+	}
+
+	// preparing parameterset for detinations...
+	fhicl::ParameterSet pset;
+
+	std::ifstream logfhicl(conf);
+	if (logfhicl.is_open())
+	{
+		std::stringstream fhiclstream;
+		fhiclstream << logfhicl.rdbuf();
+		std::string pstr(fhiclstream.str());
+		fhicl::make_ParameterSet(pstr, pset);
+	}
+	else
+	{
+		pset = mf::MessageFacilityService::logConsole();
+	}
+
 	// start up message facility service
-	mf::StartMessageFacility( mf::MessageFacilityService::MultiThread, pset );
-  if(dump) {
-	std::cout << pset.to_indented_string() << std::endl;
-  }
-  mf::SetModuleName("msgsenderModule");
-  mf::SetContext("msgsenderContext");
-  mf::SetApplicationName(application);
-  
-  // logging message...
-  if( severity == "ERROR" )
-    mf::LogError  (cat) << message;
-  else if(severity == "WARNING" )
-    mf::LogWarning(cat) << message;
-  else if(severity == "INFO"    )
-    mf::LogInfo   (cat) << message;
-  else if(severity == "DEBUG"   )
-    mf::LogDebug  (cat) << message;
-  
+	mf::StartMessageFacility(mf::MessageFacilityService::MultiThread, pset);
+	if (dump)
+	{
+		std::cout << pset.to_indented_string() << std::endl;
+	}
+	mf::SetModuleName("msgsenderModule");
+	mf::SetContext("msgsenderContext");
+	mf::SetApplicationName(application);
 
-  return 0;
+	// logging message...
+	if (severity == "ERROR")
+		mf::LogError(cat) << message;
+	else if (severity == "WARNING")
+		mf::LogWarning(cat) << message;
+	else if (severity == "INFO")
+		mf::LogInfo(cat) << message;
+	else if (severity == "DEBUG")
+		mf::LogDebug(cat) << message;
+
+
+	return 0;
 }

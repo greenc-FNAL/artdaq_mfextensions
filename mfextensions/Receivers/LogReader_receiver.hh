@@ -23,35 +23,34 @@
 
 #include "mfextensions/Receivers/MVReceiver.hh"
 
-namespace mfviewer {
-
-class LogReader : public MVReceiver
+namespace mfviewer
 {
-Q_OBJECT
-public:
+	class LogReader : public MVReceiver
+	{
+		Q_OBJECT
+	public:
 
-  LogReader  (fhicl::ParameterSet pset);
-  virtual ~LogReader( );
+		LogReader(fhicl::ParameterSet pset);
 
-  // Receiver Method
-  void run();
+		virtual ~LogReader();
 
-  mf::MessageFacilityMsg read_next( );   // read next log
+		// Receiver Method
+		void run();
 
-private:
+		mf::MessageFacilityMsg read_next(); // read next log
 
-  std::ifstream log_;
-  size_t        pos_;
+	private:
 
-  std::string filename_;
-  int counter_;
+		std::ifstream log_;
+		size_t pos_;
 
-  boost::regex  metadata_1;
-  //boost::regex  metadata_2;
-  boost::smatch what_;
+		std::string filename_;
+		int counter_;
 
-};
-
+		boost::regex metadata_1;
+		//boost::regex  metadata_2;
+		boost::smatch what_;
+	};
 } // end of namespace mf
 
 #endif

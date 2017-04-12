@@ -1,7 +1,7 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_01_06
-defaultqual	e10:s41
+parent artdaq_mfextensions	v1_01_07
+defaultqual	e10:s46
 
 # These optional lines define the installed directories where
 # headers, libraries, and executables will be found
@@ -17,29 +17,30 @@ bindir      fq_dir      bin
 
 #
 product		version		optional
-messagefacility v1_17_01        s41
-messagefacility v1_18_00        s43
-messagefacility v1_17_02        s44
+messagefacility v1_18_04        s48
+messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
 qt              v5_7_1
 TRACE           v3_07_02        -       only_for_build
-cetbuildtools	v5_06_06	-	only_for_build
+cetbuildtools	v5_06_07	-	only_for_build
 end_product_list
 
-# e6 - with gcc 4.9.1 and -std=c++1y
+# See https://cdcvs.fnal.gov/redmine/projects/cet-is-public/wiki/AboutQualifiers for information about the qualifiers used
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier		messagefacility  	  qt    TRACE   notes
+e14:s48:debug      	e14:debug    	          e14   -nq-    -std=c++14
+e14:s48:prof      	e14:prof    	          e14   -nq-    -std=c++14
+e10:s48:debug      	e10:debug    	          e10   -nq-    -std=c++14
+e10:s48:prof      	e10:prof    	          e10   -nq-    -std=c++14
+e14:s47:debug      	e14:debug    	          e14   -nq-    -std=c++14
+e14:s47:prof      	e14:prof    	          e14   -nq-    -std=c++14
+e10:s47:debug      	e10:debug    	          e10   -nq-    -std=c++14
+e10:s47:prof      	e10:prof    	          e10   -nq-    -std=c++14
 e14:s46:debug      	e14:debug    	          e14   -nq-    -std=c++14
 e14:s46:prof      	e14:prof    	          e14   -nq-    -std=c++14
 e10:s46:debug      	e10:debug    	          e10   -nq-    -std=c++14
 e10:s46:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e10:s44:debug      	e10:debug    	          e10   -nq-    -std=c++14
-e10:s44:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e10:s43:debug      	e10:debug    	          e10   -nq-    -std=c++14
-e10:s43:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e10:s41:debug      	e10:debug    	          e10   -nq-    -std=c++14
-e10:s41:prof      	e10:prof    	          e10   -nq-    -std=c++14
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:

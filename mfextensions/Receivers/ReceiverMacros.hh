@@ -6,9 +6,10 @@
 
 #include <memory>
 
-namespace mfviewer {
-  typedef std::unique_ptr<mfviewer::MVReceiver>
-    (makeFunc_t) (fhicl::ParameterSet const & ps);
+namespace mfviewer
+{
+	typedef std::unique_ptr<mfviewer::MVReceiver>
+	(makeFunc_t)(fhicl::ParameterSet const& ps);
 }
 
 #define DEFINE_MFVIEWER_RECEIVER(klass)                          \

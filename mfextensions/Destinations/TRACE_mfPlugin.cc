@@ -15,112 +15,117 @@
 
 #define TRACE_NAME "MessageFacility"
 
-namespace mfplugins {
-
-  using mf::service::ELdestination;
-  using mf::ELseverityLevel;
+namespace mfplugins
+{
+	using mf::service::ELdestination;
+	using mf::ELseverityLevel;
 #ifndef NO_MF_UTILITIES
-  using mf::service::ELcontextSupplier;
+	using mf::service::ELcontextSupplier;
 #endif
-  using mf::ErrorObj;
+	using mf::ErrorObj;
 
-  //======================================================================
-  //
-  // TRACE destination plugin
-  //
-  //======================================================================
+	//======================================================================
+	//
+	// TRACE destination plugin
+	//
+	//======================================================================
 
-  class ELTRACE : public ELdestination {
-  public:
+	class ELTRACE : public ELdestination
+	{
+	public:
 
-    ELTRACE( const fhicl::ParameterSet& pset );
+		ELTRACE(const fhicl::ParameterSet& pset);
 
-    virtual void fillPrefix  (       std::ostringstream&, const ErrorObj&
+		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
-							   , const ELcontextSupplier&
+		                        , const ELcontextSupplier&
 #endif
- ) override;
-    virtual void fillUsrMsg  (       std::ostringstream&, const ErrorObj& ) override;
-    virtual void fillSuffix  (       std::ostringstream&, const ErrorObj& ) override {}
-    virtual void routePayload( const std::ostringstream&, const ErrorObj&
+		) override;
+
+		virtual void fillUsrMsg(std::ostringstream&, const ErrorObj&) override;
+
+		virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
+
+		virtual void routePayload(const std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
-							   , const ELcontextSupplier&
+		                          , const ELcontextSupplier&
 #endif
- ) override;
+		) override;
 
-  private:
-	int trace_level_offset_;
-    int consecutive_success_count_;
-    int error_count_;
-    int next_error_report_;
-    int error_report_backoff_factor_;
-  };
+	private:
+		int trace_level_offset_;
+		int consecutive_success_count_;
+		int error_count_;
+		int next_error_report_;
+		int error_report_backoff_factor_;
+	};
 
-  // END DECLARATION
-  //======================================================================
-  // BEGIN IMPLEMENTATION
+	// END DECLARATION
+	//======================================================================
+	// BEGIN IMPLEMENTATION
 
 
-  //======================================================================
-  // ELTRACE c'tor
-  //======================================================================
+	//======================================================================
+	// ELTRACE c'tor
+	//======================================================================
 
-  ELTRACE::ELTRACE( const fhicl::ParameterSet& pset )
-    : ELdestination( pset )
-	, trace_level_offset_(pset.get<int>("level_offset", 0))
-    , consecutive_success_count_(0)
-    , error_count_(0)
-    , next_error_report_(1)
-    , error_report_backoff_factor_()
-  {
-    error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
-	TRACE(trace_level_offset_, "ELTRACE MessageLogger destination plugin initialized.");
-  }
+	ELTRACE::ELTRACE(const fhicl::ParameterSet& pset)
+		: ELdestination(pset)
+		, trace_level_offset_(pset.get<int>("level_offset", 0))
+		, consecutive_success_count_(0)
+		, error_count_(0)
+		, next_error_report_(1)
+		, error_report_backoff_factor_()
+	{
+		error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
+		TRACE(trace_level_offset_, "ELTRACE MessageLogger destination plugin initialized.");
+	}
 
-  //======================================================================
-  // Message prefix filler ( overriddes ELdestination::fillPrefix )
-  //======================================================================
-  void ELTRACE::fillPrefix( std::ostringstream& oss,const ErrorObj & msg
+	//======================================================================
+	// Message prefix filler ( overriddes ELdestination::fillPrefix )
+	//======================================================================
+	void ELTRACE::fillPrefix(std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
-							   , ELcontextSupplier const&
+	                         , ELcontextSupplier const&
 #endif
- ) {
-    const auto& xid = msg.xid();
+	)
+	{
+		const auto& xid = msg.xid();
 
-    oss << xid.application << ", ";                       // application
-    oss << xid.id << ": ";                                // category
-	// oss << mf::MessageDrop::instance()->runEvent + ELstring(" "); // run/event no
-    // oss << xid.module+ELstring(": ");                            // module name
-  }
+		oss << xid.application << ", "; // application
+		oss << xid.id << ": "; // category
+		// oss << mf::MessageDrop::instance()->runEvent + ELstring(" "); // run/event no
+		// oss << xid.module+ELstring(": ");                            // module name
+	}
 
-  //======================================================================
-  // Message filler ( overriddes ELdestination::fillUsrMsg )
-  //======================================================================
-  void ELTRACE::fillUsrMsg( std::ostringstream& oss,const ErrorObj & msg ) {
+	//======================================================================
+	// Message filler ( overriddes ELdestination::fillUsrMsg )
+	//======================================================================
+	void ELTRACE::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
+	{
+		std::ostringstream tmposs;
+		ELdestination::fillUsrMsg(tmposs, msg);
 
-    std::ostringstream tmposs;
-    ELdestination::fillUsrMsg( tmposs, msg );
+		// remove leading "\n" if present
+		const std::string& usrMsg = !tmposs.str().compare(0, 1, "\n") ? tmposs.str().erase(0, 1) : tmposs.str();
 
-    // remove leading "\n" if present
-    const std::string& usrMsg = !tmposs.str().compare(0,1,"\n") ? tmposs.str().erase(0,1) : tmposs.str();
+		oss << usrMsg;
+	}
 
-    oss << usrMsg;
-  }
-
-  //======================================================================
-  // Message router ( overriddes ELdestination::routePayload )
-  //======================================================================
-  void ELTRACE::routePayload( const std::ostringstream& oss, const ErrorObj& msg
+	//======================================================================
+	// Message router ( overriddes ELdestination::routePayload )
+	//======================================================================
+	void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
-							   , ELcontextSupplier const&
+	                           , ELcontextSupplier const&
 #endif
-) {
-    auto message = oss.str();
-	const auto& xid = msg.xid();
-	auto level = trace_level_offset_ + xid.severity.getLevel();
-	TRACE(level, message);
-  
-  }
+	)
+	{
+		auto message = oss.str();
+		const auto& xid = msg.xid();
+		auto level = trace_level_offset_ + xid.severity.getLevel();
+		TRACE(level, message);
+	}
 } // end namespace mfplugins
 
 //======================================================================
@@ -129,14 +134,13 @@ namespace mfplugins {
 //
 //======================================================================
 
-extern "C" {
-
-  auto makePlugin( const std::string&,
-                   const fhicl::ParameterSet& pset) {
-
-    return std::make_unique<mfplugins::ELTRACE>( pset );
-
-  }
-
+extern "C"
+{
+	auto makePlugin(const std::string&,
+	                const fhicl::ParameterSet& pset)
+	{
+		return std::make_unique<mfplugins::ELTRACE>(pset);
+	}
 }
+
 DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)
