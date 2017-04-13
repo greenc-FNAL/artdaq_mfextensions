@@ -20,6 +20,7 @@ product		version		optional
 messagefacility v1_18_04        s48
 messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
+messagefacility v1_16_07        s21
 qt              v5_7_1
 TRACE           v3_07_02        -       only_for_build
 cetbuildtools	v5_06_07	-	only_for_build
@@ -41,6 +42,8 @@ e14:s46:debug      	e14:debug    	          e14   -nq-    -std=c++14
 e14:s46:prof      	e14:prof    	          e14   -nq-    -std=c++14
 e10:s46:debug      	e10:debug    	          e10   -nq-    -std=c++14
 e10:s46:prof      	e10:prof    	          e10   -nq-    -std=c++14
+e9:s21:debug        e9:debug                  e9    -nq-    -std=c++14
+e9:s21:prof         e9:prof                   e9    -nq-    -std=c++14
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:

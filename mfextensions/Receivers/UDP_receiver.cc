@@ -119,18 +119,24 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
 		msg.setTimestamp(tv);
 
 		int seqNum = 0;
+		auto prevIt = it;
+		try
+		{
 		if (++it != tokens.end()) { seqNum = std::stoi(*it); }
+		}
+		catch (std::invalid_argument e) { it = prevIt; }
 		if (++it != tokens.end()) { msg.setHostname(*it); }
 		if (++it != tokens.end()) { msg.setHostaddr(*it); }
 		if (++it != tokens.end()) { msg.setSeverity(*it); }
 		if (++it != tokens.end()) { msg.setCategory(*it); }
 		if (++it != tokens.end()) { msg.setApplication(*it); }
 		if (++it != tokens.end()) { msg.setProcess(*it); }
+		prevIt = it;
 		try
 		{
 			if (++it != tokens.end()) { msg.setPid(std::stol(*it)); }
 		}
-		catch (std::invalid_argument e) { ; }
+		catch (std::invalid_argument e) { it = prevIt; }
 		if (++it != tokens.end()) { msg.setContext(*it); }
 		if (++it != tokens.end()) { msg.setModule(*it); }
 		std::ostringstream oss;

@@ -11,6 +11,7 @@
 #include "messagefacility/MessageLogger/MessageDrop.h"
 #include "messagefacility/Utilities/exception.h"
 #include "messagefacility/Utilities/formatTime.h"
+#include <iostream>
 
 namespace mfplugins
 {
