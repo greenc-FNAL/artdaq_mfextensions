@@ -77,6 +77,11 @@ namespace mfplugins
 		, next_error_report_(1)
 		, error_report_backoff_factor_()
 	{
+
+		size_t lvls = pset.get<size_t>("lvls", 0x7);
+		size_t lvlm = pset.get<size_t>("lvlm", 0x0);
+		TRACE_CNTL("lvlmsk", lvlm, lvls, 0);
+
 		error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
 		TRACE(trace_level_offset_, "ELTRACE MessageLogger destination plugin initialized.");
 	}
@@ -121,8 +126,8 @@ namespace mfplugins
 #endif
 	)
 	{
-		auto message = oss.str();
 		const auto& xid = msg.xid();
+		auto message = oss.str();
 		auto level = trace_level_offset_ + xid.severity.getLevel();
 		TRACE(level, message);
 	}
