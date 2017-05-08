@@ -22,7 +22,7 @@ messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
 messagefacility v1_16_07        s21
 qt              v5_7_1
-TRACE           v3_07_03        -       only_for_build
+TRACE           v3_08_00        -       only_for_build
 cetbuildtools	v5_06_07	-	only_for_build
 end_product_list
 
