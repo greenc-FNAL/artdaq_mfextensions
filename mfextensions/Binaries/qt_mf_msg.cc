@@ -1,9 +1,9 @@
 #ifdef NO_MF_UTILITIES
-#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
-#include <messagefacility/MessageLogger/ELseverityLevel.h>
+#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
+#include "messagefacility/MessageLogger/ELseverityLevel.h"
 #else
-#include <messagefacility/Utilities/MessageFacilityMsg.h>
-#include <messagefacility/Utilities/ELseverityLevel.h>
+#include "messagefacility/Utilities/MessageFacilityMsg.h"
+#include "messagefacility/Utilities/ELseverityLevel.h"
 #endif
 
 #include "mfextensions/Binaries/qt_mf_msg.hh"

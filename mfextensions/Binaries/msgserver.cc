@@ -1,8 +1,8 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #ifdef NO_MF_UTILITIES
-#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
+#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
 #else
-#include <messagefacility/Utilities/MessageFacilityMsg.h>
+#include "messagefacility/Utilities/MessageFacilityMsg.h"
 #endif
 
 #include <boost/program_options.hpp>
@@ -10,8 +10,8 @@
 
 #include <iostream>
 #include <string>
-#include <mfextensions/Binaries/ReceiverManager.hh>
-#include <fhiclcpp/make_ParameterSet.h>
+#include "mfextensions/Binaries/ReceiverManager.hh"
+#include "fhiclcpp/make_ParameterSet.h"
 
 namespace po = boost::program_options;
 

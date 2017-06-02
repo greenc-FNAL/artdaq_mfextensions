@@ -1,7 +1,7 @@
 #include "mfextensions/Binaries/ReceiverManager.hh"
 
 #include "mfextensions/Receivers/makeMVReceiver.hh"
-#include <fhiclcpp/ParameterSet.h>
+#include "fhiclcpp/ParameterSet.h"
 #include <iostream>
 
 mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
