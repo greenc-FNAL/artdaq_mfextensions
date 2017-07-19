@@ -62,11 +62,6 @@ if (CETLIB_EXPOSES_OSTREAM_OWNER)
    add_definitions(-DCETLIB_EXPOSES_OSTREAM_OWNER)
 endif()
 
-check_ups_version(messagefacility "$ENV{MESSAGEFACILITY_VERSION}" v1_17_00 PRODUCT_OLDER_VAR NO_MF_UTILITIES)
-if (NO_MF_UTILITIES)
-  add_definitions(-DNO_MF_UTILITIES)
-endif()
-
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
 if(BTYPE_UC STREQUAL DEBUG)
