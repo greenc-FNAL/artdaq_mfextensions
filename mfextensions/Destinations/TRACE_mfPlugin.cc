@@ -5,10 +5,14 @@
 #ifdef NO_MF_UTILITIES
 #include "messagefacility/MessageLogger/ELseverityLevel.h"
 #else
-#include "messagefacility/MessageService/ELcontextSupplier.h"
-#include "messagefacility/Utilities/ELseverityLevel.h"
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+#  include "messagefacility/MessageService/ELcontextSupplier.h"
+# endif
+# include "messagefacility/Utilities/ELseverityLevel.h"
 #endif
-#include "messagefacility/MessageLogger/MessageDrop.h"
+#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+# include "messagefacility/MessageLogger/MessageDrop.h"
+#endif
 #include "messagefacility/Utilities/exception.h"
 
 #define TRACE_NAME "MessageFacility"
@@ -20,7 +24,9 @@ namespace mfplugins
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	using mf::service::ELcontextSupplier;
+# endif
 #endif
 	using mf::ErrorObj;
 
@@ -38,7 +44,9 @@ namespace mfplugins
 
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		                        , const ELcontextSupplier&
+# endif
 #endif
 		) override;
 
@@ -48,7 +56,9 @@ namespace mfplugins
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		                          , const ELcontextSupplier&
+# endif
 #endif
 		) override;
 
@@ -92,14 +102,21 @@ namespace mfplugins
 	//======================================================================
 	void ELTRACE::fillPrefix(std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	                         , ELcontextSupplier const&
+# endif
 #endif
 	)
 	{
 		const auto& xid = msg.xid();
 
+# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		oss << xid.application() << ", "; // application
+		oss << xid.id() << ": "; // category
+# else
 		oss << xid.application << ", "; // application
 		oss << xid.id << ": "; // category
+# endif
 		// oss << mf::MessageDrop::instance()->runEvent + ELstring(" "); // run/event no
 		// oss << xid.module+ELstring(": ");                            // module name
 	}
@@ -123,13 +140,19 @@ namespace mfplugins
 	//======================================================================
 	void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	                           , ELcontextSupplier const&
+# endif
 #endif
 	)
 	{
 		const auto& xid = msg.xid();
 		auto message = oss.str();
+# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		auto level = trace_level_offset_ + xid.severity().getLevel();
+# else
 		auto level = trace_level_offset_ + xid.severity.getLevel();
+# endif
 		TRACE(level, message);
 	}
 } // end namespace mfplugins

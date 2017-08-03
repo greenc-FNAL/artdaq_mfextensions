@@ -11,12 +11,12 @@
 #include <string>
 #include <fstream>
 
-#include <fhiclcpp/fwd.h>
-#include <messagefacility/MessageLogger/MessageLogger.h>
+#include "fhiclcpp/fwd.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 #ifdef NO_MF_UTILITIES
-#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
+#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
 #else
-#include <messagefacility/Utilities/MessageFacilityMsg.h>
+#include "messagefacility/Utilities/MessageFacilityMsg.h"
 #endif
 
 #include <boost/regex.hpp>

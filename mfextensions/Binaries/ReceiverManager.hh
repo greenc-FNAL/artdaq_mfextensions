@@ -1,12 +1,12 @@
 #ifndef RECEIVER_MANAGER_H
 #define RECEIVER_MANAGER_H
 
-#include <fhiclcpp/fwd.h>
+#include "fhiclcpp/fwd.h"
 #include <QObject>
 #ifdef NO_MF_UTILITIES
-#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
+#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
 #else
-#include <messagefacility/Utilities/MessageFacilityMsg.h>
+#include "messagefacility/Utilities/MessageFacilityMsg.h"
 #endif
 #include "mfextensions/Receivers/MVReceiver.hh"
 

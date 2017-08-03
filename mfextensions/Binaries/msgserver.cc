@@ -1,8 +1,8 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #ifdef NO_MF_UTILITIES
-#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
+#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
 #else
-#include <messagefacility/Utilities/MessageFacilityMsg.h>
+#include "messagefacility/Utilities/MessageFacilityMsg.h"
 #endif
 
 #include <boost/program_options.hpp>
@@ -10,8 +10,8 @@
 
 #include <iostream>
 #include <string>
-#include <mfextensions/Binaries/ReceiverManager.hh>
-#include <fhiclcpp/make_ParameterSet.h>
+#include "mfextensions/Binaries/ReceiverManager.hh"
+#include "fhiclcpp/make_ParameterSet.h"
 
 namespace po = boost::program_options;
 
@@ -36,8 +36,10 @@ void printmsg(mf::MessageFacilityMsg const& mfmsg)
 	std::cout << "timestamp:      " << mfmsg.timestr() << "\n";
 	std::cout << "hostname:       " << mfmsg.hostname() << "\n";
 	std::cout << "hostaddr(ip):   " << mfmsg.hostaddr() << "\n";
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	std::cout << "process:        " << mfmsg.process() << "\n";
-	std::cout << "porcess_id:     " << mfmsg.pid() << "\n";
+#  endif
+	std::cout << "process_id:     " << mfmsg.pid() << "\n";
 	std::cout << "application:    " << mfmsg.application() << "\n";
 	std::cout << "module:         " << mfmsg.module() << "\n";
 	std::cout << "context:        " << mfmsg.context() << "\n";
@@ -97,9 +99,16 @@ int main(int argc, char* argv[])
 
 
 	// Start MessageFacility Service
+#  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+	std::ostringstream descstr;
+	descstr << "";
+	fhicl::ParameterSet main_pset;
+	mf::StartMessageFacility( main_pset );
+#  else
 	mf::StartMessageFacility(
 		mf::MessageFacilityService::SingleThread,
 		mf::MessageFacilityService::logArchive(filename));
+#  endif
 
 	fhicl::ParameterSet pset;
 	auto maker = cet::filepath_maker();

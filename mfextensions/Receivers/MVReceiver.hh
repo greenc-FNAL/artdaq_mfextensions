@@ -3,12 +3,12 @@
 
 #include <string>
 
-#include <fhiclcpp/ParameterSet.h>
+#include "fhiclcpp/ParameterSet.h"
 
 #ifdef NO_MF_UTILITIES
-#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
+#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
 #else
-#include <messagefacility/Utilities/MessageFacilityMsg.h>
+#include "messagefacility/Utilities/MessageFacilityMsg.h"
 #endif
 
 #include <QtCore/QThread>

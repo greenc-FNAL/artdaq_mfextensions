@@ -18,6 +18,15 @@ ${MF_MESSAGESERVICE}
 	${CETLIB_EXCEPT}
 )
 
+basic_plugin( "Friendly" "mfPlugin"
+    ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
+${MF_MESSAGESERVICE}
+    ${FHICLCPP}
+    ${CETLIB}
+	${CETLIB_EXCEPT}
+)
+
 basic_plugin( "MultiFile" "mfPlugin"
     ${MF_MESSAGELOGGER}
   ${MF_UTILITIES}
