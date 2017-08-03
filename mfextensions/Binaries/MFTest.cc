@@ -2,7 +2,6 @@
 #define ML_DEBUG    // always enable debug
 
 #if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-# include "messagefacility/MessageLogger/MessageLogger.h"
 # include "fhiclcpp/ParameterSet.h"
 # include "fhiclcpp/make_ParameterSet.h"
 # include <fstream>
@@ -12,6 +11,7 @@
 #include <stdlib.h>
 #include <cstdio>
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
 
 void anotherLogger()
 {
