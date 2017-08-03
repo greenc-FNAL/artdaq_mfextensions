@@ -143,19 +143,27 @@ int main(int ac, char* av[])
 		std::string pstr(fhiclstream.str());
 		fhicl::make_ParameterSet(pstr, pset);
 	}
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // an indication of a switch from s48 to s50
 	else
 	{
 		pset = mf::MessageFacilityService::logConsole();
 	}
+#  endif
 
 	// start up message facility service
+#  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+	mf::StartMessageFacility(pset);
+#  else
 	mf::StartMessageFacility(mf::MessageFacilityService::MultiThread, pset);
+#  endif
 	if (dump)
 	{
 		std::cout << pset.to_indented_string() << std::endl;
 	}
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // an indication of a switch from s48 to s50
 	mf::SetModuleName("msgsenderModule");
 	mf::SetContext("msgsenderContext");
+#  endif
 	mf::SetApplicationName(application);
 
 	// logging message...

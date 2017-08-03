@@ -4,12 +4,16 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 #ifdef NO_MF_UTILITIES
-#include "messagefacility/MessageLogger/ELseverityLevel.h"
+# include "messagefacility/MessageLogger/ELseverityLevel.h"
 #else
-#include "messagefacility/Utilities/ELseverityLevel.h"
-#include "messagefacility/MessageService/ELcontextSupplier.h"
+# include "messagefacility/Utilities/ELseverityLevel.h"
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+#  include "messagefacility/MessageService/ELcontextSupplier.h"
+# endif
 #endif
-#include "messagefacility/MessageLogger/MessageDrop.h"
+#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+# include "messagefacility/MessageLogger/MessageDrop.h"
+#endif
 #include "messagefacility/Utilities/exception.h"
 
 #include <fstream>
@@ -20,7 +24,9 @@ namespace mfplugins
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	using mf::service::ELcontextSupplier;
+# endif
 #endif
 
 	//======================================================================
@@ -39,13 +45,17 @@ namespace mfplugins
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		                          , const ELcontextSupplier&
+# endif
 #endif
 		) override;
 
 		virtual void flush(
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 			const ELcontextSupplier&
+# endif
 #endif
 		) override;
 
@@ -83,17 +93,27 @@ namespace mfplugins
 	//======================================================================
 	void ELMultiFileOutput::routePayload(const std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	                                     , ELcontextSupplier const& sup
+# endif
 #endif
 	)
 	{
 		const auto& xid = msg.xid();
 		std::string fileName = baseDir_ + "/";
+#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		if (useModule_) { fileName += xid.module() + "-"; }
+		if (useCategory_) { fileName += xid.id() + "-"; }
+		if (useApplication_) { fileName += xid.application() + "-"; }
+		if (useHost_) { fileName += xid.hostname() + "-"; }
+		fileName += std::to_string(xid.pid()) + ".log";
+#      else
 		if (useModule_) { fileName += xid.module + "-"; }
 		if (useCategory_) { fileName += xid.id + "-"; }
 		if (useApplication_) { fileName += xid.application + "-"; }
 		if (useHost_) { fileName += xid.hostname + "-"; }
 		fileName += std::to_string(xid.pid) + ".log";
+#      endif
 		if (outputs_.count(fileName) == 0)
 		{
 #ifndef CETLIB_EXPOSES_OSTREAM_OWNER // New cetlib
@@ -105,14 +125,18 @@ namespace mfplugins
 		*outputs_[fileName] << oss.str();
 		flush(
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 			sup
+# endif
 #endif
 		);
 	}
 
 	void ELMultiFileOutput::flush(
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		ELcontextSupplier const&
+# endif
 #endif
 	)
 	{

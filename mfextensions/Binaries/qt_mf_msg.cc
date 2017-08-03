@@ -27,7 +27,9 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const& msg)
 
 	switch (sevid)
 	{
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	case mf::ELseverityLevel::ELsev_incidental:
+#  endif
 	case mf::ELseverityLevel::ELsev_success:
 	case mf::ELseverityLevel::ELsev_zeroSeverity:
 	case mf::ELseverityLevel::ELsev_unspecified:
@@ -43,19 +45,23 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const& msg)
 		break;
 
 	case mf::ELseverityLevel::ELsev_warning:
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	case mf::ELseverityLevel::ELsev_warning2:
+#  endif
 		sev_ = SWARNING;
 		text_ += QString("#E08000>");
 		color_.setRgb(224, 128, 0);
 		break;
 
 	case mf::ELseverityLevel::ELsev_error:
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	case mf::ELseverityLevel::ELsev_error2:
 	case mf::ELseverityLevel::ELsev_next:
-	case mf::ELseverityLevel::ELsev_severe:
 	case mf::ELseverityLevel::ELsev_severe2:
 	case mf::ELseverityLevel::ELsev_abort:
 	case mf::ELseverityLevel::ELsev_fatal:
+#  endif
+	case mf::ELseverityLevel::ELsev_severe:
 	case mf::ELseverityLevel::ELsev_highestSeverity:
 		sev_ = SERROR;
 		text_ += QString("#FF0000>");
@@ -77,7 +83,10 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const& msg)
 		+ QString(msg.timestr().c_str()).toHtmlEscaped() + "<br>"
 		+ QString(msg.hostname().c_str()).toHtmlEscaped() + " ("
 		+ QString(msg.hostaddr().c_str()).toHtmlEscaped() + ")<br>"
-		+ QString(msg.process().c_str()).toHtmlEscaped() + " ("
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+		+ QString(msg.process().c_str()).toHtmlEscaped()
+#endif
+		+ " ("
 		+ QString::number(msg.pid()) + ")";
 
 	if (msg.file().compare("--"))

@@ -1,16 +1,26 @@
 //#define NDEBUG
 #define ML_DEBUG    // always enable debug
 
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+# include "messagefacility/MessageLogger/MessageLogger.h"
+# include "fhiclcpp/ParameterSet.h"
+# include "fhiclcpp/make_ParameterSet.h"
+# include <fstream>
+# include <sstream>
+#endif
 #include <iostream>
 #include <stdlib.h>
 #include <cstdio>
 
-#include "messagefacility/MessageLogger/MessageLogger.h"
 
 void anotherLogger()
 {
 	// Set module name
+#  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+	mf::SetApplicationName("anotherLogger");
+#  else
 	mf::SetModuleName("anotherLogger");
+#  endif
 
 	mf::LogWarning("warn1 | warn2") << "Followed by a WARNING message.";
 	mf::LogDebug("debug") << "The debug message in the other thread";
@@ -23,11 +33,25 @@ int main()
 	try
 	{
 		// Start MessageFacility Service
+#  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		std::ostringstream ss;
+		std::ifstream logfhicl("MessageFacility.cfg");
+		if (logfhicl.is_open()) {
+			std::stringstream fhiclstream;
+			fhiclstream << logfhicl.rdbuf();
+			ss << fhiclstream.str();
+		}
+		fhicl::ParameterSet pset;
+		std::string pstr(ss.str());
+		fhicl::make_ParameterSet(pstr, pset);
+		mf::StartMessageFacility( pset );
+#  else
 		mf::StartMessageFacility(
 			mf::MessageFacilityService::MultiThread,
 			mf::MessageFacilityService::ConfigurationFile(
 				"MessageFacility.cfg",
 				mf::MessageFacilityService::logCF("mylog")));
+#  endif
 	}
 	catch (std::exception& e)
 	{
@@ -37,8 +61,10 @@ int main()
 
 	// Set module name for the main thread
 	mf::SetApplicationName("mftest");
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	mf::SetModuleName("MFTest");
 	mf::SetContext("pre-event");
+#  endif
 
 	// Start up another logger in a seperate thread
 	//boost::thread loggerThread(anotherLogger);
@@ -48,7 +74,9 @@ int main()
 	//mf::LogWarning("warning") << "Followed by a WARNING message.";
 
 	// Switch context
+#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	mf::SetContext("pro-event");
+#  endif
 
 	//mf::SwitchChannel(2);
 

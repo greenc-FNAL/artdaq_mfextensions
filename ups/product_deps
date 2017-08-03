@@ -17,6 +17,7 @@ bindir      fq_dir      bin
 
 #
 product		version		optional
+messagefacility v2_00_02        s50
 messagefacility v1_18_04        s48
 messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
@@ -29,6 +30,8 @@ end_product_list
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier		messagefacility  	  qt    TRACE   notes
+e14:s50:debug      	e14:debug    	          e14   -nq-    -std=c++14
+e14:s50:prof      	e14:prof    	          e14   -nq-    -std=c++14
 e14:s48:debug      	e14:debug    	          e14   -nq-    -std=c++14
 e14:s48:prof      	e14:prof    	          e14   -nq-    -std=c++14
 e10:s48:debug      	e10:debug    	          e10   -nq-    -std=c++14

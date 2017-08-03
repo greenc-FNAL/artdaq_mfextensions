@@ -3,12 +3,22 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 #ifdef NO_MF_UTILITIES
-#include "messagefacility/MessageLogger/ELseverityLevel.h"
+# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+#  include "messagefacility/Utilities/ELseverityLevel.h"
+# else
+#  include "messagefacility/MessageLogger/ELseverityLevel.h"
+# endif
 #else
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#include "messagefacility/MessageService/ELcontextSupplier.h"
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+#  include "messagefacility/MessageService/ELcontextSupplier.h"
+# endif
 #endif
-#include "messagefacility/MessageLogger/MessageDrop.h"
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+# include "messagefacility/MessageService/MessageDrop.h"
+#else
+# include "messagefacility/MessageLogger/MessageDrop.h"
+#endif
 #include "messagefacility/Utilities/exception.h"
 
 // C/C++ includes
@@ -26,7 +36,9 @@ namespace mfplugins
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	using mf::service::ELcontextSupplier;
+# endif
 #endif
 	using boost::asio::ip::udp;
 
@@ -44,7 +56,9 @@ namespace mfplugins
 
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		                        , const ELcontextSupplier&
+# endif
 #endif
 		) override;
 
@@ -54,7 +68,9 @@ namespace mfplugins
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		                          , const ELcontextSupplier&
+# endif
 #endif
 		) override;
 
@@ -144,31 +160,51 @@ namespace mfplugins
 	//======================================================================
 	void ELUDP::fillPrefix(std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	                       , ELcontextSupplier const&
+# endif
 #endif
 	)
 	{
 		const auto& xid = msg.xid();
 
+#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		auto id = xid.id();
+		auto app = xid.application();
+		auto module = xid.module();
+#      else
 		auto id = xid.id;
 		auto app = xid.application;
 		auto process = xid.process;
 		auto module = xid.module;
+#      endif
 		std::replace(id.begin(), id.end(), '|', '!');
 		std::replace(app.begin(), app.end(), '|', '!');
+#      if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		std::replace(process.begin(), process.end(), '|', '!');
+#      endif
 		std::replace(module.begin(), module.end(), '|', '!');
 
 		oss << format.timestamp(msg.timestamp()) + "|"; // timestamp
 		oss << std::to_string(++seqNum_) + "|"; // sequence number
+#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		oss << xid.hostname() + "|"; // host name
+		oss << xid.hostaddr() + "|"; // host address
+		oss << xid.severity().getName() + "|"; // severity
+#      else
 		oss << xid.hostname + "|"; // host name
 		oss << xid.hostaddr + "|"; // host address
 		oss << xid.severity.getName() + "|"; // severity
+#      endif
 		oss << id + "|"; // category
 		oss << app + "|"; // application
+#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		oss << xid.pid() << "|"; // process id
+#      else
 		oss << process + "|";
 		oss << xid.pid << "|"; // process id
 		oss << mf::MessageDrop::instance()->runEvent + "|"; // run/event no
+#      endif
 		oss << module + "|"; // module name
 	}
 
@@ -191,13 +227,19 @@ namespace mfplugins
 	//======================================================================
 	void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	                         , ELcontextSupplier const&
+# endif
 #endif
 	)
 	{
 		if (error_count_ < error_max_)
 		{
+#          if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+			auto pid = msg.xid().pid();
+#          else
 			auto pid = msg.xid().pid;
+#          endif
 			//std::cout << oss.str() << std::endl;
 			auto string = "UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str();
 			//std::cout << string << std::endl;

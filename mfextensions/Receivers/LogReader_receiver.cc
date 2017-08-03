@@ -119,7 +119,11 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next()
 		msg.setCategory(std::string(what_[2].first, what_[2].second));
 		msg.setTimestamp(tv);
 		msg.setApplication(std::string(what_[3].first, what_[3].second));
+#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		msg.setModule(std::string(what_[5].first, what_[5].second));
+#      else
 		msg.setProcess(std::string(what_[5].first, what_[5].second));
+#      endif
 		//msg.setHostname ( std::string(what_[4].first, what_[4].second) );
 		//msg.setHostaddr ( std::string(what_[5].first, what_[5].second) );
 	}
@@ -140,7 +144,9 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next()
 		", Category: " << msg.category() <<
 		", Hostname: " << msg.hostname() <<
 		", Hostaddr: " << msg.hostaddr() <<
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		", Process: " << msg.process() <<
+# endif
 		", Application: " << msg.application() <<
 		", Module: " << msg.module() <<
 		", Context: " << msg.context() <<

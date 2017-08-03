@@ -130,7 +130,9 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
 		if (++it != tokens.end()) { msg.setSeverity(*it); }
 		if (++it != tokens.end()) { msg.setCategory(*it); }
 		if (++it != tokens.end()) { msg.setApplication(*it); }
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		if (++it != tokens.end()) { msg.setProcess(*it); }
+# endif
 		prevIt = it;
 		try
 		{
