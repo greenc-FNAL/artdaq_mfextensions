@@ -92,7 +92,7 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
 	mf::MessageFacilityMsg msg;
 	if (debug_) { std::cout << "Recieved MF/Syslog message with contents: " << input << std::endl; }
 
-	boost::char_separator<char> sep("|");
+	boost::char_separator<char> sep("|","",boost::keep_empty_tokens);
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 	tokenizer tokens(input, sep);
 	tokenizer::iterator it = tokens.begin();

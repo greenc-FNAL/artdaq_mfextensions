@@ -175,10 +175,8 @@ namespace mfplugins
 # endif
 			lvlNum = 1;
 			break;
-
-
-			TRACE(lvlNum, message);
 		}
+		TRACE(lvlNum, message);
 	}
 	} // end namespace mfplugins
 
