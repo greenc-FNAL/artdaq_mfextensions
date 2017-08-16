@@ -200,6 +200,7 @@ namespace mfplugins
 		oss << app + "|"; // application
 #      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		oss << xid.pid() << "|"; // process id
+		oss << mf::MessageDrop::instance()->iteration + "|"; // run/event no
 #      else
 		oss << process + "|";
 		oss << xid.pid << "|"; // process id

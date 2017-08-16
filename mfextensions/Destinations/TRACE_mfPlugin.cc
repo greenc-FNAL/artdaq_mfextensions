@@ -45,7 +45,7 @@ namespace mfplugins
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		                        , const ELcontextSupplier&
+								, const ELcontextSupplier&
 # endif
 #endif
 		) override;
@@ -57,13 +57,12 @@ namespace mfplugins
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
 #ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		                          , const ELcontextSupplier&
+								  , const ELcontextSupplier&
 # endif
 #endif
 		) override;
 
 	private:
-		int trace_level_offset_;
 		int consecutive_success_count_;
 		int error_count_;
 		int next_error_report_;
@@ -81,7 +80,6 @@ namespace mfplugins
 
 	ELTRACE::ELTRACE(const fhicl::ParameterSet& pset)
 		: ELdestination(pset)
-		, trace_level_offset_(pset.get<int>("level_offset", 0))
 		, consecutive_success_count_(0)
 		, error_count_(0)
 		, next_error_report_(1)
@@ -94,7 +92,7 @@ namespace mfplugins
 		TRACE_CNTL("lvlmsk", lvlm, lvls, 0);
 
 		error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
-		TRACE(trace_level_offset_, "ELTRACE MessageLogger destination plugin initialized.");
+		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
 	}
 
 	//======================================================================
@@ -103,7 +101,7 @@ namespace mfplugins
 	void ELTRACE::fillPrefix(std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	                         , ELcontextSupplier const&
+							 , ELcontextSupplier const&
 # endif
 #endif
 	)
@@ -141,35 +139,60 @@ namespace mfplugins
 	void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg
 #ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	                           , ELcontextSupplier const&
+							   , ELcontextSupplier const&
 # endif
 #endif
 	)
 	{
 		const auto& xid = msg.xid();
 		auto message = oss.str();
+
 # if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-		auto level = trace_level_offset_ + xid.severity().getLevel();
+		auto level = xid.severity().getLevel();
 # else
-		auto level = trace_level_offset_ + xid.severity.getLevel();
+		auto level = xid.severity.getLevel();
 # endif
-		TRACE(level, message);
+		auto lvlNum = 0;
+
+		switch (level)
+		{
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+		case mf::ELseverityLevel::ELsev_incidental:
+# endif
+		case mf::ELseverityLevel::ELsev_success:
+		case mf::ELseverityLevel::ELsev_zeroSeverity:
+		case mf::ELseverityLevel::ELsev_unspecified:
+			lvlNum = 3;
+			break;
+
+		case mf::ELseverityLevel::ELsev_info:
+			lvlNum = 2;
+			break;
+
+		case mf::ELseverityLevel::ELsev_warning:
+# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+		case mf::ELseverityLevel::ELsev_warning2:
+# endif
+			lvlNum = 1;
+			break;
+		}
+		TRACE(lvlNum, message);
 	}
-} // end namespace mfplugins
+	} // end namespace mfplugins
 
-//======================================================================
-//
-// makePlugin function
-//
-//======================================================================
+	//======================================================================
+	//
+	// makePlugin function
+	//
+	//======================================================================
 
-extern "C"
-{
-	auto makePlugin(const std::string&,
-	                const fhicl::ParameterSet& pset)
+	extern "C"
 	{
-		return std::make_unique<mfplugins::ELTRACE>(pset);
+		auto makePlugin(const std::string&,
+						const fhicl::ParameterSet& pset)
+		{
+			return std::make_unique<mfplugins::ELTRACE>(pset);
+		}
 	}
-}
 
-DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)
+	DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)
