@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_01_10
+parent artdaq_mfextensions	v1_01_11
 #defaultqual	e14:s50
 defaultqual	e10:s46
 

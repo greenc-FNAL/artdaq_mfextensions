@@ -2,29 +2,25 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
-#ifdef NO_MF_UTILITIES
-# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-#  include "messagefacility/Utilities/ELseverityLevel.h"
-# else
-#  include "messagefacility/MessageLogger/ELseverityLevel.h"
-# endif
-#else
 #include "messagefacility/Utilities/ELseverityLevel.h"
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-#  include "messagefacility/MessageService/ELcontextSupplier.h"
-# endif
-#endif
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-# include "messagefacility/MessageService/MessageDrop.h"
-#else
+#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+# include "messagefacility/MessageService/ELcontextSupplier.h"
 # include "messagefacility/MessageLogger/MessageDrop.h"
+#else
+# include "messagefacility/MessageService/MessageDrop.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
 
 // C/C++ includes
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <algorithm>
+#include <arpa/inet.h>
+#include <ifaddrs.h>
+#include <netdb.h>
+#include <netinet/in.h>
+
 
 // Boost includes
 #include <boost/asio.hpp>
@@ -35,11 +31,9 @@ namespace mfplugins
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	using mf::service::ELcontextSupplier;
 # endif
-#endif
 	using boost::asio::ip::udp;
 
 	//======================================================================
@@ -55,11 +49,9 @@ namespace mfplugins
 		ELUDP(const fhicl::ParameterSet& pset);
 
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		                        , const ELcontextSupplier&
+								, const ELcontextSupplier&
 # endif
-#endif
 		) override;
 
 		virtual void fillUsrMsg(std::ostringstream&, const ErrorObj&) override;
@@ -67,11 +59,9 @@ namespace mfplugins
 		virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		                          , const ELcontextSupplier&
+								  , const ELcontextSupplier&
 # endif
-#endif
 		) override;
 
 	private:
@@ -88,6 +78,12 @@ namespace mfplugins
 		std::string host_;
 		int port_;
 		int seqNum_;
+
+
+		long pid_;
+		std::string hostname_;
+		std::string hostaddr_;
+		std::string app_;
 	};
 
 	// END DECLARATION
@@ -112,8 +108,101 @@ namespace mfplugins
 		, host_(pset.get<std::string>("host", "227.128.12.27"))
 		, port_(pset.get<int>("port", 5140))
 		, seqNum_(0)
+		, pid_(static_cast<long>(getpid()))
 	{
 		reconnect_();
+
+		// hostname
+		char hostname_c[1024];
+		hostname_ = (gethostname(hostname_c, 1023) == 0) ? hostname_c : "Unkonwn Host";
+		
+		// host ip address
+		hostent* host = nullptr;
+		host = gethostbyname(hostname_c);
+
+		if (host != nullptr)
+		{
+			// ip address from hostname if the entry exists in /etc/hosts
+			char* ip = inet_ntoa(*(struct in_addr *)host->h_addr);
+			hostaddr_ = ip;
+		}
+		else
+		{
+			// enumerate all network interfaces
+			struct ifaddrs* ifAddrStruct = nullptr;
+			struct ifaddrs* ifa = nullptr;
+			void* tmpAddrPtr = nullptr;
+
+			if (getifaddrs(&ifAddrStruct))
+			{
+				// failed to get addr struct
+				hostaddr_ = "127.0.0.1";
+			}
+			else
+			{
+				// iterate through all interfaces
+				for (ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next)
+				{
+					if (ifa->ifa_addr->sa_family == AF_INET)
+					{
+						// a valid IPv4 addres
+						tmpAddrPtr = &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+						char addressBuffer[INET_ADDRSTRLEN];
+						inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+						hostaddr_ = addressBuffer;
+					}
+
+					else if (ifa->ifa_addr->sa_family == AF_INET6)
+					{
+						// a valid IPv6 address
+						tmpAddrPtr = &((struct sockaddr_in6 *)ifa->ifa_addr)->sin6_addr;
+						char addressBuffer[INET6_ADDRSTRLEN];
+						inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
+						hostaddr_ = addressBuffer;
+					}
+
+					// find first non-local address
+					if (!hostaddr_.empty()
+						&& hostaddr_.compare("127.0.0.1")
+						&& hostaddr_.compare("::1"))
+						break;
+				}
+
+				if (hostaddr_.empty()) // failed to find anything
+					hostaddr_ = "127.0.0.1";
+			}
+		}
+
+#if 0
+		// get process name from '/proc/pid/exe'
+		std::string exe;
+		std::ostringstream pid_ostr;
+		pid_ostr << "/proc/" << pid_ << "/exe";
+		exe = realpath(pid_ostr.str().c_str(), NULL);
+
+		size_t end = exe.find('\0');
+		size_t start = exe.find_last_of('/', end);
+
+		app_ = exe.substr(start + 1, end - start - 1);
+#else
+		// get process name from '/proc/pid/cmdline'
+		std::stringstream ss;
+		ss << "//proc//" << pid_ << "//cmdline";
+		std::ifstream procfile{ ss.str().c_str() };
+
+		std::string procinfo;
+
+		if (procfile.is_open())
+		{
+			procfile >> procinfo;
+			procfile.close();
+		}
+
+		size_t end = procinfo.find('\0');
+		size_t start = procinfo.find_last_of('/', end);
+
+		app_ = procinfo.substr(start + 1, end - start - 1);
+#endif
 	}
 
 	void ELUDP::reconnect_(bool quiet)
@@ -159,19 +248,17 @@ namespace mfplugins
 	// Message prefix filler ( overriddes ELdestination::fillPrefix )
 	//======================================================================
 	void ELUDP::fillPrefix(std::ostringstream& oss, const ErrorObj& msg
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	                       , ELcontextSupplier const&
+						   , ELcontextSupplier const&
 # endif
-#endif
 	)
 	{
 		const auto& xid = msg.xid();
 
 #      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		auto id = xid.id();
-		auto app = xid.application();
 		auto module = xid.module();
+		auto app = app_;
 #      else
 		auto id = xid.id;
 		auto app = xid.application;
@@ -185,28 +272,28 @@ namespace mfplugins
 #      endif
 		std::replace(module.begin(), module.end(), '|', '!');
 
-		oss << format.timestamp(msg.timestamp()) + "|"; // timestamp
-		oss << std::to_string(++seqNum_) + "|"; // sequence number
+		oss << format.timestamp(msg.timestamp()) << "|"; // timestamp
+		oss << std::to_string(++seqNum_) << "|"; // sequence number
 #      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-		oss << xid.hostname() + "|"; // host name
-		oss << xid.hostaddr() + "|"; // host address
-		oss << xid.severity().getName() + "|"; // severity
+		oss << hostname_ << "|"; // host name
+		oss << hostaddr_ << "|"; // host address
+		oss << xid.severity().getName() << "|"; // severity
 #      else
-		oss << xid.hostname + "|"; // host name
-		oss << xid.hostaddr + "|"; // host address
-		oss << xid.severity.getName() + "|"; // severity
+		oss << xid.hostname << "|"; // host name
+		oss << xid.hostaddr << "|"; // host address
+		oss << xid.severity.getName() << "|"; // severity
 #      endif
-		oss << id + "|"; // category
-		oss << app + "|"; // application
+		oss << id << "|"; // category
+		oss << app << "|"; // application
 #      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-		oss << xid.pid() << "|"; // process id
-		oss << mf::MessageDrop::instance()->iteration + "|"; // run/event no
+		oss << pid_ << "|"; // process id
+		oss << mf::MessageDrop::instance()->iteration << "|"; // run/event no
 #      else
-		oss << process + "|";
+		oss << process << "|";
 		oss << xid.pid << "|"; // process id
-		oss << mf::MessageDrop::instance()->runEvent + "|"; // run/event no
+		oss << mf::MessageDrop::instance()->runEvent << "|"; // run/event no
 #      endif
-		oss << module + "|"; // module name
+		oss << module << "|"; // module name
 	}
 
 	//======================================================================
@@ -226,18 +313,18 @@ namespace mfplugins
 	//======================================================================
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
-	void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj& msg
-#ifndef NO_MF_UTILITIES
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	                         , ELcontextSupplier const&
-# endif
+	void ELUDP::routePayload(const std::ostringstream& oss
+#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+							 , const ErrorObj& msg, ELcontextSupplier const&
+#else
+							 , const ErrorObj&
 #endif
 	)
 	{
 		if (error_count_ < error_max_)
 		{
 #          if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-			auto pid = msg.xid().pid();
+			auto pid = pid_;
 #          else
 			auto pid = msg.xid().pid;
 #          endif
@@ -291,7 +378,7 @@ namespace mfplugins
 extern "C"
 {
 	auto makePlugin(const std::string&,
-	                const fhicl::ParameterSet& pset)
+					const fhicl::ParameterSet& pset)
 	{
 		return std::make_unique<mfplugins::ELUDP>(pset);
 	}

@@ -2,15 +2,9 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
-#ifdef NO_MF_UTILITIES
-#include "messagefacility/MessageLogger/ELseverityLevel.h"
-#else
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-#  include "messagefacility/MessageService/ELcontextSupplier.h"
-# endif
-# include "messagefacility/Utilities/ELseverityLevel.h"
-#endif
+#include "messagefacility/Utilities/ELseverityLevel.h"
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+# include "messagefacility/MessageService/ELcontextSupplier.h"
 # include "messagefacility/MessageLogger/MessageDrop.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
@@ -23,11 +17,9 @@ namespace mfplugins
 {
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	using mf::service::ELcontextSupplier;
 # endif
-#endif
 	using mf::ErrorObj;
 
 	//======================================================================
@@ -43,11 +35,9 @@ namespace mfplugins
 		ELTRACE(const fhicl::ParameterSet& pset);
 
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 								, const ELcontextSupplier&
 # endif
-#endif
 		) override;
 
 		virtual void fillUsrMsg(std::ostringstream&, const ErrorObj&) override;
@@ -55,11 +45,9 @@ namespace mfplugins
 		virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 								  , const ELcontextSupplier&
 # endif
-#endif
 		) override;
 
 	private:
@@ -99,11 +87,9 @@ namespace mfplugins
 	// Message prefix filler ( overriddes ELdestination::fillPrefix )
 	//======================================================================
 	void ELTRACE::fillPrefix(std::ostringstream& oss, const ErrorObj& msg
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 							 , ELcontextSupplier const&
 # endif
-#endif
 	)
 	{
 		const auto& xid = msg.xid();
@@ -137,11 +123,9 @@ namespace mfplugins
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
 	void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 							   , ELcontextSupplier const&
 # endif
-#endif
 	)
 	{
 		const auto& xid = msg.xid();

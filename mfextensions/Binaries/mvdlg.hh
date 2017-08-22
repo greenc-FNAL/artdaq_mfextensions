@@ -2,11 +2,7 @@
 #define MSGVIEWERDLG_H
 
 #include "ui_msgviewerdlgui.h"
-#ifdef NO_MF_UTILITIES
-#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
-#else
 #include "messagefacility/Utilities/MessageFacilityMsg.h"
-#endif
 #include "mfextensions/Extensions/throttle.hh"
 #include "mfextensions/Extensions/suppress.hh"
 #include "mfextensions/Binaries/qt_mf_msg.hh"

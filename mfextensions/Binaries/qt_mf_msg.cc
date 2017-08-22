@@ -1,10 +1,5 @@
-#ifdef NO_MF_UTILITIES
-#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
-#include "messagefacility/MessageLogger/ELseverityLevel.h"
-#else
 #include "messagefacility/Utilities/MessageFacilityMsg.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#endif
 
 #include "mfextensions/Binaries/qt_mf_msg.hh"
 //#include "mfextensions/Extensions/MFExtensions.hh"
@@ -17,7 +12,7 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const& msg)
 	, sev_()
 	, host_(QString(msg.hostname().substr(0, msg.hostname().find_first_of('.')).c_str()))
 	, cat_(QString(msg.category().c_str()))
-	, app_(QString(msg.application().c_str()))
+	, app_(QString((msg.application() + " (" + std::to_string(msg.pid()) + ")").c_str()))
 	, time_(msg.timestamp())
 {
 	mf::ELseverityLevel severity(msg.severity());

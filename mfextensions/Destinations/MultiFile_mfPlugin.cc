@@ -3,15 +3,9 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
-#ifdef NO_MF_UTILITIES
-# include "messagefacility/MessageLogger/ELseverityLevel.h"
-#else
 # include "messagefacility/Utilities/ELseverityLevel.h"
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-#  include "messagefacility/MessageService/ELcontextSupplier.h"
-# endif
-#endif
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+# include "messagefacility/MessageService/ELcontextSupplier.h"
 # include "messagefacility/MessageLogger/MessageDrop.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
@@ -23,10 +17,8 @@ namespace mfplugins
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
-#ifndef NO_MF_UTILITIES
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	using mf::service::ELcontextSupplier;
-# endif
 #endif
 
 	//======================================================================
@@ -44,18 +36,14 @@ namespace mfplugins
 		virtual ~ELMultiFileOutput() {}
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		                          , const ELcontextSupplier&
-# endif
 #endif
 		) override;
 
 		virtual void flush(
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 			const ELcontextSupplier&
-# endif
 #endif
 		) override;
 
@@ -92,10 +80,8 @@ namespace mfplugins
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
 	void ELMultiFileOutput::routePayload(const std::ostringstream& oss, const ErrorObj& msg
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	                                     , ELcontextSupplier const& sup
-# endif
 #endif
 	)
 	{
@@ -124,19 +110,15 @@ namespace mfplugins
 		}
 		*outputs_[fileName] << oss.str();
 		flush(
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 			sup
-# endif
 #endif
 		);
 	}
 
 	void ELMultiFileOutput::flush(
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		ELcontextSupplier const&
-# endif
 #endif
 	)
 	{
