@@ -1,9 +1,5 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#ifdef NO_MF_UTILITIES
-#include "messagefacility/MessageLogger/MessageFacilityMsg.h"
-#else
 #include "messagefacility/Utilities/MessageFacilityMsg.h"
-#endif
 
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>

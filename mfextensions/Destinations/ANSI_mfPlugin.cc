@@ -2,16 +2,10 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
-#ifdef NO_MF_UTILITIES
-# include "messagefacility/MessageLogger/ELseverityLevel.h"
-#else
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-#  include "messagefacility/MessageService/ELcontextSupplier.h"
-# endif
-# include "messagefacility/Utilities/ELseverityLevel.h"
-#endif
+#include "messagefacility/Utilities/ELseverityLevel.h"
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 # include "messagefacility/MessageLogger/MessageDrop.h"
+# include "messagefacility/MessageService/ELcontextSupplier.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
 #include "messagefacility/Utilities/formatTime.h"
@@ -21,10 +15,8 @@ namespace mfplugins
 {
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
-#ifndef NO_MF_UTILITIES
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 	using mf::service::ELcontextSupplier;
-# endif
 #endif
 	using mf::ErrorObj;
 
@@ -41,13 +33,9 @@ namespace mfplugins
 		ELANSI(const fhicl::ParameterSet& pset);
 
 #  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-		virtual void routePayload(const std::ostringstream&, const ErrorObj& ) override;
+		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
 #  else
-		virtual void routePayload(const std::ostringstream&, const ErrorObj&
-#   ifndef NO_MF_UTILITIES
-		                          , const ELcontextSupplier&
-#   endif
-		) override;
+		virtual void routePayload(const std::ostringstream&, const ErrorObj&, const ELcontextSupplier&) override;
 #  endif
 
 	private:
@@ -76,11 +64,9 @@ namespace mfplugins
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
 	void ELANSI::routePayload(const std::ostringstream& oss, const ErrorObj& msg
-#ifndef NO_MF_UTILITIES
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	                          , ELcontextSupplier const&
+							  , ELcontextSupplier const&
 # endif
-#endif
 	)
 	{
 		const auto& xid = msg.xid();
@@ -143,7 +129,7 @@ namespace mfplugins
 extern "C"
 {
 	auto makePlugin(const std::string&,
-	                const fhicl::ParameterSet& pset)
+					const fhicl::ParameterSet& pset)
 	{
 		return std::make_unique<mfplugins::ELANSI>(pset);
 	}

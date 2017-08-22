@@ -4,15 +4,9 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/MessageService/ELostreamOutput.h"
-#ifdef NO_MF_UTILITIES
-# include "messagefacility/MessageLogger/ELseverityLevel.h"
-#else
-# include "messagefacility/Utilities/ELseverityLevel.h"
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-#  include "messagefacility/MessageService/ELcontextSupplier.h"
-# endif
-#endif
+#include "messagefacility/Utilities/ELseverityLevel.h"
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
+# include "messagefacility/MessageService/ELcontextSupplier.h"
 # include "messagefacility/MessageLogger/MessageDrop.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
