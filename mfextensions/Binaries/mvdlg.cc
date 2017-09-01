@@ -9,7 +9,7 @@
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
-const size_t msgViewerDlg::BUFFER_SIZE[4] = {500, 1000, 1000, 1000};
+const size_t msgViewerDlg::BUFFER_SIZE[4] = {5000, 10000, 10000, 10000};
 const size_t msgViewerDlg::MAX_DISPLAY_MSGS = 10000;
 
 // replace the ${..} part in the filename with env variable
@@ -449,6 +449,10 @@ void msgViewerDlg::displayMsg(msgs_t::const_iterator it)
 
 	buf_lock.lock();
 	buffer += it->text(shortMode_);
+	++nDisplayMsgs;
+
+	lcdDisplayedMsgs->display(nDisplayMsgs);
+
 	buf_lock.unlock();
 }
 
@@ -486,6 +490,8 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 		if (it->get()->sev() >= sevThresh)
 		{
 			txt += it->get()->text(shortMode_);
+			++nDisplayMsgs;
+			lcdDisplayedMsgs->display(nDisplayMsgs);
 		}
 
 		if (i == 1000)
@@ -543,6 +549,8 @@ void msgViewerDlg::displayMsg()
 		if (it->sev() >= sevThresh)
 		{
 			txt += it->text(shortMode_);
+			++nDisplayMsgs;
+			lcdDisplayedMsgs->display(nDisplayMsgs);
 		}
 
 		if (i == 1000)
@@ -633,6 +641,7 @@ void list_intersect(msg_iters_t& l1, msg_iters_t const& l2)
 
 void msgViewerDlg::setFilter()
 {
+	nDisplayMsgs = 0;
 	hostFilter = toQStringList(lwHost->selectedItems());
 	appFilter = toQStringList(lwApplication->selectedItems());
 	catFilter = toQStringList(lwCategory->selectedItems());

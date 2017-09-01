@@ -124,6 +124,7 @@ private:
 	int nMsgs;
 	int nSupMsgs; // suppressed msgs
 	int nThrMsgs; // throttled msgs
+	int nDisplayMsgs; // Displayed messages
 
 	// Rendering messages in speed mode or full mode
 	bool simpleRender;
