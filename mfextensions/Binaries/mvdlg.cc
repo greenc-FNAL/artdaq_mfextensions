@@ -9,7 +9,7 @@
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
-const size_t msgViewerDlg::BUFFER_SIZE[4] = {5000, 10000, 10000, 10000};
+const size_t msgViewerDlg::BUFFER_SIZE[4] = {500, 1000, 1000, 1000};
 const size_t msgViewerDlg::MAX_DISPLAY_MSGS = 10000;
 
 // replace the ${..} part in the filename with env variable
