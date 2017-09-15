@@ -9,9 +9,6 @@
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
-const size_t msgViewerDlg::BUFFER_SIZE[4] = {500, 1000, 1000, 1000};
-const size_t msgViewerDlg::MAX_DISPLAY_MSGS = 10000;
-
 // replace the ${..} part in the filename with env variable
 // throw if the env does not exist
 static void
@@ -116,7 +113,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	connect(btnPause, SIGNAL(clicked()), this, SLOT(pause()));
 	connect(btnExit, SIGNAL(clicked()), this, SLOT(exit()));
 	connect(btnClear, SIGNAL(clicked()), this, SLOT(clear()));
-	
+
 	connect(btnRMode, SIGNAL(clicked()), this, SLOT(renderMode()));
 	connect(btnDisplayMode, SIGNAL(clicked()), this, SLOT(shortMode()));
 
@@ -153,7 +150,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 			, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
 
 	connect(&timer, SIGNAL(timeout()), this, SLOT(updateDisplayMsgs()));
-	
+
 	if (simpleRender) btnRMode->setChecked(true);
 	else btnRMode->setChecked(false);
 
@@ -162,7 +159,6 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	changeSeverity(sevThresh);
 
 	QTextDocument* doc = new QTextDocument(txtMessages);
-	doc->setMaximumBlockCount(1 * MAX_DISPLAY_MSGS);
 	txtMessages->setDocument(doc);
 
 	// start the text edit widget update timer
@@ -401,42 +397,6 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 	{
 		// push to corresponding list
 		ait->second[sev].push_back(it);
-
-		// remove earlist msg
-		if (ait->second[sev].size() > BUFFER_SIZE[sev])
-		{
-			// iter to the msg node to be deleted
-			msgs_t::iterator mit = ait->second[sev].front().get();
-
-			// update obselete host_map and cat_map
-			msg_iters_map_t::iterator map_it = host_msgs_.find(mit->host());
-			if (map_it != host_msgs_.end())
-			{
-				map_it->second.remove(ait->second[sev].front());
-				if (map_it->second.empty())
-				{
-					host_msgs_.erase(map_it);
-					update |= LIST_HOST;
-				}
-			}
-
-			map_it = cat_msgs_.find(mit->cat());
-			if (map_it != cat_msgs_.end())
-			{
-				map_it->second.remove(ait->second[sev].front());
-				if (map_it->second.empty())
-				{
-					cat_msgs_.erase(map_it);
-					update |= LIST_CAT;
-				}
-			}
-
-			// remove the message from msg pool
-			msg_pool_.erase(mit);
-
-			// remove from app_sev index
-			ait->second[sev].pop_front();
-		}
 	}
 
 	return update;
@@ -462,18 +422,8 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 
 	msg_iters_t::const_iterator it;
 
-	if (msgs.size() > MAX_DISPLAY_MSGS)
-	{
-		n = MAX_DISPLAY_MSGS;
-		it = msgs.end();
-		std::advance(it, -n);
-	}
-	else
-	{
-		n = msgs.size();
-		it = msgs.begin();
-	}
-
+	n = msgs.size();
+	it = msgs.begin();
 	QProgressDialog progress("Fetching data...", "Cancel"
 							 , 0, n / 1000, this);
 
@@ -485,7 +435,7 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 
 	updating = true;
 
-	for (; it != msgs.end(); ++it , ++i)
+	for (; it != msgs.end(); ++it, ++i)
 	{
 		if (it->get()->sev() >= sevThresh)
 		{
@@ -521,17 +471,8 @@ void msgViewerDlg::displayMsg()
 
 	msgs_t::const_iterator it;
 
-	if (msg_pool_.size() > MAX_DISPLAY_MSGS)
-	{
-		n = MAX_DISPLAY_MSGS;
-		it = msg_pool_.end();
-		std::advance(it, -n);
-	}
-	else
-	{
 		n = msg_pool_.size();
 		it = msg_pool_.begin();
-	}
 
 	QProgressDialog progress("Fetching data...", "Cancel"
 							 , 0, n / 1000, this);
@@ -544,7 +485,7 @@ void msgViewerDlg::displayMsg()
 
 	updating = true;
 
-	for (; it != msg_pool_.end(); ++it , ++i)
+	for (; it != msg_pool_.end(); ++it, ++i)
 	{
 		if (it->sev() >= sevThresh)
 		{
