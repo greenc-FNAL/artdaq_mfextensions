@@ -107,6 +107,8 @@ private:
 
 	QStringList toQStringList(QList<QListWidgetItem *> in);
 
+	msg_iters_t list_intersect(msg_iters_t const& l1, msg_iters_t const& l2);
+
 	//---------------------------------------------------------------------------
 
 private:

@@ -8,6 +8,7 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "mfextensions/Binaries/mvdlg.hh"
+#include "trace.h"
 
 // replace the ${..} part in the filename with env variable
 // throw if the env does not exist
@@ -346,7 +347,7 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
 	}
 
 	// push the message to the message pool
-	msg_pool_.push_back(mfmsg);
+	msg_pool_.emplace_back(mfmsg);
 	msgs_t::iterator it = --msg_pool_.end();
 
 	// update corresponding lists of index
@@ -471,8 +472,8 @@ void msgViewerDlg::displayMsg()
 
 	msgs_t::const_iterator it;
 
-		n = msg_pool_.size();
-		it = msg_pool_.begin();
+	n = msg_pool_.size();
+	it = msg_pool_.begin();
 
 	QProgressDialog progress("Fetching data...", "Cancel"
 							 , 0, n / 1000, this);
@@ -563,26 +564,49 @@ bool msgViewerDlg::updateList(QListWidget* lw
 	return false;
 }
 
-void list_intersect(msg_iters_t& l1, msg_iters_t const& l2)
+msg_iters_t msgViewerDlg::list_intersect(msg_iters_t const& l1, msg_iters_t const& l2)
 {
-	msg_iters_t::iterator it1 = l1.begin();
+	msg_iters_t output;
+	msg_iters_t::const_iterator it1 = l1.begin();
 	msg_iters_t::const_iterator it2 = l2.begin();
 
 	while (it1 != l1.end() && it2 != l2.end())
 	{
-		if (*it1 < *it2) { it1 = l1.erase(it1); }
+		if (*it1 < *it2) { ++it1; }
 		else if (*it2 < *it1) { ++it2; }
 		else
 		{
+			output.push_back(*it1);
 			++it1;
 			++it2;
 		}
 	}
+
+	TRACE(10, "list_intersect: output list has %zu entries", output.size());
+	return output;
+}
+
+std::string sev_to_string(sev_code_t s)
+{
+	switch (s)
+	{
+	case SDEBUG:
+		return "DEBUG";
+	case SINFO:
+		return "INFO";
+	case SWARNING:
+		return "WARNING";
+	case SERROR:
+		return "ERROR";
+	}
+	return "UNKNOWN";
 }
 
 void msgViewerDlg::setFilter()
 {
 	nDisplayMsgs = 0;
+	lcdDisplayedMsgs->display(nDisplayMsgs);
+
 	hostFilter = toQStringList(lwHost->selectedItems());
 	appFilter = toQStringList(lwApplication->selectedItems());
 	catFilter = toQStringList(lwCategory->selectedItems());
@@ -610,36 +634,48 @@ void msgViewerDlg::setFilter()
 			for (int s = sevThresh; s <= SERROR; ++s)
 			{
 				msg_iters_t temp(it->second[s]);
+				TRACE(10, "setFilter: app " + appFilter[app].toStdString() + " has %zu messages at severity " + sev_to_string(static_cast<sev_code_t>(s)), temp.size());
 				result.merge(temp);
 			}
 		}
 	}
+	TRACE(10, "setFilter: result contains %zu messages", result.size());
 
-	msg_iters_t hostResult;
-	for (auto host = 0; host < hostFilter.size(); ++host)
-	{ // host index
-		msg_iters_map_t::const_iterator it = host_msgs_.find(hostFilter[host]);
-		if (it != host_msgs_.end())
-		{
-			msg_iters_t temp(it->second);
-			hostResult.merge(temp);
+	if (!hostFilter.isEmpty())
+	{
+		msg_iters_t hostResult;
+		for (auto host = 0; host < hostFilter.size(); ++host)
+		{ // host index
+			msg_iters_map_t::const_iterator it = host_msgs_.find(hostFilter[host]);
+			if (it != host_msgs_.end())
+			{
+				msg_iters_t temp(it->second);
+				TRACE(10, "setFilter: host " + hostFilter[host].toStdString() + " has %zu messages", temp.size());
+				hostResult.merge(temp);
+			}
 		}
+		if (result.empty()) { result = hostResult; }
+		else { result = list_intersect(result, hostResult); }
+		TRACE(10, "setFilter: result contains %zu messages", result.size());
 	}
-	if (result.empty()) { result = hostResult; }
-	else { list_intersect(result, hostResult); }
 
-	msg_iters_t catResult;
-	for (auto cat = 0; cat < catFilter.size(); ++cat)
-	{ // cat index
-		msg_iters_map_t::const_iterator it = cat_msgs_.find(catFilter[cat]);
-		if (it != cat_msgs_.end())
-		{
-			msg_iters_t temp(it->second);
-			catResult.merge(temp);
+	if (!catFilter.isEmpty())
+	{
+		msg_iters_t catResult;
+		for (auto cat = 0; cat < catFilter.size(); ++cat)
+		{ // cat index
+			msg_iters_map_t::const_iterator it = cat_msgs_.find(catFilter[cat]);
+			if (it != cat_msgs_.end())
+			{
+				msg_iters_t temp(it->second);
+				TRACE(10, "setFilter: cat " + catFilter[cat].toStdString() + " has %zu messages", temp.size());
+				catResult.merge(temp);
+			}
 		}
+		if (result.empty()) { result = catResult; }
+		else { result = list_intersect(result, catResult); }
+		TRACE(10, "setFilter: result contains %zu messages", result.size());
 	}
-	if (result.empty()) { result = catResult; }
-	else { list_intersect(result, catResult); }
 
 	// Update the view
 	txtMessages->clear();

@@ -31,7 +31,7 @@ class qt_mf_msg
 {
 public:
 	// ctor & dtor
-	qt_mf_msg(mf::MessageFacilityMsg const& msg);
+	explicit qt_mf_msg(mf::MessageFacilityMsg const& msg);
 
 	// get method
 	QString const& text(bool mode) const { return mode ? shortText_ : text_; }
@@ -41,6 +41,7 @@ public:
 	QString const& cat() const { return cat_; }
 	QString const& app() const { return app_; }
 	timeval time() const { return time_; }
+	size_t seq() const { return seq_; }
 
 private:
 
@@ -52,6 +53,8 @@ private:
 	QString cat_;
 	QString app_;
 	timeval time_;
+	size_t seq_;
+	static size_t sequence;
 };
 
 typedef std::list<qt_mf_msg> msgs_t;
@@ -64,20 +67,18 @@ public:
 	msg_iter_t(msgs_t::iterator it)
 	{
 		iter_ = it;
-		time_ = it->time();
+		seq_ = it->seq();
 	}
 
 	// operators
 	bool operator==(msg_iter_t const& other) const
 	{
-		return iter_ == other.iter_;
+		return seq_ == other.seq_;
 	}
 
 	bool operator<(msg_iter_t const& other) const
 	{
-		return (time_.tv_sec == other.time_.tv_sec)
-			       ? (time_.tv_usec < other.time_.tv_usec)
-			       : (time_.tv_sec < other.time_.tv_sec);
+		return seq_ < other.seq_;
 	}
 
 	// get methods
@@ -87,7 +88,7 @@ public:
 private:
 
 	msgs_t::iterator iter_;
-	timeval time_;
+	size_t seq_;
 };
 
 typedef std::list<msg_iter_t> msg_iters_t;

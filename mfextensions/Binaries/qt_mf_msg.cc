@@ -5,6 +5,8 @@
 //#include "mfextensions/Extensions/MFExtensions.hh"
 #include <iostream>
 
+size_t qt_mf_msg::sequence = 0;
+
 qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const& msg)
 	: text_()
 	, shortText_()
@@ -14,6 +16,7 @@ qt_mf_msg::qt_mf_msg(mf::MessageFacilityMsg const& msg)
 	, cat_(QString(msg.category().c_str()))
 	, app_(QString((msg.application() + " (" + std::to_string(msg.pid()) + ")").c_str()))
 	, time_(msg.timestamp())
+	, seq_(++sequence)
 {
 	mf::ELseverityLevel severity(msg.severity());
 	int sevid = severity.getLevel();
