@@ -34,6 +34,8 @@ ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
 	${CETLIB_EXCEPT}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_DATE_TIME_LIBRARY}
 )
 
 basic_plugin( "MultiFile" "mfPlugin"
