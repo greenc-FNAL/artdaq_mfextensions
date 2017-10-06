@@ -8,9 +8,7 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "mfextensions/Binaries/mvdlg.hh"
-
-const size_t msgViewerDlg::BUFFER_SIZE[4] = {500, 1000, 1000, 1000};
-const size_t msgViewerDlg::MAX_DISPLAY_MSGS = 10000;
+#include "trace.h"
 
 // replace the ${..} part in the filename with env variable
 // throw if the env does not exist
@@ -116,7 +114,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	connect(btnPause, SIGNAL(clicked()), this, SLOT(pause()));
 	connect(btnExit, SIGNAL(clicked()), this, SLOT(exit()));
 	connect(btnClear, SIGNAL(clicked()), this, SLOT(clear()));
-	
+
 	connect(btnRMode, SIGNAL(clicked()), this, SLOT(renderMode()));
 	connect(btnDisplayMode, SIGNAL(clicked()), this, SLOT(shortMode()));
 
@@ -153,7 +151,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 			, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
 
 	connect(&timer, SIGNAL(timeout()), this, SLOT(updateDisplayMsgs()));
-	
+
 	if (simpleRender) btnRMode->setChecked(true);
 	else btnRMode->setChecked(false);
 
@@ -162,7 +160,6 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	changeSeverity(sevThresh);
 
 	QTextDocument* doc = new QTextDocument(txtMessages);
-	doc->setMaximumBlockCount(1 * MAX_DISPLAY_MSGS);
 	txtMessages->setDocument(doc);
 
 	// start the text edit widget update timer
@@ -350,7 +347,7 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
 	}
 
 	// push the message to the message pool
-	msg_pool_.push_back(mfmsg);
+	msg_pool_.emplace_back(mfmsg);
 	msgs_t::iterator it = --msg_pool_.end();
 
 	// update corresponding lists of index
@@ -401,42 +398,6 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 	{
 		// push to corresponding list
 		ait->second[sev].push_back(it);
-
-		// remove earlist msg
-		if (ait->second[sev].size() > BUFFER_SIZE[sev])
-		{
-			// iter to the msg node to be deleted
-			msgs_t::iterator mit = ait->second[sev].front().get();
-
-			// update obselete host_map and cat_map
-			msg_iters_map_t::iterator map_it = host_msgs_.find(mit->host());
-			if (map_it != host_msgs_.end())
-			{
-				map_it->second.remove(ait->second[sev].front());
-				if (map_it->second.empty())
-				{
-					host_msgs_.erase(map_it);
-					update |= LIST_HOST;
-				}
-			}
-
-			map_it = cat_msgs_.find(mit->cat());
-			if (map_it != cat_msgs_.end())
-			{
-				map_it->second.remove(ait->second[sev].front());
-				if (map_it->second.empty())
-				{
-					cat_msgs_.erase(map_it);
-					update |= LIST_CAT;
-				}
-			}
-
-			// remove the message from msg pool
-			msg_pool_.erase(mit);
-
-			// remove from app_sev index
-			ait->second[sev].pop_front();
-		}
 	}
 
 	return update;
@@ -449,6 +410,10 @@ void msgViewerDlg::displayMsg(msgs_t::const_iterator it)
 
 	buf_lock.lock();
 	buffer += it->text(shortMode_);
+	++nDisplayMsgs;
+
+	lcdDisplayedMsgs->display(nDisplayMsgs);
+
 	buf_lock.unlock();
 }
 
@@ -458,18 +423,8 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 
 	msg_iters_t::const_iterator it;
 
-	if (msgs.size() > MAX_DISPLAY_MSGS)
-	{
-		n = MAX_DISPLAY_MSGS;
-		it = msgs.end();
-		std::advance(it, -n);
-	}
-	else
-	{
-		n = msgs.size();
-		it = msgs.begin();
-	}
-
+	n = msgs.size();
+	it = msgs.begin();
 	QProgressDialog progress("Fetching data...", "Cancel"
 							 , 0, n / 1000, this);
 
@@ -481,11 +436,13 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 
 	updating = true;
 
-	for (; it != msgs.end(); ++it , ++i)
+	for (; it != msgs.end(); ++it, ++i)
 	{
 		if (it->get()->sev() >= sevThresh)
 		{
 			txt += it->get()->text(shortMode_);
+			++nDisplayMsgs;
+			lcdDisplayedMsgs->display(nDisplayMsgs);
 		}
 
 		if (i == 1000)
@@ -515,17 +472,8 @@ void msgViewerDlg::displayMsg()
 
 	msgs_t::const_iterator it;
 
-	if (msg_pool_.size() > MAX_DISPLAY_MSGS)
-	{
-		n = MAX_DISPLAY_MSGS;
-		it = msg_pool_.end();
-		std::advance(it, -n);
-	}
-	else
-	{
-		n = msg_pool_.size();
-		it = msg_pool_.begin();
-	}
+	n = msg_pool_.size();
+	it = msg_pool_.begin();
 
 	QProgressDialog progress("Fetching data...", "Cancel"
 							 , 0, n / 1000, this);
@@ -538,11 +486,13 @@ void msgViewerDlg::displayMsg()
 
 	updating = true;
 
-	for (; it != msg_pool_.end(); ++it , ++i)
+	for (; it != msg_pool_.end(); ++it, ++i)
 	{
 		if (it->sev() >= sevThresh)
 		{
 			txt += it->text(shortMode_);
+			++nDisplayMsgs;
+			lcdDisplayedMsgs->display(nDisplayMsgs);
 		}
 
 		if (i == 1000)
@@ -614,25 +564,49 @@ bool msgViewerDlg::updateList(QListWidget* lw
 	return false;
 }
 
-void list_intersect(msg_iters_t& l1, msg_iters_t const& l2)
+msg_iters_t msgViewerDlg::list_intersect(msg_iters_t const& l1, msg_iters_t const& l2)
 {
-	msg_iters_t::iterator it1 = l1.begin();
+	msg_iters_t output;
+	msg_iters_t::const_iterator it1 = l1.begin();
 	msg_iters_t::const_iterator it2 = l2.begin();
 
 	while (it1 != l1.end() && it2 != l2.end())
 	{
-		if (*it1 < *it2) { it1 = l1.erase(it1); }
+		if (*it1 < *it2) { ++it1; }
 		else if (*it2 < *it1) { ++it2; }
 		else
 		{
+			output.push_back(*it1);
 			++it1;
 			++it2;
 		}
 	}
+
+	TRACE(10, "list_intersect: output list has %zu entries", output.size());
+	return output;
+}
+
+std::string sev_to_string(sev_code_t s)
+{
+	switch (s)
+	{
+	case SDEBUG:
+		return "DEBUG";
+	case SINFO:
+		return "INFO";
+	case SWARNING:
+		return "WARNING";
+	case SERROR:
+		return "ERROR";
+	}
+	return "UNKNOWN";
 }
 
 void msgViewerDlg::setFilter()
 {
+	nDisplayMsgs = 0;
+	lcdDisplayedMsgs->display(nDisplayMsgs);
+
 	hostFilter = toQStringList(lwHost->selectedItems());
 	appFilter = toQStringList(lwApplication->selectedItems());
 	catFilter = toQStringList(lwCategory->selectedItems());
@@ -660,36 +634,48 @@ void msgViewerDlg::setFilter()
 			for (int s = sevThresh; s <= SERROR; ++s)
 			{
 				msg_iters_t temp(it->second[s]);
+				TRACE(10, "setFilter: app " + appFilter[app].toStdString() + " has %zu messages at severity " + sev_to_string(static_cast<sev_code_t>(s)), temp.size());
 				result.merge(temp);
 			}
 		}
 	}
+	TRACE(10, "setFilter: result contains %zu messages", result.size());
 
-	msg_iters_t hostResult;
-	for (auto host = 0; host < hostFilter.size(); ++host)
-	{ // host index
-		msg_iters_map_t::const_iterator it = host_msgs_.find(hostFilter[host]);
-		if (it != host_msgs_.end())
-		{
-			msg_iters_t temp(it->second);
-			hostResult.merge(temp);
+	if (!hostFilter.isEmpty())
+	{
+		msg_iters_t hostResult;
+		for (auto host = 0; host < hostFilter.size(); ++host)
+		{ // host index
+			msg_iters_map_t::const_iterator it = host_msgs_.find(hostFilter[host]);
+			if (it != host_msgs_.end())
+			{
+				msg_iters_t temp(it->second);
+				TRACE(10, "setFilter: host " + hostFilter[host].toStdString() + " has %zu messages", temp.size());
+				hostResult.merge(temp);
+			}
 		}
+		if (result.empty()) { result = hostResult; }
+		else { result = list_intersect(result, hostResult); }
+		TRACE(10, "setFilter: result contains %zu messages", result.size());
 	}
-	if (result.empty()) { result = hostResult; }
-	else { list_intersect(result, hostResult); }
 
-	msg_iters_t catResult;
-	for (auto cat = 0; cat < catFilter.size(); ++cat)
-	{ // cat index
-		msg_iters_map_t::const_iterator it = cat_msgs_.find(catFilter[cat]);
-		if (it != cat_msgs_.end())
-		{
-			msg_iters_t temp(it->second);
-			catResult.merge(temp);
+	if (!catFilter.isEmpty())
+	{
+		msg_iters_t catResult;
+		for (auto cat = 0; cat < catFilter.size(); ++cat)
+		{ // cat index
+			msg_iters_map_t::const_iterator it = cat_msgs_.find(catFilter[cat]);
+			if (it != cat_msgs_.end())
+			{
+				msg_iters_t temp(it->second);
+				TRACE(10, "setFilter: cat " + catFilter[cat].toStdString() + " has %zu messages", temp.size());
+				catResult.merge(temp);
+			}
 		}
+		if (result.empty()) { result = catResult; }
+		else { result = list_intersect(result, catResult); }
+		TRACE(10, "setFilter: result contains %zu messages", result.size());
 	}
-	if (result.empty()) { result = catResult; }
-	else { list_intersect(result, catResult); }
 
 	// Update the view
 	txtMessages->clear();

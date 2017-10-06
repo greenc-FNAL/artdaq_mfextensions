@@ -107,6 +107,8 @@ private:
 
 	QStringList toQStringList(QList<QListWidgetItem *> in);
 
+	msg_iters_t list_intersect(msg_iters_t const& l1, msg_iters_t const& l2);
+
 	//---------------------------------------------------------------------------
 
 private:
@@ -124,6 +126,7 @@ private:
 	int nMsgs;
 	int nSupMsgs; // suppressed msgs
 	int nThrMsgs; // throttled msgs
+	int nDisplayMsgs; // Displayed messages
 
 	// Rendering messages in speed mode or full mode
 	bool simpleRender;
