@@ -10,6 +10,10 @@
 typedef boost::regex regex_t;
 typedef boost::smatch smatch_t;
 
+/// <summary>
+/// Throttle messages based on name and time limits.
+/// Separate from MessageFacility limiting.
+/// </summary>
 class throttle
 {
 public:
