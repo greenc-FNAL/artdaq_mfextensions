@@ -1,9 +1,28 @@
+
+find_package(CURL)
+
+if(CURL_FOUND)
+  include_directories(${CURL_INCLUDE_DIRS})
 SET(CMAKE_C_FLAGS "-std=gnu99 -fPIC" CACHE STRING "" FORCE)
 cet_make_library(LIBRARY_NAME curl_send_message 
                  SOURCE detail/curl_send_message.c
                  LIBRARIES 
-				 curl
+				 ${CURL_LIBRARIES}
                            WITH_STATIC_LIBRARY)
+
+basic_plugin( "SMTP" "mfPlugin"
+curl_send_message
+    ${MF_MESSAGELOGGER}
+  ${MF_UTILITIES}
+${MF_MESSAGESERVICE}
+    ${FHICLCPP}
+    ${CETLIB}
+	${CETLIB_EXCEPT}
+	Qt5::Widgets
+	Qt5::Core
+	pthread
+)
+endif()
 
 basic_plugin( "UDP" "mfPlugin"
   ${MF_MESSAGELOGGER}
@@ -25,18 +44,6 @@ ${MF_MESSAGESERVICE}
 	${CETLIB_EXCEPT}
 )
 
-basic_plugin( "SMTP" "mfPlugin"
-curl_send_message
-    ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
-${MF_MESSAGESERVICE}
-    ${FHICLCPP}
-    ${CETLIB}
-	${CETLIB_EXCEPT}
-	Qt5::Widgets
-	Qt5::Core
-	pthread
-)
 
 basic_plugin( "Friendly" "mfPlugin"
     ${MF_MESSAGELOGGER}
