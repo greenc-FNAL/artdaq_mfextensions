@@ -267,7 +267,7 @@ namespace mfplugins
 			payload = message_contents_.str();
 			message_contents_.str("");
 		}
-		std::string destination = "smtp://" + smtp_host_ + ":" + std::to_string(port_);
+		std::string destination = (use_ssl_ ? "smtps://" : "smtp://") + smtp_host_ + ":" + std::to_string(port_);
 
 
 		std::vector<const char*> to;

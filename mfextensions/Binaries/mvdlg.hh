@@ -54,8 +54,6 @@ private slots:
 
 	void setFilter();
 
-	void resetFilter();
-
 	void renderMode();
 
 	void setSevError();
@@ -73,16 +71,19 @@ private slots:
 	void setSuppression(QAction* act);
 
 	void setThrottling(QAction* act);
+	
+	void tabWidgetCurrentChanged(int newTab);
 
-	// Trim the leading lines of messages in message box to avoid overwhelming
-	void updateDisplayMsgs();
+	void tabCloseRequested(int tabIndex);
 
 	//---------------------------------------------------------------------------
 
 private:
 
 	// Display all messages stored in the buffer
-	void displayMsg();
+	void displayMsg(int display);
+
+	void updateDisplays();
 
 	// test if the message is suppressed or throttled
 	bool msg_throttled(mf::MessageFacilityMsg const& mfmsg);
@@ -95,10 +96,8 @@ private:
 	template <typename M>
 	bool updateList(QListWidget* lw, M const& map);
 
-	void displayMsg(msgs_t::const_iterator it);
-
-	void displayMsg(msg_iters_t const& msgs);
-
+	void displayMsg(msgs_t::const_iterator it, int display);
+	
 	void readSettings();
 
 	void writeSettings();
@@ -112,12 +111,6 @@ private:
 	//---------------------------------------------------------------------------
 
 private:
-
-
-	// buffer size
-	static const size_t BUFFER_SIZE[4];
-	static const size_t MAX_DISPLAY_MSGS;
-
 	bool updating;
 	bool paused;
 	bool shortMode_;
@@ -126,7 +119,7 @@ private:
 	int nMsgs;
 	int nSupMsgs; // suppressed msgs
 	int nThrMsgs; // throttled msgs
-	int nDisplayMsgs; // Displayed messages
+	int nFilters;
 
 	// Rendering messages in speed mode or full mode
 	bool simpleRender;
@@ -143,13 +136,7 @@ private:
 	std::vector<throttle> e_thr_host;
 	std::vector<throttle> e_thr_app;
 	std::vector<throttle> e_thr_cat;
-
-
-	// filter strings for hosts, applications, and categories
-	QStringList hostFilter;
-	QStringList appFilter;
-	QStringList catFilter;
-
+	
 	// search string
 	QString searchStr;
 
@@ -159,21 +146,25 @@ private:
 	// map of a key to a list of msg iters
 	msg_iters_map_t host_msgs_;
 	msg_iters_map_t cat_msgs_;
-
-	msg_sevs_map_t app_sev_msgs_;
-
-	QString buffer;
-	QMutex buf_lock;
-
-	// Qt timer for purging the over displayed messages
-	QTimer timer;
-
+	msg_iters_map_t app_msgs_;
+	
 	// context menu for "suppression" and "throttling" button
 	QMenu* sup_menu;
 	QMenu* thr_menu;
 
 	//Receiver Plugin Manager
 	mfviewer::ReceiverManager receivers_;
+
+	struct MsgFilterDisplay
+	{
+		int nDisplayMsgs;
+		msg_iters_t msgs;
+		QStringList hostFilter;
+		QStringList appFilter;
+		QStringList catFilter;
+		QTextEdit* txtDisplay;
+	};
+	std::vector<MsgFilterDisplay> msgFilters_;
 };
 
 enum list_mask_t
