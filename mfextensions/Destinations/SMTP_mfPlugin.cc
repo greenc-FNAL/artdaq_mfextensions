@@ -47,6 +47,12 @@ namespace mfplugins
 
 		ELSMTP(const fhicl::ParameterSet& pset);
 
+		~ELSMTP()
+		{
+			abort_sleep_ = true;
+			while (sending_thread_active_) usleep(1000);
+		}
+
 		virtual void routePayload(const std::ostringstream&, const ErrorObj& msg
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 								  , const ELcontextSupplier&
@@ -78,6 +84,7 @@ namespace mfplugins
 		bool ssl_verify_host_cert_;
 
 		std::atomic<bool> sending_thread_active_;
+		std::atomic<bool> abort_sleep_;
 		size_t send_interval_s_;
 		mutable std::mutex message_mutex_;
 		std::ostringstream message_contents_;
@@ -98,13 +105,14 @@ namespace mfplugins
 		, to_(pset.get<std::vector<std::string>>("to_addresses"))
 		, from_(pset.get<std::string>("from_address"))
 		, subject_(pset.get<std::string>("subject", "MessageFacility SMTP Message Digest"))
-		, message_prefix_(pset.get<std::string>("message_header",""))
+		, message_prefix_(pset.get<std::string>("message_header", ""))
 		, pid_(static_cast<long>(getpid()))
 		, use_ssl_(pset.get<bool>("use_smtps", false))
 		, username_(pset.get<std::string>("smtp_username", ""))
 		, password_(pset.get<std::string>("smtp_password", ""))
 		, ssl_verify_host_cert_(pset.get<bool>("verify_host_ssl_certificate", true))
 		, sending_thread_active_(false)
+		, abort_sleep_(false)
 		, send_interval_s_(pset.get<size_t>("email_send_interval_seconds", 15))
 	{
 		// hostname
@@ -259,7 +267,12 @@ namespace mfplugins
 
 	void ELSMTP::send_message_()
 	{
-		sleep(send_interval_s_);
+		size_t slept = 0;
+		while (!abort_sleep_ && slept < send_interval_s_ * 1000000)
+		{
+			usleep(10000);
+			slept += 10000;
+		}
 
 		std::string payload;
 		{
@@ -289,7 +302,7 @@ namespace mfplugins
 		headers_builder << "To: " << toString << "\r\n";
 		headers_builder << "From: " << from_ << "\r\n";
 		headers_builder << "Message-ID:  <" + generateMessageId_() + "@" + from_.substr(from_.find('@') + 1) + ">\r\n";
-		headers_builder << "Subject: " << subject_ << "\r\n";
+		headers_builder << "Subject: " << subject_ << " @ " << dateTimeNow_() << " from PID " << getpid() << "\r\n";
 		headers_builder << "Content-Type: text/html; charset=\"UTF-8\"\r\n";
 		headers_builder << "\r\n";
 

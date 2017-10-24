@@ -151,6 +151,11 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	allMessages.txtDisplay = txtMessages;
 	msgFilters_.push_back(allMessages);
 
+//https://stackoverflow.com/questions/2616483/close-button-only-for-some-tabs-in-qt
+	QTabBar *tabBar = tabWidget->findChild<QTabBar *>();
+	tabBar->setTabButton(0, QTabBar::RightSide, 0);
+	tabBar->setTabButton(0, QTabBar::LeftSide, 0);
+
 	if (simpleRender) btnRMode->setChecked(true);
 	else btnRMode->setChecked(false);
 
@@ -645,10 +650,6 @@ void msgViewerDlg::setFilter()
 	layout->setContentsMargins(0, 0, 0, 0);
 	newTab->setLayout(layout);
 
-	tabWidget->addTab(newTab, newTabTitle);
-	tabWidget->setTabToolTip(tabWidget->count() - 1, filterExpression);
-	tabWidget->setCurrentIndex(tabWidget->count() - 1);
-
 	MsgFilterDisplay filteredMessages;
 	filteredMessages.msgs = result;
 	filteredMessages.hostFilter = hostFilter;
@@ -657,6 +658,10 @@ void msgViewerDlg::setFilter()
 	filteredMessages.txtDisplay = txtDisplay;
 	filteredMessages.nDisplayMsgs = result.size();
 	msgFilters_.push_back(filteredMessages);
+
+	tabWidget->addTab(newTab, newTabTitle);
+	tabWidget->setTabToolTip(tabWidget->count() - 1, filterExpression);
+	tabWidget->setCurrentIndex(tabWidget->count() - 1);
 
 	displayMsg(msgFilters_.size() - 1);
 }
@@ -868,6 +873,35 @@ void msgViewerDlg::setThrottling(QAction* act)
 void msgViewerDlg::tabWidgetCurrentChanged(int newTab)
 {
 	lcdDisplayedMsgs->display(msgFilters_[newTab].nDisplayMsgs);
+
+	lwHost->setCurrentRow(-1, QItemSelectionModel::Clear);
+	lwApplication->setCurrentRow(-1, QItemSelectionModel::Clear);
+	lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear);
+
+	for (auto host : msgFilters_[newTab].hostFilter)
+	{
+		auto items = lwHost->findItems(host, Qt::MatchExactly);
+		if (items.size() > 0)
+		{
+			items[0]->setSelected(true);
+		}
+	}
+	for (auto app : msgFilters_[newTab].appFilter)
+	{
+		auto items = lwApplication->findItems(app, Qt::MatchExactly);
+		if (items.size() > 0)
+		{
+			items[0]->setSelected(true);
+		}
+	}
+	for (auto cat : msgFilters_[newTab].catFilter)
+	{
+		auto items = lwCategory->findItems(cat, Qt::MatchExactly);
+		if (items.size() > 0)
+		{
+			items[0]->setSelected(true);
+		}
+	}
 }
 
 void msgViewerDlg::tabCloseRequested(int tabIndex)
