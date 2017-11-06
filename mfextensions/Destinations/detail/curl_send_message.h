@@ -10,14 +10,24 @@ extern "C" {
 #include <string.h>
 
 	/**
-	* \file send_gmetric.h
+	* \file curl_send_message.h
 	* This file wraps the C-language cURL SMTP functions
 	* Code is from https://curl.haxx.se/libcurl/c/example.html
 	*/
 
 	/**
+	 * \brief Structure to track progress of upload in cURL send function
+	 */
+	struct upload_status
+	{
+		size_t pos; ///< Current position within payload
+		size_t size; ///< Size of payload
+		const char* payload; ///< payload string
+	};
+
+	/**
 	 * \brief Sends a message to the given SMTP server
-	 * \param dest URL of SMTP server, in form smtp://<HOST>:<PORT>
+	 * \param dest URL of SMTP server, in form smtp://[HOST]:[PORT]
 	 * \param to Array of strings containing destination addresses
 	 * \param to_size Size of the to array (must be >0!)
 	 * \param from Address that the email is originating from
@@ -28,7 +38,7 @@ extern "C" {
 
 	/**
 	* \brief Sends a message to the given SMTP server, using SSL encryption
-	* \param dest URL of SMTP server, in form smtp://<HOST>:<PORT>
+	* \param dest URL of SMTP server, in form smtps://[HOST]:[PORT]
 	* \param to Array of strings containing destination addresses
 	* \param to_size Size of the to array (must be >0!)
 	* \param from Address that the email is originating from

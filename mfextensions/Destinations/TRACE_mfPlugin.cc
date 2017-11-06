@@ -22,12 +22,9 @@ namespace mfplugins
 # endif
 	using mf::ErrorObj;
 
-	//======================================================================
-	//
-	// TRACE destination plugin
-	//
-	//======================================================================
-
+	/// <summary>
+	/// Message Facility destination which logs messages to a TRACE buffer
+	/// </summary>
 	class ELTRACE : public ELdestination
 	{
 	public:

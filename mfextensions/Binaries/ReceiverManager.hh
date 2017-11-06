@@ -8,6 +8,9 @@
 
 namespace mfviewer
 {
+	/// <summary>
+	/// The ReceiverManager loads one or more receiver plugins and displays messages received by those plugins on the Message Viewer dialog
+	/// </summary>
 	class ReceiverManager : public QObject
 	{
 		Q_OBJECT

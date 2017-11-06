@@ -23,6 +23,9 @@ namespace fhicl
 	class ParameterSet;
 }
 
+/// <summary>
+/// Message Viewer Dialog Window
+/// </summary>
 class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
 {
 	Q_OBJECT

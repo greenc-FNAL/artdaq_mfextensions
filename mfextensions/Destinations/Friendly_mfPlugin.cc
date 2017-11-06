@@ -23,12 +23,9 @@ namespace mfplugins
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
 
-	//======================================================================
-	//
-	// Parser-Friendly destination plugin
-	//
-	//======================================================================
-
+	/// <summary>
+	/// Parser-Friendly Message Facility destination plugin
+	/// </summary>
 	class ELFriendly : public ELostreamOutput
 	{
 	public:

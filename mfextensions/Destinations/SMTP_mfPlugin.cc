@@ -35,12 +35,9 @@ namespace mfplugins
 	using mf::service::ELcontextSupplier;
 # endif
 
-	//======================================================================
-	//
-	// SMTP destination plugin (Using libcurl)
-	//
-	//======================================================================
-
+	/// <summary>
+	/// SMTP Message Facility destination plugin (Using libcurl)
+	/// </summary>
 	class ELSMTP : public ELdestination
 	{
 	public:

@@ -3,12 +3,6 @@
 #include <time.h>
 
 
-struct upload_status
-{
-	size_t pos;
-	size_t size;
-	const char* payload;
-};
 
 static size_t payload_source(void *ptr, size_t size, size_t nmemb, void *userp)
 {

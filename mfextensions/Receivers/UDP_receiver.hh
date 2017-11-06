@@ -11,6 +11,9 @@ using boost::asio::ip::udp;
 
 namespace mfviewer
 {
+	/// <summary>
+	/// Receive messages through a UDP socket. Expects the syslog format provided by UDP_mfPlugin (ELUDP)
+	/// </summary>
 	class UDPReceiver : public MVReceiver
 	{
 		Q_OBJECT

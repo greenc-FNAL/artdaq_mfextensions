@@ -23,12 +23,10 @@ namespace mfplugins
 	using mf::service::ELcontextSupplier;
 #endif
 
-	//======================================================================
-	//
-	// TRACE destination plugin
-	//
-	//======================================================================
-
+	/// <summary>
+	/// Message Facility destination which generates the output file name based on some combination of 
+	/// PID, hostname, application name, and/or timestamp
+	/// </summary>
 	class ELGenFileOutput : public ELdestination
 	{
 	public:
