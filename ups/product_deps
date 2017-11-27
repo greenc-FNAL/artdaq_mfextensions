@@ -1,8 +1,8 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
 parent artdaq_mfextensions	v1_01_12
-#defaultqual	e14:s50
-defaultqual	e14:s48
+defaultqual	e14:s50
+#defaultqual	e14:s48
 
 # These optional lines define the installed directories where
 # headers, libraries, and executables will be found
@@ -24,7 +24,7 @@ messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
 qt              v5_7_1
 TRACE           v3_09_01        -       only_for_build
-cetbuildtools	v5_06_07	-	only_for_build
+cetbuildtools	v5_14_04	-	only_for_build
 end_product_list
 
 # See https://cdcvs.fnal.gov/redmine/projects/cet-is-public/wiki/AboutQualifiers for information about the qualifiers used
