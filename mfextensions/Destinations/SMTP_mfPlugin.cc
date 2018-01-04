@@ -188,8 +188,11 @@ namespace mfplugins
 
 	std::string ELSMTP::to_html(std::string msgString, const ErrorObj& msg)
 	{
-		mf::ELseverityLevel severity(msg.xid().severity());
-		int sevid = severity.getLevel();
+# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+		auto sevid = msg.xid().severity().getLevel();
+# else
+		auto sevid = msg.xid().severity.getLevel();
+# endif
 
 		QString text_ = QString("<font color=");
 
