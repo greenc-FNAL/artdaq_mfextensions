@@ -70,12 +70,6 @@ namespace mfplugins
 		, next_error_report_(1)
 		, error_report_backoff_factor_()
 	{
-
-		size_t lvls = pset.get<size_t>("lvls", 0x7);
-		size_t lvlm = pset.get<size_t>("lvlm", 0x0);
-		TRACE_CNTL("name", "MessageFacility");
-		TRACE_CNTL("lvlmsk", lvlm, lvls, 0);
-
 		error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
 		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
 	}
