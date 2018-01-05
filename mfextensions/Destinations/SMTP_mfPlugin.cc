@@ -15,13 +15,13 @@
 #include <memory>
 #include <algorithm>
 #include <atomic>
-#include <thread>
 #include <mutex>
 #include <random>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <boost/thread.hpp>
 
 #include <QtCore/QString>
 #include "mfextensions/Destinations/detail/curl_send_message.h"
@@ -260,7 +260,7 @@ namespace mfplugins
 		if (!sending_thread_active_)
 		{
 			sending_thread_active_ = true;
-			std::thread t([=] { send_message_(); });
+			boost::thread t([=] { send_message_(); });
 			t.detach();
 		}
 	}

@@ -21,6 +21,8 @@ ${MF_MESSAGESERVICE}
 	Qt5::Widgets
 	Qt5::Core
 	pthread
+	${Boost_SYSTEM_LIBRARY}
+	${Boost_THREAD_LIBRARY}
 )
 endif()
 
