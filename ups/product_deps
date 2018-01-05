@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_01_12
+parent artdaq_mfextensions	v1_01_13
 defaultqual	e14:s50
 #defaultqual	e14:s48
 
@@ -18,19 +18,31 @@ bindir      fq_dir      bin
 
 #
 product		version		optional
+messagefacility v2_01_04        s60
+messagefacility v2_01_03        s58
 messagefacility v2_00_02        s50
 messagefacility v1_18_04        s48
 messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
-qt              v5_7_1
+qt              v5_7_1          e10
+qt              v5_7_1          e14
+qt              v5_7_1a         e15
 TRACE           v3_13_01        -       only_for_build
-cetbuildtools	v5_14_04	-	only_for_build
+cetbuildtools	v6_01_00	-	only_for_build
 end_product_list
 
 # See https://cdcvs.fnal.gov/redmine/projects/cet-is-public/wiki/AboutQualifiers for information about the qualifiers used
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier		messagefacility  	  qt    TRACE   notes
+e15:s60:debug      	e15:debug    	          e15   -nq-    -std=c++14
+e15:s60:prof      	e15:prof    	          e15   -nq-    -std=c++14
+e14:s60:debug      	e14:debug    	          e14   -nq-    -std=c++14
+e14:s60:prof      	e14:prof    	          e14   -nq-    -std=c++14
+e15:s58:debug      	e15:debug    	          e15   -nq-    -std=c++14
+e15:s58:prof      	e15:prof    	          e15   -nq-    -std=c++14
+e14:s58:debug      	e14:debug    	          e14   -nq-    -std=c++14
+e14:s58:prof      	e14:prof    	          e14   -nq-    -std=c++14
 e14:s50:debug      	e14:debug    	          e14   -nq-    -std=c++14
 e14:s50:prof      	e14:prof    	          e14   -nq-    -std=c++14
 e14:s48:debug      	e14:debug    	          e14   -nq-    -std=c++14
