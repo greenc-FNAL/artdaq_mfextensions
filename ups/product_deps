@@ -24,9 +24,7 @@ messagefacility v2_00_02        s50
 messagefacility v1_18_04        s48
 messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
-qt              v5_7_1          e10
-qt              v5_7_1          e14
-qt              v5_7_1a         e15
+qt              v5_7_1a
 TRACE           v3_13_01        -       only_for_build
 cetbuildtools	v6_01_00	-	only_for_build
 end_product_list
