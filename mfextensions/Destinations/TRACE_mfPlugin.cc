@@ -71,17 +71,12 @@ namespace mfplugins
 		, error_report_backoff_factor_()
 	{
 		size_t msk;
-		bool   do_set;
 
-		do_set=true;
-		try { msk = pset.get<size_t>("lvls"); }
-		catch (...){ do_set=false; }
-		if (do_set) TRACE_CNTL("lvlmskS",msk); // the S mask for TRACE_NAME
+		if (pset.get_if_present<size_t>("lvls",msk))
+			TRACE_CNTL("lvlmskS",msk); // the S mask for TRACE_NAME
 
-		do_set=true;
-		try { msk = pset.get<size_t>("lvlm"); }
-		catch (...){ do_set=false; }
-		if (do_set) TRACE_CNTL("lvlmskM",msk); // the M mask for TRACE_NAME
+		if (pset.get_if_present<size_t>("lvlm",msk))
+			TRACE_CNTL("lvlmskM",msk); // the M mask for TRACE_NAME
 
 		error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
 		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
