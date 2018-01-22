@@ -21,12 +21,9 @@ namespace mfplugins
 	using mf::service::ELcontextSupplier;
 #endif
 
-	//======================================================================
-	//
-	// TRACE destination plugin
-	//
-	//======================================================================
-
+	/// <summary>
+	/// Message Facility Destination which automatically opens files and sorts messages into them based on given criteria
+	/// </summary>
 	class ELMultiFileOutput : public ELdestination
 	{
 	public:

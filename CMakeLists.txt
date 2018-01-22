@@ -82,6 +82,9 @@ include(BasicPlugin)
 # Configuration Files
 add_subdirectory(config)
 
+# API Documentation
+add_subdirectory(doc)
+
 # MFExtensions Library
 add_subdirectory(mfextensions)
 

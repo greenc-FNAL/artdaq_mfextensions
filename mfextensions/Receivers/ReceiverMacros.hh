@@ -8,8 +8,12 @@
 
 namespace mfviewer
 {
-	typedef std::unique_ptr<mfviewer::MVReceiver>
-	(makeFunc_t)(fhicl::ParameterSet const& ps);
+	/**
+	 * \brief Constructs a MVReceiver instance and returns a pointer to it
+	 * \param ps Parameter set for initializing the CommandableFragmentGenerator
+	 * \return A smart pointer to the CommandableFragmentGenerator
+	 */
+	typedef std::unique_ptr<mfviewer::MVReceiver> makeFunc_t(fhicl::ParameterSet const& ps);
 }
 
 #define DEFINE_MFVIEWER_RECEIVER(klass)                          \

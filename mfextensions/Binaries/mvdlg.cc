@@ -9,6 +9,7 @@
 
 #include "mfextensions/Binaries/mvdlg.hh"
 #include "trace.h"
+#include "mvdlg.hh"
 
 // replace the ${..} part in the filename with env variable
 // throw if the env does not exist
@@ -78,19 +79,14 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	, nMsgs(0)
 	, nSupMsgs(0)
 	, nThrMsgs(0)
+	, nFilters(0)
 	, simpleRender(true)
 	, sevThresh(SINFO)
-	, hostFilter()
-	, appFilter()
-	, catFilter()
 	, searchStr("")
 	, msg_pool_()
 	, host_msgs_()
 	, cat_msgs_()
-	, app_sev_msgs_()
-	, buffer()
-	, buf_lock()
-	, timer(this)
+	, app_msgs_()
 	, sup_menu(new QMenu(this))
 	, thr_menu(new QMenu(this))
 	, receivers_(readConf(conf).get<fhicl::ParameterSet>("receivers", fhicl::ParameterSet()))
@@ -123,7 +119,6 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 			SIGNAL(clicked()), this, SLOT(searchClear()));
 
 	connect(btnFilter, SIGNAL(clicked()), this, SLOT(setFilter()));
-	connect(btnReset, SIGNAL(clicked()), this, SLOT(resetFilter()));
 
 	connect(btnError, SIGNAL(clicked()), this, SLOT(setSevError()));
 	connect(btnWarning, SIGNAL(clicked()), this, SLOT(setSevWarning()));
@@ -150,7 +145,16 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 			, this
 			, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
 
-	connect(&timer, SIGNAL(timeout()), this, SLOT(updateDisplayMsgs()));
+	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
+	connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
+	MsgFilterDisplay allMessages;
+	allMessages.txtDisplay = txtMessages;
+	msgFilters_.push_back(allMessages);
+
+//https://stackoverflow.com/questions/2616483/close-button-only-for-some-tabs-in-qt
+	QTabBar *tabBar = tabWidget->findChild<QTabBar *>();
+	tabBar->setTabButton(0, QTabBar::RightSide, 0);
+	tabBar->setTabButton(0, QTabBar::LeftSide, 0);
 
 	if (simpleRender) btnRMode->setChecked(true);
 	else btnRMode->setChecked(false);
@@ -162,8 +166,6 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	QTextDocument* doc = new QTextDocument(txtMessages);
 	txtMessages->setDocument(doc);
 
-	// start the text edit widget update timer
-	timer.start(100);
 	receivers_.start();
 }
 
@@ -354,24 +356,27 @@ void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
 	unsigned int flag = update_index(it);
 
 	// update gui list
-	if (flag & LIST_APP) updateList<msg_sevs_map_t>(lwApplication, app_sev_msgs_);
+	if (flag & LIST_APP) updateList<msg_iters_map_t>(lwApplication, app_msgs_);
 	if (flag & LIST_CAT) updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
 	if (flag & LIST_HOST) updateList<msg_iters_map_t>(lwHost, host_msgs_);
 
-	bool hostMatch = hostFilter.contains(it->host(), Qt::CaseInsensitive) || hostFilter.size() == 0;
-	bool appMatch = appFilter.contains(it->app(), Qt::CaseInsensitive) || appFilter.size() == 0;
-	bool catMatch = catFilter.contains(it->cat(), Qt::CaseInsensitive) || catFilter.size() == 0;
-
-	// Check to display the message
-	if (hostMatch && appMatch && catMatch)
+	for (size_t d = 0; d < msgFilters_.size(); ++d)
 	{
-		displayMsg(it);
+		bool hostMatch = msgFilters_[d].hostFilter.contains(it->host(), Qt::CaseInsensitive) || msgFilters_[d].hostFilter.size() == 0;
+		bool appMatch = msgFilters_[d].appFilter.contains(it->app(), Qt::CaseInsensitive) || msgFilters_[d].appFilter.size() == 0;
+		bool catMatch = msgFilters_[d].catFilter.contains(it->cat(), Qt::CaseInsensitive) || msgFilters_[d].catFilter.size() == 0;
+
+		// Check to display the message
+		if (hostMatch && appMatch && catMatch)
+		{
+			msgFilters_[d].msgs.push_back(it);
+			displayMsg(it, d);
+		}
 	}
 }
 
 unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 {
-	sev_code_t sev = it->sev();
 	QString const& app = it->app();
 	QString const& cat = it->cat();
 	QString const& host = it->host();
@@ -380,51 +385,41 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 
 	if (cat_msgs_.find(cat) == cat_msgs_.end()) update |= LIST_CAT;
 	if (host_msgs_.find(host) == host_msgs_.end()) update |= LIST_HOST;
+	if (app_msgs_.find(app) == app_msgs_.end()) update |= LIST_APP;
 
 	cat_msgs_[cat].push_back(it);
 	host_msgs_[host].push_back(it);
-
-	msg_sevs_map_t::iterator ait = app_sev_msgs_.find(app);
-
-	if (ait == app_sev_msgs_.end()) // new app
-	{
-		msg_sevs_t msg_sevs(4);
-		msg_sevs[sev].push_back(it);
-		app_sev_msgs_.insert(std::make_pair(app, msg_sevs));
-
-		update |= LIST_APP;
-	}
-	else // already existing app
-	{
-		// push to corresponding list
-		ait->second[sev].push_back(it);
-	}
+	app_msgs_[app].push_back(it);
 
 	return update;
 }
 
 
-void msgViewerDlg::displayMsg(msgs_t::const_iterator it)
+void msgViewerDlg::displayMsg(msgs_t::const_iterator it, int display)
 {
 	if (it->sev() < sevThresh) return;
 
-	buf_lock.lock();
-	buffer += it->text(shortMode_);
-	++nDisplayMsgs;
+	msgFilters_[display].nDisplayMsgs++;
+	if (display == tabWidget->currentIndex())
+	{
+		lcdDisplayedMsgs->display(msgFilters_[display].nDisplayMsgs);
+	}
 
-	lcdDisplayedMsgs->display(nDisplayMsgs);
-
-	buf_lock.unlock();
+	auto txt = it->text(shortMode_);
+	msgFilters_[display].txtDisplay->append(txt);
+	msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
 }
 
-void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
+void msgViewerDlg::displayMsg(int display)
 {
 	int n = 0;
+	msgFilters_[display].txtDisplay->clear();
+	msgFilters_[display].nDisplayMsgs = 0;
 
 	msg_iters_t::const_iterator it;
 
-	n = msgs.size();
-	it = msgs.begin();
+	n = msgFilters_[display].msgs.size();
+	it = msgFilters_[display].msgs.begin();
 	QProgressDialog progress("Fetching data...", "Cancel"
 							 , 0, n / 1000, this);
 
@@ -436,13 +431,12 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 
 	updating = true;
 
-	for (; it != msgs.end(); ++it, ++i)
+	for (; it != msgFilters_[display].msgs.end(); ++it, ++i)
 	{
 		if (it->get()->sev() >= sevThresh)
 		{
 			txt += it->get()->text(shortMode_);
-			++nDisplayMsgs;
-			lcdDisplayedMsgs->display(nDisplayMsgs);
+			++msgFilters_[display].nDisplayMsgs;
 		}
 
 		if (i == 1000)
@@ -451,7 +445,7 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 			++prog;
 			progress.setValue(prog);
 
-			txtMessages->append(txt);
+			msgFilters_[display].txtDisplay->append(txt);
 			txt.clear();
 		}
 
@@ -459,81 +453,27 @@ void msgViewerDlg::displayMsg(msg_iters_t const& msgs)
 			break;
 	}
 
-	txtMessages->append(txt);
-	txtMessages->moveCursor(QTextCursor::End);
+	if (display == tabWidget->currentIndex())
+	{
+		lcdDisplayedMsgs->display(msgFilters_[display].nDisplayMsgs);
+	}
+
+	msgFilters_[display].txtDisplay->append(txt);
+	msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
 
 	updating = false;
 }
 
-// display all messages in buffer
-void msgViewerDlg::displayMsg()
+void msgViewerDlg::updateDisplays()
 {
-	int n = 0;
-
-	msgs_t::const_iterator it;
-
-	n = msg_pool_.size();
-	it = msg_pool_.begin();
-
-	QProgressDialog progress("Fetching data...", "Cancel"
-							 , 0, n / 1000, this);
-
-	progress.setWindowModality(Qt::WindowModal);
-	progress.setMinimumDuration(2000); // 2 seconds
-
-	QString txt;
-	int i = 0, prog = 0;
-
-	updating = true;
-
-	for (; it != msg_pool_.end(); ++it, ++i)
+	for (size_t ii = 0; ii < msgFilters_.size(); ++ii)
 	{
-		if (it->sev() >= sevThresh)
-		{
-			txt += it->text(shortMode_);
-			++nDisplayMsgs;
-			lcdDisplayedMsgs->display(nDisplayMsgs);
-		}
-
-		if (i == 1000)
-		{
-			i = 0;
-			++prog;
-			progress.setValue(prog);
-
-			txtMessages->append(txt);
-			txt.clear();
-		}
-
-		if (progress.wasCanceled())
-			break;
+		displayMsg(ii);
 	}
-
-	txtMessages->append(txt);
-	txtMessages->moveCursor(QTextCursor::End);
-
-	updating = false;
-}
-
-void msgViewerDlg::updateDisplayMsgs()
-{
-	if (updating || paused) return;
-
-	buf_lock.lock();
-	{
-		if (!buffer.isEmpty())
-		{
-			txtMessages->append(buffer);
-			buffer.clear();
-		}
-	}
-	buf_lock.unlock();
 }
 
 template <typename M>
-bool msgViewerDlg::updateList(QListWidget* lw
-							  , M const& map
-)
+bool msgViewerDlg::updateList(QListWidget* lw, M const& map)
 {
 	bool nonSelectedBefore = (lw->currentRow() == -1);
 	bool nonSelectedAfter = true;
@@ -604,48 +544,49 @@ std::string sev_to_string(sev_code_t s)
 
 void msgViewerDlg::setFilter()
 {
-	nDisplayMsgs = 0;
-	lcdDisplayedMsgs->display(nDisplayMsgs);
+	auto hostFilter = toQStringList(lwHost->selectedItems());
+	auto appFilter = toQStringList(lwApplication->selectedItems());
+	auto catFilter = toQStringList(lwCategory->selectedItems());
 
-	hostFilter = toQStringList(lwHost->selectedItems());
-	appFilter = toQStringList(lwApplication->selectedItems());
-	catFilter = toQStringList(lwCategory->selectedItems());
-
-	if (hostFilter.isEmpty()) { lwHost->setCurrentRow(-1, QItemSelectionModel::Clear); }
-	if (appFilter.isEmpty()) { lwApplication->setCurrentRow(-1, QItemSelectionModel::Clear); }
-	if (catFilter.isEmpty()) { lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear); }
+	lwHost->setCurrentRow(-1, QItemSelectionModel::Clear);
+	lwApplication->setCurrentRow(-1, QItemSelectionModel::Clear);
+	lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear);
 
 	if (hostFilter.isEmpty()
 		&& appFilter.isEmpty()
 		&& catFilter.isEmpty())
 	{
-		resetFilter();
 		return;
 	}
 
 	msg_iters_t result;
+	QString catFilterExpression = "";
+	QString hostFilterExpression = "";
+	QString appFilterExpression = "";
+	bool first = true;
 
 	for (auto app = 0; app < appFilter.size(); ++app)
 	{ // app-sev index
-		msg_sevs_map_t::const_iterator it = app_sev_msgs_.find(appFilter[app]);
-
-		if (it != app_sev_msgs_.end())
+		msg_iters_map_t::const_iterator it = app_msgs_.find(appFilter[app]);
+		appFilterExpression += QString(first ? "" : " || ") + appFilter[app];
+		first = false;
+		if (it != app_msgs_.end())
 		{
-			for (int s = sevThresh; s <= SERROR; ++s)
-			{
-				msg_iters_t temp(it->second[s]);
-				TRACE(10, "setFilter: app " + appFilter[app].toStdString() + " has %zu messages at severity " + sev_to_string(static_cast<sev_code_t>(s)), temp.size());
-				result.merge(temp);
-			}
+			msg_iters_t temp(it->second);
+			TRACE(10, "setFilter: app " + appFilter[app].toStdString() + " has %zu messages", temp.size());
+			result.merge(temp);
 		}
 	}
 	TRACE(10, "setFilter: result contains %zu messages", result.size());
 
+	first = true;
 	if (!hostFilter.isEmpty())
 	{
 		msg_iters_t hostResult;
 		for (auto host = 0; host < hostFilter.size(); ++host)
 		{ // host index
+			hostFilterExpression += QString(first ? "" : " || ") + hostFilter[host];
+			first = false;
 			msg_iters_map_t::const_iterator it = host_msgs_.find(hostFilter[host]);
 			if (it != host_msgs_.end())
 			{
@@ -659,11 +600,14 @@ void msgViewerDlg::setFilter()
 		TRACE(10, "setFilter: result contains %zu messages", result.size());
 	}
 
+	first = true;
 	if (!catFilter.isEmpty())
 	{
 		msg_iters_t catResult;
 		for (auto cat = 0; cat < catFilter.size(); ++cat)
 		{ // cat index
+			catFilterExpression += QString(first ? "" : " || ") + catFilter[cat];
+			first = false;
 			msg_iters_map_t::const_iterator it = cat_msgs_.find(catFilter[cat]);
 			if (it != cat_msgs_.end())
 			{
@@ -677,24 +621,49 @@ void msgViewerDlg::setFilter()
 		TRACE(10, "setFilter: result contains %zu messages", result.size());
 	}
 
-	// Update the view
-	txtMessages->clear();
-	displayMsg(result);
-}
+	// Create the filter expression
+	auto nFilterExpressions = (appFilterExpression != "" ? 1 : 0) + (hostFilterExpression != "" ? 1 : 0) + (catFilterExpression != "" ? 1 : 0);
+	QString filterExpression = "";
+	if (nFilterExpressions == 1)
+	{
+		filterExpression = catFilterExpression + hostFilterExpression + appFilterExpression;
+	}
+	else
+	{
+		filterExpression = "(" + (catFilterExpression != "" ? catFilterExpression + ") && (" : "") 
+			+ hostFilterExpression 
+			+ (hostFilterExpression != "" && appFilterExpression != "" ? ") && (" : "") 
+			+ appFilterExpression + ")";
+	}
 
-void msgViewerDlg::resetFilter()
-{
-	hostFilter.clear();
-	appFilter.clear();
-	catFilter.clear();
+	// Add the tab and populate it
 
-	lwHost->setCurrentRow(-1, QItemSelectionModel::Clear);
-	lwApplication->setCurrentRow(-1, QItemSelectionModel::Clear);
-	lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear);
+	auto newTabTitle = QString("Filter ") + QString::number(++nFilters);
+	QWidget* newTab = new QWidget();
 
-	// Update the view
-	txtMessages->clear();
-	displayMsg();
+	QTextEdit* txtDisplay = new QTextEdit(newTab);
+	QTextDocument* doc = new QTextDocument(txtDisplay);
+	txtDisplay->setDocument(doc);
+
+	QVBoxLayout* layout = new QVBoxLayout();
+	layout->addWidget(txtDisplay);
+	layout->setContentsMargins(0, 0, 0, 0);
+	newTab->setLayout(layout);
+
+	MsgFilterDisplay filteredMessages;
+	filteredMessages.msgs = result;
+	filteredMessages.hostFilter = hostFilter;
+	filteredMessages.appFilter = appFilter;
+	filteredMessages.catFilter = catFilter;
+	filteredMessages.txtDisplay = txtDisplay;
+	filteredMessages.nDisplayMsgs = result.size();
+	msgFilters_.push_back(filteredMessages);
+
+	tabWidget->addTab(newTab, newTabTitle);
+	tabWidget->setTabToolTip(tabWidget->count() - 1, filterExpression);
+	tabWidget->setCurrentIndex(tabWidget->count() - 1);
+
+	displayMsg(msgFilters_.size() - 1);
 }
 
 void msgViewerDlg::pause()
@@ -726,18 +695,22 @@ void msgViewerDlg::clear()
 		nMsgs = 0;
 		nSupMsgs = 0;
 		nThrMsgs = 0;
-		hostFilter = QStringList();
-		appFilter = QStringList();
-		catFilter = QStringList();
 		msg_pool_.clear();
 		host_msgs_.clear();
 		cat_msgs_.clear();
-		app_sev_msgs_.clear();
-		updateList<msg_sevs_map_t>(lwApplication, app_sev_msgs_);
+		app_msgs_.clear();
+		updateList<msg_iters_map_t>(lwApplication, app_msgs_);
 		updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
 		updateList<msg_iters_map_t>(lwHost, host_msgs_);
-		txtMessages->clear();
+		for (auto& display : msgFilters_)
+		{
+			display.txtDisplay->clear();
+			display.msgs.clear();
+			display.nDisplayMsgs = 0;
+		}
+
 		lcdMsgs->display(nMsgs);
+		lcdDisplayedMsgs->display(0);
 		break;
 	case QMessageBox::No:
 	default:
@@ -757,9 +730,7 @@ void msgViewerDlg::shortMode()
 		shortMode_ = false;
 		btnDisplayMode->setText("Compact View");
 	}
-
-	txtMessages->clear();
-	displayMsg();
+	updateDisplays();
 }
 
 void msgViewerDlg::changeSeverity(int sev)
@@ -781,7 +752,7 @@ void msgViewerDlg::changeSeverity(int sev)
 	default: setSevDebug();
 	}
 
-	setFilter();
+	updateDisplays();
 }
 
 void msgViewerDlg::setSevError()
@@ -831,12 +802,15 @@ void msgViewerDlg::renderMode()
 	if (simpleRender)
 	{
 		btnRMode->setChecked(true);
-		txtMessages->setPlainText(txtMessages->toPlainText());
+		for (auto display : msgFilters_)
+		{
+			display.txtDisplay->setPlainText(display.txtDisplay->toPlainText());
+		}
 	}
 	else
 	{
 		btnRMode->setChecked(false);
-		setFilter();
+		updateDisplays();
 	}
 }
 
@@ -847,12 +821,13 @@ void msgViewerDlg::searchMsg()
 	if (search.isEmpty())
 		return;
 
+	auto display = tabWidget->currentIndex();
 	if (search != searchStr)
 	{
-		txtMessages->moveCursor(QTextCursor::Start);
-		if (!txtMessages->find(search))
+		msgFilters_[display].txtDisplay->moveCursor(QTextCursor::Start);
+		if (!msgFilters_[display].txtDisplay->find(search))
 		{
-			txtMessages->moveCursor(QTextCursor::End);
+			msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
 			searchStr = "";
 		}
 		else
@@ -860,12 +835,12 @@ void msgViewerDlg::searchMsg()
 	}
 	else
 	{
-		if (!txtMessages->find(search))
+		if (!msgFilters_[display].txtDisplay->find(search))
 		{
-			txtMessages->moveCursor(QTextCursor::Start);
-			if (!txtMessages->find(search))
+			msgFilters_[display].txtDisplay->moveCursor(QTextCursor::Start);
+			if (!msgFilters_[display].txtDisplay->find(search))
 			{
-				txtMessages->moveCursor(QTextCursor::End);
+				msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
 				searchStr = "";
 			}
 		}
@@ -874,10 +849,11 @@ void msgViewerDlg::searchMsg()
 
 void msgViewerDlg::searchClear()
 {
+	auto display = tabWidget->currentIndex();
 	editSearch->setText("");
 	searchStr = "";
-	txtMessages->find("");
-	txtMessages->moveCursor(QTextCursor::End);
+	msgFilters_[display].txtDisplay->find("");
+	msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
 }
 
 void msgViewerDlg::setSuppression(QAction* act)
@@ -892,6 +868,51 @@ void msgViewerDlg::setThrottling(QAction* act)
 	bool status = act->isChecked();
 	throttle* thr = (throttle *)act->data().value<void*>();
 	thr->use(status);
+}
+
+void msgViewerDlg::tabWidgetCurrentChanged(int newTab)
+{
+	lcdDisplayedMsgs->display(msgFilters_[newTab].nDisplayMsgs);
+
+	lwHost->setCurrentRow(-1, QItemSelectionModel::Clear);
+	lwApplication->setCurrentRow(-1, QItemSelectionModel::Clear);
+	lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear);
+
+	for (auto host : msgFilters_[newTab].hostFilter)
+	{
+		auto items = lwHost->findItems(host, Qt::MatchExactly);
+		if (items.size() > 0)
+		{
+			items[0]->setSelected(true);
+		}
+	}
+	for (auto app : msgFilters_[newTab].appFilter)
+	{
+		auto items = lwApplication->findItems(app, Qt::MatchExactly);
+		if (items.size() > 0)
+		{
+			items[0]->setSelected(true);
+		}
+	}
+	for (auto cat : msgFilters_[newTab].catFilter)
+	{
+		auto items = lwCategory->findItems(cat, Qt::MatchExactly);
+		if (items.size() > 0)
+		{
+			items[0]->setSelected(true);
+		}
+	}
+}
+
+void msgViewerDlg::tabCloseRequested(int tabIndex)
+{
+	if (tabIndex == 0 || static_cast<size_t>(tabIndex) >= msgFilters_.size()) return;
+
+	auto widget = tabWidget->widget(tabIndex);
+	tabWidget->removeTab(tabIndex);
+	delete widget;
+
+	msgFilters_.erase(msgFilters_.begin() + tabIndex);
 }
 
 void msgViewerDlg::closeEvent(QCloseEvent* event)

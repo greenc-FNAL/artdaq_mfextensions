@@ -20,7 +20,6 @@
 #include <ifaddrs.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <thread>
 
 
 // Boost includes
@@ -37,12 +36,10 @@ namespace mfplugins
 # endif
 	using boost::asio::ip::udp;
 
-	//======================================================================
-	//
-	// UDP destination plugin
-	//
-	//======================================================================
-
+	/// <summary>
+	/// Message Facility UDP Streamer Destination
+	/// Formats messages into a delimited string and sends via UDP
+	/// </summary>
 	class ELUDP : public ELdestination
 	{
 	public:

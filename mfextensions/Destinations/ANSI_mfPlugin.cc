@@ -20,12 +20,9 @@ namespace mfplugins
 #endif
 	using mf::ErrorObj;
 
-	//======================================================================
-	//
-	// ANSI destination plugin
-	//
-	//======================================================================
-
+	/// <summary>
+	/// Message Facility destination which colorizes the console output
+	/// </summary>
 	class ELANSI : public ELdestination
 	{
 	public:
@@ -41,6 +38,10 @@ namespace mfplugins
 	private:
 		bool bellError_;
 		bool blinkError_;
+		std::string errorColor_;
+		std::string warningColor_;
+		std::string infoColor_;
+		std::string debugColor_;
 	};
 
 	// END DECLARATION
@@ -56,6 +57,10 @@ namespace mfplugins
 		: ELdestination(pset)
 		, bellError_(pset.get<bool>("bell_on_error", true))
 		, blinkError_(pset.get<bool>("blink_error_messages", false))
+		, errorColor_(pset.get<std::string>("error_ansi_color", "\033[1m\033[91m"))
+		, warningColor_(pset.get<std::string>("warning_ansi_color", "\033[1m\033[93m"))
+		, infoColor_(pset.get<std::string>("info_ansi_color", "\033[92m"))
+		, debugColor_(pset.get<std::string>("debug_ansi_color", "\033[39m"))
 	{
 		//std::cout << "ANSI Plugin configured with ParameterSet: " << pset.to_string() << std::endl;
 	}
@@ -84,18 +89,18 @@ namespace mfplugins
 		case mf::ELseverityLevel::ELsev_success:
 		case mf::ELseverityLevel::ELsev_zeroSeverity:
 		case mf::ELseverityLevel::ELsev_unspecified:
-			std::cout << "\033[39m";
+			std::cout << debugColor_;
 			break;
 
 		case mf::ELseverityLevel::ELsev_info:
-			std::cout << "\033[92m";
+			std::cout << infoColor_;
 			break;
 
 		case mf::ELseverityLevel::ELsev_warning:
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 		case mf::ELseverityLevel::ELsev_warning2:
 # endif
-			std::cout << "\033[1m\033[93m";
+			std::cout << warningColor_;
 			break;
 
 		case mf::ELseverityLevel::ELsev_error:
@@ -110,7 +115,7 @@ namespace mfplugins
 		case mf::ELseverityLevel::ELsev_highestSeverity:
 			if (bellError_) { std::cout << "\007"; }
 			if (blinkError_) { std::cout << "\033[5m"; }
-			std::cout << "\033[1m\033[91m";
+			std::cout << errorColor_;
 			break;
 
 		default: break;

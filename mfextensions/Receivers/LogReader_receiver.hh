@@ -1,13 +1,6 @@
 #ifndef MF_LOG_READER_H
 #define MF_LOG_READER_H
 
-// ------------------------------
-// MessageFacility Log Reader
-//
-//   Read messagefacility log archive and reemit as 
-//   messagefacility messages
-//
-
 #include <string>
 #include <fstream>
 
@@ -21,6 +14,11 @@
 
 namespace mfviewer
 {
+	/// <summary>
+	/// MessageFacility Log Reader
+	///   Read messagefacility log archive and reemit as 
+	///   messagefacility messages
+	/// </summary>
 	class LogReader : public MVReceiver
 	{
 		Q_OBJECT
