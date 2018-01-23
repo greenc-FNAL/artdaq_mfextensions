@@ -1,5 +1,5 @@
 
-find_package(CURL)
+find_package(CURL 7.20.0)
 
 if(CURL_FOUND)
   include_directories(${CURL_INCLUDE_DIRS})
