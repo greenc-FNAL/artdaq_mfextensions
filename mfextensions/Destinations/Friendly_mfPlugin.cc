@@ -28,9 +28,20 @@ namespace mfplugins
 	/// </summary>
 	class ELFriendly : public ELostreamOutput
 	{
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
+		struct Config
+		{
+			fhicl::TableFragment<ELostreamOutput::Config> elOstrConfig;
+			fhicl::Atom<std::string> delimiter{ fhicl::Name{ "field_delimiter" },fhicl::Comment{ "String to print between each message field" },"  " };
+		};
+		using Parameters = fhicl::WrappedTable<Config>;
+#endif
 	public:
-
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELFriendly(const fhicl::ParameterSet& pset);
+#else
+		ELFriendly(Parameters const& pset);
+#endif
 
 #      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&) override;
@@ -53,11 +64,16 @@ namespace mfplugins
 	// ELFriendly c'tor
 	//======================================================================
 
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 	ELFriendly::ELFriendly(const fhicl::ParameterSet& pset)
 		: ELostreamOutput(pset, cet::ostream_handle{ std::cout }, false)
 		, delimeter_(pset.get<std::string>("field_delimeter", "  "))
-	{
-	}
+#else
+	ELFriendly::ELFriendly(Parameters const& pset)
+		: ELostreamOutput(pset().elOstrConfig(), cet::ostream_handle{ std::cout }, false)
+		, delimeter_(pset().delimiter())
+#endif
+	{}
 
 	//======================================================================
 	// Message prefix filler ( overriddes ELdestination::fillPrefix )
@@ -183,51 +199,51 @@ namespace mfplugins
 
 
 	//=============================================================================
-    void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg)
-    {
-      if (!format.want(TEXT)) return;
+	void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg)
+	{
+	  if (!format.want(TEXT)) return;
 
-      format.preambleMode = false;
-      auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
-      auto it = msg.items().cbegin();
+	  format.preambleMode = false;
+	  auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
+	  auto it = msg.items().cbegin();
 
-      // Determine if file and line should be included
-      if (true || !msg.is_verbatim()) {
+	  // Determine if file and line should be included
+	  if (true || !msg.is_verbatim()) {
 
-        // The first four items are { " ", "<FILENAME>", ":", "<LINE>" }
-        while (it != usrMsgStart) {
-          if (!it->compare(" ") && !std::next(it)->compare("--")) {
-            // Do not emit if " --:0" is the match
-            std::advance(it,4);
-          }
-          else {
-            // Emit if <FILENAME> and <LINE> are meaningful
-            emitToken(oss, *it++);
-          }
-        }
+		// The first four items are { " ", "<FILENAME>", ":", "<LINE>" }
+		while (it != usrMsgStart) {
+		  if (!it->compare(" ") && !std::next(it)->compare("--")) {
+			// Do not emit if " --:0" is the match
+			std::advance(it,4);
+		  }
+		  else {
+			// Emit if <FILENAME> and <LINE> are meaningful
+			emitToken(oss, *it++);
+		  }
+		}
 
-        // Check for user-requested line breaks
-        if (format.want(NO_LINE_BREAKS)) emitToken(oss, " ==> ");
-        else emitToken(oss, "", true);
-      }
+		// Check for user-requested line breaks
+		if (format.want(NO_LINE_BREAKS)) emitToken(oss, " ==> ");
+		else emitToken(oss, "", true);
+	  }
 
-      // For verbatim (and user-supplied) messages, just print the contents
-      auto const end = msg.items().cend();
-      for (; it != end; ++it) {
-        emitToken(oss, *it);
-      }
+	  // For verbatim (and user-supplied) messages, just print the contents
+	  auto const end = msg.items().cend();
+	  for (; it != end; ++it) {
+		emitToken(oss, *it);
+	  }
 
-    }
+	}
 
 
-    //=============================================================================
-    void ELFriendly::fillSuffix(std::ostringstream& oss, ErrorObj const& msg)
-    {
+	//=============================================================================
+	void ELFriendly::fillSuffix(std::ostringstream& oss, ErrorObj const& msg)
+	{
 		if ((true || !msg.is_verbatim()) && !format.want(NO_LINE_BREAKS)) {
-        emitToken(oss,"\n%MSG");
-      }
-      oss << '\n';
-    }
+		emitToken(oss,"\n%MSG");
+	  }
+	  oss << '\n';
+	}
 
 
 

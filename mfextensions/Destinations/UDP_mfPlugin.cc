@@ -42,9 +42,23 @@ namespace mfplugins
 	/// </summary>
 	class ELUDP : public ELdestination
 	{
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
+		struct Config
+		{
+			fhicl::TableFragment<ELdestination::Config> elDestConfig;
+			fhicl::Atom<int> error_max{ fhicl::Name{ "error_turnoff_threshold" },fhicl::Comment{ "Number of errors before turning off destination (default: 0, don't turn off)" },0 };
+			fhicl::Atom<int> error_report{ fhicl::Name{ "error_report_backoff_factor" },fhicl::Comment{ "Print an error message every N errors" },100 };
+			fhicl::Atom<std::string> host{ fhicl::Name{ "host" },fhicl::Comment{ "Address to send messages to" }, "227.128.12.27" };
+			fhicl::Atom<int> port{ fhicl::Name{ "port" },fhicl::Comment{ "Port to send messages to" },5140 };
+		};
+		using Parameters = fhicl::WrappedTable<Config>;
+#endif
 	public:
-
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELUDP(const fhicl::ParameterSet& pset);
+#else
+		ELUDP(Parameters const& pset);
+#endif
 
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
@@ -65,16 +79,19 @@ namespace mfplugins
 	private:
 		void reconnect_(bool quiet = false);
 
+		// Parameters
+		int error_report_backoff_factor_;
+		int error_max_;
+		std::string host_;
+		int port_;
+
+		// Other stuff
 		boost::asio::io_service io_service_;
 		udp::socket socket_;
 		udp::endpoint remote_endpoint_;
 		int consecutive_success_count_;
 		int error_count_;
 		int next_error_report_;
-		int error_report_backoff_factor_;
-		int error_max_;
-		std::string host_;
-		int port_;
 		int seqNum_;
 
 
@@ -93,18 +110,27 @@ namespace mfplugins
 	// ELUDP c'tor
 	//======================================================================
 
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 	ELUDP::ELUDP(const fhicl::ParameterSet& pset)
 		: ELdestination(pset)
+		, error_report_backoff_factor_(pset.get<int>("error_report_backoff_factor", 100))
+		, error_max_(pset.get<int>("error_turnoff_threshold", 0))
+		, host_(pset.get<std::string>("host", "227.128.12.27"))
+		, port_(pset.get<int>("port", 5140))
+#else
+	ELUDP::ELUDP(Parameters const& pset)
+		: ELdestination(pset().elDestConfig())
+		, error_report_backoff_factor_(pset().error_report())
+		, error_max_(pset().error_max())
+		, host_(pset().host())
+		, port_(pset().port())
+#endif
 		, io_service_()
 		, socket_(io_service_)
 		, remote_endpoint_()
 		, consecutive_success_count_(0)
 		, error_count_(0)
 		, next_error_report_(1)
-		, error_report_backoff_factor_(pset.get<int>("error_report_backoff_factor", 10))
-		, error_max_(pset.get<int>("error_turnoff_threshold", 1))
-		, host_(pset.get<std::string>("host", "227.128.12.27"))
-		, port_(pset.get<int>("port", 5140))
 		, seqNum_(0)
 		, pid_(static_cast<long>(getpid()))
 	{
@@ -319,7 +345,7 @@ namespace mfplugins
 #endif
 	)
 	{
-		if (error_count_ < error_max_)
+		if (error_count_ < error_max_ || error_max_ == 0)
 		{
 #          if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 			auto pid = pid_;

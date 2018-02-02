@@ -25,9 +25,25 @@ namespace mfplugins
 	/// </summary>
 	class ELANSI : public ELdestination
 	{
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
+		struct Config
+		{
+			fhicl::TableFragment<ELdestination::Config> elDestConfig;
+			fhicl::Atom<bool> bellOnError{ fhicl::Name{ "bell_on_error" },fhicl::Comment{ "Whether to ring the system bell on error messages" },true };
+			fhicl::Atom<bool> blinkOnError{ fhicl::Name{ "blink_error_messages" },fhicl::Comment{ "Whether to print error messages with blinking text"},false };
+			fhicl::Atom<std::string> errorColor{ fhicl::Name{ "error_ansi_color" },fhicl::Comment{ "ANSI Color string for Error Messages" }, "\033[1m\033[91m" };
+			fhicl::Atom<std::string> warningColor{ fhicl::Name{ "warning_ansi_color" },fhicl::Comment{ "ANSI Color string for Warning Messages" }, "\033[1m\033[93m" };
+			fhicl::Atom<std::string> infoColor{ fhicl::Name{ "info_ansi_color" },fhicl::Comment{ "ANSI Color string for Info Messages" }, "\033[92m" };
+			fhicl::Atom<std::string> debugColor{ fhicl::Name{ "debug_ansi_color" },fhicl::Comment{ "ANSI Color string for Debug Messages" }, "\033[39m" };
+	};
+		using Parameters = fhicl::WrappedTable<Config>;
+#endif
 	public:
-
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELANSI(const fhicl::ParameterSet& pset);
+#else
+		ELANSI(Parameters const& pset);
+#endif
 
 #  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
@@ -53,6 +69,7 @@ namespace mfplugins
 	// ELANSI c'tor
 	//======================================================================
 
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 	ELANSI::ELANSI(const fhicl::ParameterSet& pset)
 		: ELdestination(pset)
 		, bellError_(pset.get<bool>("bell_on_error", true))
@@ -61,6 +78,16 @@ namespace mfplugins
 		, warningColor_(pset.get<std::string>("warning_ansi_color", "\033[1m\033[93m"))
 		, infoColor_(pset.get<std::string>("info_ansi_color", "\033[92m"))
 		, debugColor_(pset.get<std::string>("debug_ansi_color", "\033[39m"))
+#else
+	ELANSI::ELANSI(Parameters const& pset)
+		: ELdestination(pset().elDestConfig())
+		, bellError_(pset().bellOnError())
+		, blinkError_(pset().blinkOnError())
+		, errorColor_(pset().errorColor())
+		, warningColor_(pset().warningColor())
+		, infoColor_(pset().infoColor())
+		, debugColor_(pset().debugColor())
+#endif
 	{
 		//std::cout << "ANSI Plugin configured with ParameterSet: " << pset.to_string() << std::endl;
 	}

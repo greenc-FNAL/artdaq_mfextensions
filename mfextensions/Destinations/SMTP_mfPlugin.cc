@@ -1,5 +1,11 @@
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
+#include "fhiclcpp/types/ConfigurationTable.h"
+#include "fhiclcpp/types/Sequence.h"
+#include "fhiclcpp/types/TableFragment.h"
+#endif
+
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
@@ -40,9 +46,32 @@ namespace mfplugins
 	/// </summary>
 	class ELSMTP : public ELdestination
 	{
-	public:
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
+		struct Config
+		{
+			using strings_t = fhicl::Sequence<std::string>::default_type;
 
+			fhicl::TableFragment<ELdestination::Config> elDestConfig;
+			fhicl::Atom<std::string> host{ fhicl::Name{ "host" },fhicl::Comment{ "SMTP Server hostname" }, "smtp.fnal.gov" };
+			fhicl::Atom<int> port{ fhicl::Name{ "port" },fhicl::Comment{ "SMTP Server port" },25 };
+			fhicl::Sequence<std::string> to{ fhicl::Name{ "to_addresses" }, fhicl::Comment{"The list of email addresses that SMTP mfPlugin should sent to" } , strings_t {} };
+			fhicl::Atom<std::string> from{ fhicl::Name{ "from_address" },fhicl::Comment{ "Source email address" } };
+			fhicl::Atom<std::string> subject{ fhicl::Name{ "subject" },fhicl::Comment{ "Subject of the email message" }, "MessageFacility SMTP Message Digest" };
+			fhicl::Atom<std::string> messageHeader{ fhicl::Name{ "message_header" },fhicl::Comment{ "String to preface messages with in email body" }, "" };
+			fhicl::Atom<bool> useSmtps{ fhicl::Name{ "use_smtps" },fhicl::Comment{ "Use SMTPS protocol" }, false };
+			fhicl::Atom<std::string> user{ fhicl::Name{ "smtp_username" },fhicl::Comment{ "Username for SMTP server" }, "" };
+			fhicl::Atom<std::string> pw{ fhicl::Name{ "smtp_password" },fhicl::Comment{ "Password for SMTP server" }, "" };
+			fhicl::Atom<bool> verifyCert{ fhicl::Name{ "verify_host_ssl_certificate" },fhicl::Comment{ "Whether to run full SSL verify on SMTP server in SMTPS mode" }, true };
+			fhicl::Atom<size_t> sendInterval{ fhicl::Name{ "email_send_interval_seconds" },fhicl::Comment{ "Only send email every N seconds" }, 15};
+		};
+		using Parameters = fhicl::WrappedTable<Config>;
+#endif
+	public:
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELSMTP(const fhicl::ParameterSet& pset);
+#else
+		ELSMTP(Parameters const& pset);
+#endif
 
 		~ELSMTP()
 		{
@@ -52,7 +81,7 @@ namespace mfplugins
 
 		virtual void routePayload(const std::ostringstream&, const ErrorObj& msg
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-								  , const ELcontextSupplier&
+			, const ELcontextSupplier&
 # endif
 		) override;
 
@@ -95,6 +124,7 @@ namespace mfplugins
 	// ELSMTP c'tor
 	//======================================================================
 
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 	ELSMTP::ELSMTP(const fhicl::ParameterSet& pset)
 		: ELdestination(pset)
 		, smtp_host_(pset.get<std::string>("host", "smtp.fnal.gov"))
@@ -111,6 +141,24 @@ namespace mfplugins
 		, sending_thread_active_(false)
 		, abort_sleep_(false)
 		, send_interval_s_(pset.get<size_t>("email_send_interval_seconds", 15))
+#else
+	ELSMTP::ELSMTP(Parameters const& pset)
+		: ELdestination(pset().elDestConfig())
+		, smtp_host_(pset().host())
+		, port_(pset().port())
+		, to_(pset().to())
+		, from_(pset().from())
+		, subject_(pset().subject())
+		, message_prefix_(pset().messageHeader())
+		, pid_(static_cast<long>(getpid()))
+		, use_ssl_(pset().useSmtps())
+		, username_(pset().user())
+		, password_(pset().pw())
+		, ssl_verify_host_cert_(pset().verifyCert())
+		, sending_thread_active_(false)
+		, abort_sleep_(false)
+		, send_interval_s_(pset().sendInterval())
+#endif
 	{
 		// hostname
 		char hostname_c[1024];
@@ -241,16 +289,16 @@ namespace mfplugins
 
 		text_ += QString("</font>");
 		return text_.toStdString();
-	}
+}
 
 	//======================================================================
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
 	void ELSMTP::routePayload(const std::ostringstream& oss
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-							  , const ErrorObj& msg, ELcontextSupplier const&
+		, const ErrorObj& msg, ELcontextSupplier const&
 #else
-							  , const ErrorObj& msg
+		, const ErrorObj& msg
 #endif
 	)
 	{
@@ -372,7 +420,7 @@ namespace mfplugins
 extern "C"
 {
 	auto makePlugin(const std::string&,
-					const fhicl::ParameterSet& pset)
+		const fhicl::ParameterSet& pset)
 	{
 		return std::make_unique<mfplugins::ELSMTP>(pset);
 	}
