@@ -1,8 +1,7 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_02_01
+parent artdaq_mfextensions	v1_02_02
 defaultqual	e14:s50
-#defaultqual	e14:s48
 
 # These optional lines define the installed directories where
 # headers, libraries, and executables will be found
@@ -18,41 +17,22 @@ bindir      fq_dir      bin
 
 #
 product		version		optional
-messagefacility v2_01_04        s60
-messagefacility v2_01_03        s58
+messagefacility v2_01_06        s64
 messagefacility v2_00_02        s50
-messagefacility v1_18_04        s48
-messagefacility v1_18_03        s47
 messagefacility v1_18_03        s46
 qt              v5_7_1a
 TRACE           v3_13_04        -       only_for_build
-cetbuildtools	v6_01_00	-	only_for_build
+cetbuildtools	v7_00_02	-	only_for_build
 end_product_list
 
 # See https://cdcvs.fnal.gov/redmine/projects/cet-is-public/wiki/AboutQualifiers for information about the qualifiers used
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier		messagefacility  	  qt    TRACE   notes
-e15:s60:debug      	e15:debug    	          e15   -nq-    -std=c++14
-e15:s60:prof      	e15:prof    	          e15   -nq-    -std=c++14
-e14:s60:debug      	e14:debug    	          e14   -nq-    -std=c++14
-e14:s60:prof      	e14:prof    	          e14   -nq-    -std=c++14
-e15:s58:debug      	e15:debug    	          e15   -nq-    -std=c++14
-e15:s58:prof      	e15:prof    	          e15   -nq-    -std=c++14
-e14:s58:debug      	e14:debug    	          e14   -nq-    -std=c++14
-e14:s58:prof      	e14:prof    	          e14   -nq-    -std=c++14
+e15:s64:debug      	e15:debug    	          e15   -nq-    -std=c++14
+e15:s64:prof      	e15:prof    	          e15   -nq-    -std=c++14
 e14:s50:debug      	e14:debug    	          e14   -nq-    -std=c++14
 e14:s50:prof      	e14:prof    	          e14   -nq-    -std=c++14
-e14:s48:debug      	e14:debug    	          e14   -nq-    -std=c++14
-e14:s48:prof      	e14:prof    	          e14   -nq-    -std=c++14
-e10:s48:debug      	e10:debug    	          e10   -nq-    -std=c++14
-e10:s48:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e14:s47:debug      	e14:debug    	          e14   -nq-    -std=c++14
-e14:s47:prof      	e14:prof    	          e14   -nq-    -std=c++14
-e10:s47:debug      	e10:debug    	          e10   -nq-    -std=c++14
-e10:s47:prof      	e10:prof    	          e10   -nq-    -std=c++14
-e14:s46:debug      	e14:debug    	          e14   -nq-    -std=c++14
-e14:s46:prof      	e14:prof    	          e14   -nq-    -std=c++14
 e10:s46:debug      	e10:debug    	          e10   -nq-    -std=c++14
 e10:s46:prof      	e10:prof    	          e10   -nq-    -std=c++14
 end_qualifier_list

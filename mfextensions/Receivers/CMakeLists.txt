@@ -24,6 +24,7 @@ basic_plugin("UDP" "receiver"
   ${CETLIB}
   ${CETLIB_EXCEPT}
   Qt5::Core
+  pthread
 )
  
 #get_cmake_property(_variableNames VARIABLES)

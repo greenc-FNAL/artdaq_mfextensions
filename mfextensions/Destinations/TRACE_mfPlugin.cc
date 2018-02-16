@@ -1,5 +1,8 @@
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20106 // v2_01_06 => cetlib v3_02_00 => new clang support
+#include "cetlib/ProvideMakePluginMacros.h"
+#endif
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
@@ -27,9 +30,24 @@ namespace mfplugins
 	/// </summary>
 	class ELTRACE : public ELdestination
 	{
+
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
+		struct Config
+		{
+			fhicl::TableFragment<ELdestination::Config> elDestConfig;
+			fhicl::Atom<size_t> lvls{ fhicl::Name{ "lvls" },fhicl::Comment{ "TRACE level mask for Slow output" },0 };
+			fhicl::Atom<size_t> lvlm{ fhicl::Name{ "lvlm" },fhicl::Comment{ "TRACE level mask for Memory output" },0 };
+		};
+		using Parameters = fhicl::WrappedTable<Config>;
+#endif
+
 	public:
 
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELTRACE(const fhicl::ParameterSet& pset);
+#else
+		ELTRACE(Parameters const& pset);
+#endif
 
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
@@ -47,11 +65,6 @@ namespace mfplugins
 # endif
 		) override;
 
-	private:
-		int consecutive_success_count_;
-		int error_count_;
-		int next_error_report_;
-		int error_report_backoff_factor_;
 	};
 
 	// END DECLARATION
@@ -62,13 +75,9 @@ namespace mfplugins
 	//======================================================================
 	// ELTRACE c'tor
 	//======================================================================
-
+#if MESSAGEFACILITY_HEX_VERSION < 0x20103
 	ELTRACE::ELTRACE(const fhicl::ParameterSet& pset)
 		: ELdestination(pset)
-		, consecutive_success_count_(0)
-		, error_count_(0)
-		, next_error_report_(1)
-		, error_report_backoff_factor_()
 	{
 		size_t msk;
 
@@ -78,9 +87,28 @@ namespace mfplugins
 		if (pset.get_if_present<size_t>("lvlm",msk))
 			TRACE_CNTL("lvlmskM",msk); // the M mask for TRACE_NAME
 
-		error_report_backoff_factor_ = pset.get<int>("error_report_backoff_factor", 10);
 		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
 	}
+#else
+	ELTRACE::ELTRACE(Parameters const& pset)
+		: ELdestination(pset().elDestConfig())
+	{
+		size_t msk;
+
+		if (pset().lvls() != 0) {
+			msk = pset().lvls();
+			TRACE_CNTL("lvlmskS", msk); // the S mask for TRACE_NAME
+		}
+		if (pset().lvlm() != 0)
+		{
+			msk = pset().lvlm();
+			TRACE_CNTL("lvlmskM", msk); // the M mask for TRACE_NAME
+		}
+
+		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
+	}
+
+#endif
 
 	//======================================================================
 	// Message prefix filler ( overriddes ELdestination::fillPrefix )
