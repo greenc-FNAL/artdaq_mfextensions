@@ -9,6 +9,7 @@
 #endif
 #include "messagefacility/Utilities/exception.h"
 #include "messagefacility/Utilities/formatTime.h"
+#include "cetlib/compiler_macros.h"
 #include <iostream>
 
 namespace mfplugins
@@ -158,8 +159,11 @@ namespace mfplugins
 //
 //======================================================================
 
-extern "C"
-{
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#endif
+
+EXTERN_C_FUNC_DECLARE_START
 	auto makePlugin(const std::string&,
 					const fhicl::ParameterSet& pset)
 	{

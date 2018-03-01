@@ -31,6 +31,7 @@
 
 #include <QtCore/QString>
 #include "mfextensions/Destinations/detail/curl_send_message.h"
+#include "cetlib/compiler_macros.h"
 
 namespace mfplugins
 {
@@ -417,8 +418,11 @@ namespace mfplugins
   //
   //======================================================================
 
-extern "C"
-{
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#endif
+
+EXTERN_C_FUNC_DECLARE_START
 	auto makePlugin(const std::string&,
 		const fhicl::ParameterSet& pset)
 	{
