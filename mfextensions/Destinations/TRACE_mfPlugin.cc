@@ -88,7 +88,7 @@ namespace mfplugins
 		if (pset.get_if_present<size_t>("lvlm",msk))
 			TRACE_CNTL("lvlmskM",msk); // the M mask for TRACE_NAME
 
-		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
+		TLOG(TLVL_INFO) << "ELTRACE MessageLogger destination plugin initialized.";
 	}
 #else
 	ELTRACE::ELTRACE(Parameters const& pset)
@@ -106,7 +106,7 @@ namespace mfplugins
 			TRACE_CNTL("lvlmskM", msk); // the M mask for TRACE_NAME
 		}
 
-		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
+		TLOG(TLVL_INFO) << "ELTRACE MessageLogger destination plugin initialized.";
 	}
 
 #endif
