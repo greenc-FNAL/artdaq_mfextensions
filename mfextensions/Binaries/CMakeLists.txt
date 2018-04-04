@@ -8,8 +8,7 @@ ${FHICLCPP}
 
 cet_make_exec(MFTest SOURCE MFTest.cc 
 LIBRARIES
-${MF_MESSAGELOGGER}
-${MF_UTILITIES}
+  ${MESSAGEFACILITY_LIBS}
 ${FHICLCPP}
 )
 
@@ -29,7 +28,7 @@ ${FHICLCPP}
 Qt5::Core
 )
 
-cet_make_exec(msgviewer SOURCE msgviewer.cc mvdlg.cc qt_mf_msg.cc ReceiverManager.cc
+cet_make_exec(msgviewer SOURCE msgviewer.cc mvdlg.cc ReceiverManager.cc
 LIBRARIES
 MFExtensions
 MFReceivers

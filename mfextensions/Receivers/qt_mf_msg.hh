@@ -12,11 +12,12 @@
 #include <list>
 #include <map>
 
+#include "messagefacility/Utilities/ELseverityLevel.h"
 #include <sys/time.h>
 
 namespace mf
 {
-	class MessageFacilityMsg;
+	class ErrorObj;
 }
 
 /// <summary>
@@ -37,10 +38,12 @@ class qt_mf_msg
 {
 public:
 	/// <summary>
-	/// Construct a qt_mf_msg using the given MessageFacilityMsg
+	/// Construct a qt_mf_msg
 	/// </summary>
-	/// <param name="msg">Message to wrap</param>
-	explicit qt_mf_msg(mf::MessageFacilityMsg const& msg);
+	qt_mf_msg(std::string hostname, std::string category, std::string application, pid_t pid, timeval time);
+
+	qt_mf_msg() {}
+	qt_mf_msg(const qt_mf_msg&) = default;
 
 	// get method
 	/// <summary>
@@ -85,6 +88,16 @@ public:
 	/// <returns>Message sequence number</returns>
 	size_t seq() const { return seq_; }
 
+	void setSeverity(mf::ELseverityLevel sev);
+	void setSeverityLevel(sev_code_t sev) { sev_ = sev; }
+	void setMessage(std::string prefix, int iteration, std::string msg) { msg_ = QString((prefix + " " + std::to_string(iteration) + ": " + msg).c_str()).trimmed().toHtmlEscaped(); }
+	void setHostAddr(std::string hostaddr) { hostaddr_ = QString(hostaddr.c_str()).toHtmlEscaped(); }
+	void setFileName(std::string file) { file_ = QString(file.c_str()).toHtmlEscaped(); }
+	void setLineNumber(std::string line) { line_ = QString(line.c_str()).toHtmlEscaped(); }
+	void setModule(std::string module) { module_ = QString(module.c_str()).toHtmlEscaped(); }
+	void setEventID(std::string eventID) { eventID_ = QString(eventID.c_str()).toHtmlEscaped(); }
+
+	void updateText();
 private:
 
 	QString text_;
@@ -97,6 +110,16 @@ private:
 	timeval time_;
 	size_t seq_;
 	static size_t sequence;
+
+	QString msg_;
+	QString application_;
+	QString pid_;
+	QString hostaddr_;
+	QString file_;
+	QString line_;
+	QString module_;
+	QString eventID_;
+
 };
 
 /// <summary>

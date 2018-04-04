@@ -2,10 +2,9 @@
 #define MSGVIEWERDLG_H
 
 #include "ui_msgviewerdlgui.h"
-#include "messagefacility/Utilities/MessageFacilityMsg.h"
 #include "mfextensions/Extensions/throttle.hh"
 #include "mfextensions/Extensions/suppress.hh"
-#include "mfextensions/Binaries/qt_mf_msg.hh"
+#include "mfextensions/Receivers/qt_mf_msg.hh"
 #include "mfextensions/Binaries/ReceiverManager.hh"
 
 #include <QtCore/QTimer>
@@ -53,7 +52,7 @@ protected:
 
 private slots:
 
-	void onNewMsg(mf::MessageFacilityMsg const& mfmsg);
+	void onNewMsg(qt_mf_msg const& mfmsg);
 
 	void setFilter();
 
@@ -89,7 +88,7 @@ private:
 	void updateDisplays();
 
 	// test if the message is suppressed or throttled
-	bool msg_throttled(mf::MessageFacilityMsg const& mfmsg);
+	bool msg_throttled(qt_mf_msg const& mfmsg);
 
 	unsigned int update_index(msgs_t::iterator it);
 

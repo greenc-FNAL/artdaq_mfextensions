@@ -1,14 +1,15 @@
 #include "mfextensions/Receivers/UDP_receiver.hh"
 #include "mfextensions/Receivers/ReceiverMacros.hh"
+#include "messagefacility/Utilities/ELseverityLevel.h"
 #include <boost/tokenizer.hpp>
 #include <boost/regex.hpp>
 #include <sstream>
 
 mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
-															 , port_(pset.get<int>("port", 5140))
-															 , io_service_()
-															 , socket_(io_service_)
-															 , debug_(pset.get<bool>("debug_mode", false))
+, port_(pset.get<int>("port", 5140))
+, io_service_()
+, socket_(io_service_)
+, debug_(pset.get<bool>("debug_mode", false))
 {
 	//std::cout << "UDPReceiver Constructor" << std::endl;
 	boost::system::error_code ec;
@@ -87,12 +88,17 @@ void mfviewer::UDPReceiver::run()
 	std::cout << "UDPReceiver shutting down!" << std::endl;
 }
 
-mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
+qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 {
-	mf::MessageFacilityMsg msg;
+	std::string hostname, category, application, message, hostaddr, file, line, module, eventID;
+	mf::ELseverityLevel sev;
+	timeval tv;
+	int pid = 0;
+	int seqNum = 0;
+
 	if (debug_) { std::cout << "Recieved MF/Syslog message with contents: " << input << std::endl; }
 
-	boost::char_separator<char> sep("|","",boost::keep_empty_tokens);
+	boost::char_separator<char> sep("|", "", boost::keep_empty_tokens);
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 	tokenizer tokens(input, sep);
 	tokenizer::iterator it = tokens.begin();
@@ -109,38 +115,39 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
 	{
 		struct tm tm;
 		time_t t;
-		timeval tv;
 		std::string value(res[1].first, res[1].second);
 		strptime(value.c_str(), "%d-%b-%Y %H:%M:%S", &tm);
 		tm.tm_isdst = -1;
 		t = mktime(&tm);
 		tv.tv_sec = t;
 		tv.tv_usec = 0;
-		msg.setTimestamp(tv);
 
-		int seqNum = 0;
 		auto prevIt = it;
 		try
 		{
-		if (++it != tokens.end()) { seqNum = std::stoi(*it); }
+			if (++it != tokens.end()) { seqNum = std::stoi(*it); }
 		}
 		catch (std::invalid_argument e) { it = prevIt; }
-		if (++it != tokens.end()) { msg.setHostname(*it); }
-		if (++it != tokens.end()) { msg.setHostaddr(*it); }
-		if (++it != tokens.end()) { msg.setSeverity(*it); }
-		if (++it != tokens.end()) { msg.setCategory(*it); }
-		if (++it != tokens.end()) { msg.setApplication(*it); }
+		if (++it != tokens.end()) { hostname = *it; }
+		if (++it != tokens.end()) { hostaddr = *it; }
+		if (++it != tokens.end()) { sev = mf::ELseverityLevel(*it); }
+		if (++it != tokens.end()) { category = *it; }
+		if (++it != tokens.end()) { application = *it; }
 # if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		if (++it != tokens.end()) { msg.setProcess(*it); }
+		if (++it != tokens.end()) {}
 # endif
 		prevIt = it;
 		try
 		{
-			if (++it != tokens.end()) { msg.setPid(std::stol(*it)); }
+			if (++it != tokens.end()) { pid = std::stol(*it); }
 		}
 		catch (std::invalid_argument e) { it = prevIt; }
-		if (++it != tokens.end()) { msg.setContext(*it); }
-		if (++it != tokens.end()) { msg.setModule(*it); }
+		if (++it != tokens.end()) { eventID = *it; }
+		if (++it != tokens.end()) { module = *it; }
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20201 // Sender and receiver version must match!
+		if (++it != tokens.end()) { file = *it; }
+		if (++it != tokens.end()) { line = *it; }
+#endif
 		std::ostringstream oss;
 		bool first = true;
 		while (++it != tokens.end())
@@ -150,8 +157,18 @@ mf::MessageFacilityMsg mfviewer::UDPReceiver::read_msg(std::string input)
 			oss << *it;
 		}
 		if (debug_) { std::cout << "Message content: " << oss.str() << std::endl; }
-		msg.setMessage(std::string("UDPMessage"), std::to_string(seqNum), oss.str());
+		message = oss.str();
 	}
+
+	qt_mf_msg msg(hostname, category, application, pid, tv);
+	msg.setSeverity(sev);
+	msg.setMessage("UDPMessage", seqNum, message);
+	msg.setHostAddr(hostaddr);
+	msg.setFileName(file);
+	msg.setLineNumber(line);
+	msg.setModule(module);
+	msg.setEventID(eventID);
+	msg.updateText();
 
 	return msg;
 }
