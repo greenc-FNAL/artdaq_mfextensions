@@ -80,7 +80,7 @@ endif()
 include(BasicPlugin)
 
 # Configuration Files
-add_subdirectory(config)
+add_subdirectory(fcl)
 
 # API Documentation
 add_subdirectory(doc)
