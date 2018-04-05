@@ -90,7 +90,7 @@ public:
 
 	void setSeverity(mf::ELseverityLevel sev);
 	void setSeverityLevel(sev_code_t sev) { sev_ = sev; }
-	void setMessage(std::string prefix, int iteration, std::string msg) { msg_ = QString((prefix + " " + std::to_string(iteration) + ": " + msg).c_str()).trimmed().toHtmlEscaped(); }
+	void setMessage(std::string prefix, int iteration, std::string msg);
 	void setHostAddr(std::string hostaddr) { hostaddr_ = QString(hostaddr.c_str()).toHtmlEscaped(); }
 	void setFileName(std::string file) { file_ = QString(file.c_str()).toHtmlEscaped(); }
 	void setLineNumber(std::string line) { line_ = QString(line.c_str()).toHtmlEscaped(); }
@@ -119,7 +119,8 @@ private:
 	QString line_;
 	QString module_;
 	QString eventID_;
-
+	QString sourceType_;
+	int sourceSequence_;
 };
 
 /// <summary>

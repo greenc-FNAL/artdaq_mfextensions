@@ -66,6 +66,13 @@ void qt_mf_msg::setSeverity(mf::ELseverityLevel sev)
 	}
 }
 
+void qt_mf_msg::setMessage(std::string prefix, int iteration, std::string msg)
+{
+	sourceType_ = QString(prefix.c_str()).toHtmlEscaped();
+	sourceSequence_ = iteration;
+	msg_ = QString(msg.c_str()).toHtmlEscaped();
+}
+
 void qt_mf_msg::updateText()
 {
 	text_ = QString("<font color=");
@@ -112,18 +119,17 @@ void qt_mf_msg::updateText()
 	strftime(ts, sizeof(ts), "%d-%b-%Y %H:%M:%S %Z", localtime_r(&time_.tv_sec, &timebuf));
 
 
-	text_ += QString("<pre>")
+	text_ += QString("<pre style=\"width: 100%;\">")
 		+ sev_name.toHtmlEscaped() + " / "
 		+ cat_.toHtmlEscaped() + "<br>"
 		+ QString(ts).toHtmlEscaped() + "<br>"
 		+ host_.toHtmlEscaped() + " ("
 		+ hostaddr_ + ")<br>"
-		+ " ("
-		+ pid_ + ")";
+		+ sourceType_ + " " + QString::number(sourceSequence_) + " / "
+		+ "PID " + pid_;
 
-	if (file_.toStdString().compare("--"))
-		text_ += QString(" / ") + file_
-		+ QString(":") + line_;
+	if (file_ != "")
+		text_ += QString(" / ") + file_	+ QString(":") + line_;
 
 	text_ += QString("<br>")
 		+ application_ + " / "

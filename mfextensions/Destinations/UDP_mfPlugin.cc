@@ -339,7 +339,10 @@ namespace mfplugins
 	void ELUDP::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
 	{
 		std::ostringstream tmposs;
-		ELdestination::fillUsrMsg(tmposs, msg);
+		// Print the contents.
+		for (auto const& val : msg.items()) {
+			tmposs << val;
+		}
 
 		// remove leading "\n" if present
 		const std::string& usrMsg = !tmposs.str().compare(0, 1, "\n") ? tmposs.str().erase(0, 1) : tmposs.str();
