@@ -12,8 +12,10 @@
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 # include "messagefacility/MessageService/ELcontextSupplier.h"
 # include "messagefacility/MessageLogger/MessageDrop.h"
-#else
+#elif MESSAGEFACILITY_HEX_VERSION < 0x20201 //  v2_02_01 is s67
 # include "messagefacility/MessageService/MessageDrop.h"
+#else
+# include "messagefacility/MessageLogger/MessageLogger.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
 

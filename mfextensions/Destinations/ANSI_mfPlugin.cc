@@ -8,7 +8,7 @@
 # include "messagefacility/MessageService/ELcontextSupplier.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
-#include "messagefacility/Utilities/formatTime.h"
+//#include "messagefacility/Utilities/formatTime.h"
 #include "cetlib/compiler_macros.h"
 #include <iostream>
 

@@ -1,5 +1,5 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "messagefacility/Utilities/MessageFacilityMsg.h"
+#include "messagefacility/Utilities/ErrorObj.h"
 
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>
@@ -13,44 +13,6 @@ namespace po = boost::program_options;
 
 bool cmdline = false;
 int z = 0;
-
-void printmsg(mf::MessageFacilityMsg const& mfmsg)
-{
-	// No display of received messages in command line mode
-	if (cmdline) return;
-
-	// First archive the received message
-	// have to do it this way because LogErrorObj() takes a pointer
-	// to ErrorObj and take over the ownership (it will deal with
-	// with deletion), plus the fact ErrorObj doesn't have a copy
-	// assignment operator
-	mf::ErrorObj* eop = new mf::ErrorObj(mfmsg.ErrorObject());
-	mf::LogErrorObj(eop);
-
-	// Show received message on screen
-	std::cout << "severity:       " << mfmsg.severity() << "\n";
-	std::cout << "timestamp:      " << mfmsg.timestr() << "\n";
-	std::cout << "hostname:       " << mfmsg.hostname() << "\n";
-	std::cout << "hostaddr(ip):   " << mfmsg.hostaddr() << "\n";
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	std::cout << "process:        " << mfmsg.process() << "\n";
-#  endif
-	std::cout << "process_id:     " << mfmsg.pid() << "\n";
-	std::cout << "application:    " << mfmsg.application() << "\n";
-	std::cout << "module:         " << mfmsg.module() << "\n";
-	std::cout << "context:        " << mfmsg.context() << "\n";
-	std::cout << "category(id):   " << mfmsg.category() << "\n";
-	std::cout << "file:           " << mfmsg.file() << "\n";
-	std::cout << "line:           " << mfmsg.line() << "\n";
-	std::cout << "message:        " << mfmsg.message() << "\n";
-	std::cout << std::endl;
-}
-
-void printnull(mf::MessageFacilityMsg const& mfmsg)
-{
-	mf::ErrorObj* eop = new mf::ErrorObj(mfmsg.ErrorObject());
-	mf::LogErrorObj(eop);
-}
 
 int main(int argc, char* argv[])
 {

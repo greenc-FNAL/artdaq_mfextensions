@@ -8,7 +8,20 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "mfextensions/Binaries/mvdlg.hh"
+
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+
 #include "trace.h"
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic pop 
+#endif
+
+
 #include "mvdlg.hh"
 
 // replace the ${..} part in the filename with env variable
@@ -141,9 +154,9 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 		, SLOT(changeSeverity(int)));
 
 	connect(&receivers_
-		, SIGNAL(newMessage(mf::MessageFacilityMsg const &))
+		, SIGNAL(newMessage(qt_mf_msg const &))
 		, this
-		, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
+		, SLOT(onNewMsg(qt_mf_msg const &)));
 
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
 	connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
@@ -268,22 +281,22 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	if (lvl == "ERROR" || lvl == "error" || lvl == "3") { sevThresh = SERROR; }
 }
 
-bool msgViewerDlg::msg_throttled(mf::MessageFacilityMsg const& mfmsg)
+bool msgViewerDlg::msg_throttled(qt_mf_msg const& mfmsg)
 {
 	// suppression list
 
 	++nSupMsgs;
 
 	for (size_t i = 0; i < e_sup_host.size(); ++i)
-		if (e_sup_host[i].match(mfmsg.hostname()))
+		if (e_sup_host[i].match(mfmsg.host().toStdString()))
 			return true;
 
 	for (size_t i = 0; i < e_sup_app.size(); ++i)
-		if (e_sup_app[i].match(mfmsg.application()))
+		if (e_sup_app[i].match(mfmsg.app().toStdString()))
 			return true;
 
 	for (size_t i = 0; i < e_sup_cat.size(); ++i)
-		if (e_sup_cat[i].match(mfmsg.category()))
+		if (e_sup_cat[i].match(mfmsg.cat().toStdString()))
 			return true;
 
 	--nSupMsgs;
@@ -293,15 +306,15 @@ bool msgViewerDlg::msg_throttled(mf::MessageFacilityMsg const& mfmsg)
 	++nThrMsgs;
 
 	for (size_t i = 0; i < e_thr_host.size(); ++i)
-		if (e_thr_host[i].reach_limit(mfmsg.hostname(), mfmsg.timestamp()))
+		if (e_thr_host[i].reach_limit(mfmsg.host().toStdString(), mfmsg.time()))
 			return true;
 
 	for (size_t i = 0; i < e_thr_app.size(); ++i)
-		if (e_thr_app[i].reach_limit(mfmsg.application(), mfmsg.timestamp()))
+		if (e_thr_app[i].reach_limit(mfmsg.app().toStdString(), mfmsg.time()))
 			return true;
 
 	for (size_t i = 0; i < e_thr_cat.size(); ++i)
-		if (e_thr_cat[i].reach_limit(mfmsg.category(), mfmsg.timestamp()))
+		if (e_thr_cat[i].reach_limit(mfmsg.cat().toStdString(), mfmsg.time()))
 			return true;
 
 	--nThrMsgs;
@@ -331,7 +344,7 @@ void msgViewerDlg::readSettings()
 	settings.endGroup();
 }
 
-void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
+void msgViewerDlg::onNewMsg(qt_mf_msg const& mfmsg)
 {
 	// 21-Aug-2015, KAB: copying the incrementing (and displaying) of the number
 	// of messages to here. I'm also not sure if we want to

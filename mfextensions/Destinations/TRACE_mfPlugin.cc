@@ -14,7 +14,17 @@
 #include "cetlib/compiler_macros.h"
 
 #define TRACE_NAME "MessageFacility"
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+
 #include "trace.h"
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic pop 
+#endif
 
 
 namespace mfplugins

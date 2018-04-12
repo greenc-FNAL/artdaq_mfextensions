@@ -17,6 +17,9 @@
 #include <memory>
 #include <algorithm>
 
+#if MESSAGEFACILITY_HEX_VERSION < 0x20201 // format changed to format_ for s67
+#define format_ format
+#endif
 
 namespace mfplugins
 {
@@ -89,7 +92,9 @@ namespace mfplugins
 
 		// Output the prologue:
 		//
-		format.preambleMode = true;
+#if MESSAGEFACILITY_HEX_VERSION < 0x20201 // format changed to format_ for s67
+		format_.preambleMode = true;
+#endif
 
 		auto const& xid = msg.xid();
 
@@ -126,7 +131,7 @@ namespace mfplugins
 
 		// Output serial number of message:
 		//
-		if (format.want(SERIAL)) {
+		if (format_.want(SERIAL)) {
 			std::ostringstream s;
 			s << msg.serial();
 			emitToken(oss, "[serial #" + s.str() + "]");
@@ -136,24 +141,24 @@ namespace mfplugins
 		// Provide further identification:
 		//
 		bool needAspace = true;
-		if (format.want(EPILOGUE_SEPARATE)) {
+		if (format_.want(EPILOGUE_SEPARATE)) {
 			if (module.length() + subroutine.length() > 0) {
 				emitToken(oss, "\n");
 				needAspace = false;
 			}
-			else if (format.want(TIMESTAMP) && !format.want(TIME_SEPARATE)) {
+			else if (format_.want(TIMESTAMP) && !format_.want(TIME_SEPARATE)) {
 				emitToken(oss, "\n");
 				needAspace = false;
 			}
 		}
-		if (format.want(MODULE) && (module.length() > 0)) {
+		if (format_.want(MODULE) && (module.length() > 0)) {
 			if (needAspace) {
 				emitToken(oss, delimeter_);
 				needAspace = false;
 			}
 			emitToken(oss, module + "  ");
 		}
-		if (format.want(SUBROUTINE) && (subroutine.length() > 0)) {
+		if (format_.want(SUBROUTINE) && (subroutine.length() > 0)) {
 			if (needAspace) {
 				emitToken(oss, delimeter_);
 				needAspace = false;
@@ -164,8 +169,8 @@ namespace mfplugins
 
 		// Provide time stamp:
 		//
-		if (format.want(TIMESTAMP)) {
-			if (format.want(TIME_SEPARATE)) {
+		if (format_.want(TIMESTAMP)) {
+			if (format_.want(TIME_SEPARATE)) {
 				emitToken(oss, "\n");
 				needAspace = false;
 			}
@@ -173,13 +178,13 @@ namespace mfplugins
 				emitToken(oss, delimeter_);
 				needAspace = false;
 			}
-			emitToken(oss, format.timestamp(msg.timestamp()));
+			emitToken(oss, format_.timestamp(msg.timestamp()));
 			emitToken(oss, delimeter_);
 		}
 
 		// Provide the context information:
 		//
-		if (format.want(SOME_CONTEXT)) {
+		if (format_.want(SOME_CONTEXT)) {
 			if (needAspace) {
 				emitToken(oss, delimeter_);
 				needAspace = false;
@@ -187,7 +192,7 @@ namespace mfplugins
 #          if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 			emitToken(oss, msg.context());
 #          else
-			if (format.want(FULL_CONTEXT)) {
+			if (format_.want(FULL_CONTEXT)) {
 				emit(oss, contextSupplier.fullContext());
 			}
 			else {
@@ -202,9 +207,11 @@ namespace mfplugins
 	//=============================================================================
 	void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg)
 	{
-	  if (!format.want(TEXT)) return;
+	  if (!format_.want(TEXT)) return;
 
-	  format.preambleMode = false;
+#if MESSAGEFACILITY_HEX_VERSION < 0x20201 // format changed to format_ for s67
+	  format_.preambleMode = false;
+#endif
 	  auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
 	  auto it = msg.items().cbegin();
 
@@ -224,7 +231,7 @@ namespace mfplugins
 		}
 
 		// Check for user-requested line breaks
-		if (format.want(NO_LINE_BREAKS)) emitToken(oss, " ==> ");
+		if (format_.want(NO_LINE_BREAKS)) emitToken(oss, " ==> ");
 		else emitToken(oss, "", true);
 	  }
 
@@ -240,7 +247,7 @@ namespace mfplugins
 	//=============================================================================
 	void ELFriendly::fillSuffix(std::ostringstream& oss, ErrorObj const& msg)
 	{
-		if ((true || !msg.is_verbatim()) && !format.want(NO_LINE_BREAKS)) {
+		if ((true || !msg.is_verbatim()) && !format_.want(NO_LINE_BREAKS)) {
 		emitToken(oss,"\n%MSG");
 	  }
 	  oss << '\n';
