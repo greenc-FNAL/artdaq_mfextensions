@@ -6,10 +6,13 @@
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 # include "messagefacility/MessageService/ELcontextSupplier.h"
 # include "messagefacility/MessageLogger/MessageDrop.h"
-#else
+#elif MESSAGEFACILITY_HEX_VERSION < 0x20201 // v2_02_01 is s67
 # include "messagefacility/MessageService/MessageDrop.h"
+#else
+# include "messagefacility/MessageLogger/MessageLogger.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
+#include "cetlib/compiler_macros.h"
 
 // C/C++ includes
 #include <iostream>
@@ -25,6 +28,10 @@
 // Boost includes
 #include <boost/asio.hpp>
 #include <boost/algorithm/string.hpp>
+
+#if MESSAGEFACILITY_HEX_VERSION < 0x20201 // format changed to format_ for s67
+#define format_ format
+#endif
 
 namespace mfplugins
 {
@@ -296,7 +303,7 @@ namespace mfplugins
 #      endif
 		std::replace(module.begin(), module.end(), '|', '!');
 
-		oss << format.timestamp(msg.timestamp()) << "|"; // timestamp
+		oss << format_.timestamp(msg.timestamp()) << "|"; // timestamp
 		oss << std::to_string(++seqNum_) << "|"; // sequence number
 #      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		oss << hostname_ << "|"; // host name
@@ -309,7 +316,10 @@ namespace mfplugins
 #      endif
 		oss << id << "|"; // category
 		oss << app << "|"; // application
-#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
+#      if MESSAGEFACILITY_HEX_VERSION >= 0x20201 // an indication of s67
+		oss << pid_ << "|";
+		oss << mf::GetIteration() << "|"; // run/event no
+#      elif MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		oss << pid_ << "|"; // process id
 		oss << mf::MessageDrop::instance()->iteration << "|"; // run/event no
 #      else
@@ -318,6 +328,9 @@ namespace mfplugins
 		oss << mf::MessageDrop::instance()->runEvent << "|"; // run/event no
 #      endif
 		oss << module << "|"; // module name
+#if MESSAGEFACILITY_HEX_VERSION >= 0x20201
+		oss << msg.filename() << "|" << std::to_string(msg.lineNumber()) << "|";
+#endif
 	}
 
 	//======================================================================
@@ -326,7 +339,10 @@ namespace mfplugins
 	void ELUDP::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
 	{
 		std::ostringstream tmposs;
-		ELdestination::fillUsrMsg(tmposs, msg);
+		// Print the contents.
+		for (auto const& val : msg.items()) {
+			tmposs << val;
+		}
 
 		// remove leading "\n" if present
 		const std::string& usrMsg = !tmposs.str().compare(0, 1, "\n") ? tmposs.str().erase(0, 1) : tmposs.str();
@@ -399,8 +415,11 @@ namespace mfplugins
 //
 //======================================================================
 
-extern "C"
-{
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#endif
+
+EXTERN_C_FUNC_DECLARE_START
 	auto makePlugin(const std::string&,
 					const fhicl::ParameterSet& pset)
 	{

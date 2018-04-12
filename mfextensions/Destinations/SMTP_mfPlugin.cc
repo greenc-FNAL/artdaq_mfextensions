@@ -12,8 +12,10 @@
 #if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
 # include "messagefacility/MessageService/ELcontextSupplier.h"
 # include "messagefacility/MessageLogger/MessageDrop.h"
-#else
+#elif MESSAGEFACILITY_HEX_VERSION < 0x20201 //  v2_02_01 is s67
 # include "messagefacility/MessageService/MessageDrop.h"
+#else
+# include "messagefacility/MessageLogger/MessageLogger.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
 
@@ -31,6 +33,7 @@
 
 #include <QtCore/QString>
 #include "mfextensions/Destinations/detail/curl_send_message.h"
+#include "cetlib/compiler_macros.h"
 
 namespace mfplugins
 {
@@ -417,8 +420,11 @@ namespace mfplugins
   //
   //======================================================================
 
-extern "C"
-{
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#endif
+
+EXTERN_C_FUNC_DECLARE_START
 	auto makePlugin(const std::string&,
 		const fhicl::ParameterSet& pset)
 	{

@@ -11,9 +11,20 @@
 # include "messagefacility/MessageLogger/MessageDrop.h"
 #endif
 #include "messagefacility/Utilities/exception.h"
+#include "cetlib/compiler_macros.h"
 
 #define TRACE_NAME "MessageFacility"
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+
 #include "trace.h"
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic pop 
+#endif
 
 
 namespace mfplugins
@@ -87,7 +98,7 @@ namespace mfplugins
 		if (pset.get_if_present<size_t>("lvlm",msk))
 			TRACE_CNTL("lvlmskM",msk); // the M mask for TRACE_NAME
 
-		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
+		TLOG(TLVL_INFO) << "ELTRACE MessageLogger destination plugin initialized.";
 	}
 #else
 	ELTRACE::ELTRACE(Parameters const& pset)
@@ -105,7 +116,7 @@ namespace mfplugins
 			TRACE_CNTL("lvlmskM", msk); // the M mask for TRACE_NAME
 		}
 
-		TRACE(3, "ELTRACE MessageLogger destination plugin initialized.");
+		TLOG(TLVL_INFO) << "ELTRACE MessageLogger destination plugin initialized.";
 	}
 
 #endif
@@ -197,8 +208,11 @@ namespace mfplugins
 	//
 	//======================================================================
 
-	extern "C"
-	{
+#ifndef EXTERN_C_FUNC_DECLARE_START
+#define EXTERN_C_FUNC_DECLARE_START extern "C" {
+#endif
+
+	EXTERN_C_FUNC_DECLARE_START
 		auto makePlugin(const std::string&,
 						const fhicl::ParameterSet& pset)
 		{

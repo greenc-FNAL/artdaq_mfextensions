@@ -12,8 +12,7 @@ cet_make_library(LIBRARY_NAME curl_send_message
 
 basic_plugin( "SMTP" "mfPlugin"
 curl_send_message
-    ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
+  ${MESSAGEFACILITY_LIBS}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -27,8 +26,7 @@ ${MF_MESSAGESERVICE}
 endif()
 
 basic_plugin( "UDP" "mfPlugin"
-  ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
+  ${MESSAGEFACILITY_LIBS}
 ${MF_MESSAGESERVICE}
   ${Boost_SYSTEM_LIBRARY}
   ${FHICLCPP}
@@ -38,8 +36,7 @@ ${MF_MESSAGESERVICE}
 )
 
 basic_plugin( "TRACE" "mfPlugin"
-    ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
+  ${MESSAGEFACILITY_LIBS}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -48,8 +45,7 @@ ${MF_MESSAGESERVICE}
 
 
 basic_plugin( "Friendly" "mfPlugin"
-    ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
+  ${MESSAGEFACILITY_LIBS}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -57,8 +53,7 @@ ${MF_MESSAGESERVICE}
 )
 
 basic_plugin( "MultiFile" "mfPlugin"
-    ${MF_MESSAGELOGGER}
-  ${MF_UTILITIES}
+  ${MESSAGEFACILITY_LIBS}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -66,8 +61,7 @@ ${MF_MESSAGESERVICE}
 )
     
 basic_plugin( "ANSI" "mfPlugin"
-     ${MF_MESSAGELOGGER}
-     ${MF_UTILITIES}
+  ${MESSAGEFACILITY_LIBS}
      ${MF_MESSAGESERVICE}
      ${FHICLCPP}
      ${CETLIB}

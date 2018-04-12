@@ -3,7 +3,6 @@
 
 #include "fhiclcpp/fwd.h"
 #include <QObject>
-#include "messagefacility/Utilities/MessageFacilityMsg.h"
 #include "mfextensions/Receivers/MVReceiver.hh"
 
 namespace mfviewer
@@ -25,10 +24,10 @@ namespace mfviewer
 		void stop();
 
 		signals :
-		void newMessage(mf::MessageFacilityMsg const&);
+		void newMessage(qt_mf_msg const&);
 
 	private slots:
-		void onNewMessage(mf::MessageFacilityMsg const& mfmsg);
+		void onNewMessage(qt_mf_msg const& mfmsg);
 
 	private:
 		std::vector<std::unique_ptr<mfviewer::MVReceiver>> receivers_;

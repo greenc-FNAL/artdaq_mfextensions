@@ -6,7 +6,6 @@
 
 #include "fhiclcpp/fwd.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "messagefacility/Utilities/MessageFacilityMsg.h"
 
 #include <boost/regex.hpp>
 
@@ -31,7 +30,7 @@ namespace mfviewer
 		// Receiver Method
 		void run();
 
-		mf::MessageFacilityMsg read_next(); // read next log
+		qt_mf_msg read_next(); // read next log
 
 	private:
 

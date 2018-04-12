@@ -5,7 +5,7 @@
 
 #include "fhiclcpp/ParameterSet.h"
 
-#include "messagefacility/Utilities/MessageFacilityMsg.h"
+#include "mfextensions/Receivers/qt_mf_msg.hh"
 
 #include <QtCore/QThread>
 #include <iostream>
@@ -45,7 +45,7 @@ namespace mfviewer
 		/// When a message is received by the MVReceiver, this signal should be raised so that the connected listener can process it.
 		/// </summary>
 		/// <param name="msg">Received message</param>
-		void NewMessage(mf::MessageFacilityMsg const& msg);
+		void NewMessage(qt_mf_msg const& msg);
 	};
 }
 

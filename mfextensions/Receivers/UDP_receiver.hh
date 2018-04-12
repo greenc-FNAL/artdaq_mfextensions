@@ -4,7 +4,6 @@
 #include "mfextensions/Receivers/MVReceiver.hh"
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include "messagefacility/Utilities/MessageFacilityMsg.h"
 
 #include <boost/asio.hpp>
 using boost::asio::ip::udp;
@@ -26,7 +25,7 @@ namespace mfviewer
 		void run() override;
 
 		// Message Parser
-		mf::MessageFacilityMsg read_msg(std::string input);
+		qt_mf_msg read_msg(std::string input);
 
 		static bool validate_packet(std::string input);
 

@@ -10,8 +10,8 @@ mfviewer::LogReader::LogReader(fhicl::ParameterSet pset)
 	, counter_(0)
 	, metadata_1
 	("\\%MSG-([wide])\\s([^:]*):\\s\\s([^\\s]*)\\s*(\\d\\d-[^-]*-\\d{4}\\s\\d+:\\d+:\\d+)\\s.[DS]T\\s\\s(\\w+)")
-//, metadata_2 
-//  ( "([^\\s]*)\\s([^\\s]*)\\s([^\\s]*)\\s(([^\\s]*)\\s)?([^:]*):(\\d*)" )
+	//, metadata_2 
+	//  ( "([^\\s]*)\\s([^\\s]*)\\s([^\\s]*)\\s(([^\\s]*)\\s)?([^:]*):(\\d*)" )
 {
 	std::cout << "LogReader_receiver Constructor" << std::endl;
 }
@@ -71,42 +71,44 @@ void mfviewer::LogReader::run()
 #include <iostream>
 #include <time.h>
 
-mf::MessageFacilityMsg mfviewer::LogReader::read_next()
+qt_mf_msg mfviewer::LogReader::read_next()
 {
-	mf::MessageFacilityMsg msg;
 	std::string line;
 
 	// meta data 1
 	getline(log_, line);
 
+	std::string category, application, eventID;
+	timeval tv;
+	sev_code_t sev = SERROR;
+
 	if (boost::regex_search(line, what_, metadata_1))
 	{
 #if 0
-	std::cout << ">> " << std::string(what_[1].first, what_[1].second) << "\n";
-	std::cout << ">> " << std::string(what_[2].first, what_[2].second) << "\n";
-	std::cout << ">> " << std::string(what_[3].first, what_[3].second) << "\n";
-	std::cout << ">> " << std::string(what_[4].first, what_[4].second) << "\n";
-	std::cout << ">> " << std::string(what_[5].first, what_[5].second) << "\n";
+		std::cout << ">> " << std::string(what_[1].first, what_[1].second) << "\n";
+		std::cout << ">> " << std::string(what_[2].first, what_[2].second) << "\n";
+		std::cout << ">> " << std::string(what_[3].first, what_[3].second) << "\n";
+		std::cout << ">> " << std::string(what_[4].first, what_[4].second) << "\n";
+		std::cout << ">> " << std::string(what_[5].first, what_[5].second) << "\n";
 #endif
 
 		std::string value = std::string(what_[1].first, what_[1].second);
 
 		switch (value[0])
 		{
-		case 'e': msg.setSeverity("ERROR");
+		case 'e': sev = SERROR;
 			break;
-		case 'w': msg.setSeverity("WARNING");
+		case 'w':sev = SWARNING;
 			break;
-		case 'i': msg.setSeverity("INFO");
+		case 'i': sev = SINFO;
 			break;
-		case 'd': msg.setSeverity("DEBUG");
+		case 'd': sev = SDEBUG;
 			break;
 		default: break;
 		}
 
 		struct tm tm;
 		time_t t;
-		timeval tv;
 
 		value = std::string(what_[4].first, what_[4].second);
 		strptime(value.c_str(), "%d-%b-%Y %H:%M:%S", &tm);
@@ -116,19 +118,20 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next()
 		tv.tv_sec = t;
 		tv.tv_usec = 0;
 
-		msg.setCategory(std::string(what_[2].first, what_[2].second));
-		msg.setTimestamp(tv);
-		msg.setApplication(std::string(what_[3].first, what_[3].second));
-#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
-		msg.setModule(std::string(what_[5].first, what_[5].second));
-#      else
-		msg.setProcess(std::string(what_[5].first, what_[5].second));
-#      endif
+		category = std::string(what_[2].first, what_[2].second);
+		application = std::string(what_[3].first, what_[3].second);
+
+		eventID = std::string(what_[5].first, what_[5].second);
 		//msg.setHostname ( std::string(what_[4].first, what_[4].second) );
 		//msg.setHostaddr ( std::string(what_[5].first, what_[5].second) );
 	}
 	std::string body;
 	getline(log_, line);
+
+	qt_mf_msg msg("", category, application, 0, tv);
+	msg.setSeverityLevel(sev);
+	msg.setEventID(eventID);
+
 
 	while (!log_.eof() && line.find("%MSG") == std::string::npos)
 	{
@@ -136,22 +139,8 @@ mf::MessageFacilityMsg mfviewer::LogReader::read_next()
 		getline(log_, line);
 	}
 
-	msg.setMessage(filename_, std::to_string(counter_), body);
-
-	std::cout <<
-		"Time: " << msg.timestr() <<
-		", Severity: " << msg.severity() <<
-		", Category: " << msg.category() <<
-		", Hostname: " << msg.hostname() <<
-		", Hostaddr: " << msg.hostaddr() <<
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		", Process: " << msg.process() <<
-# endif
-		", Application: " << msg.application() <<
-		", Module: " << msg.module() <<
-		", Context: " << msg.context() <<
-		", File: " << msg.file() <<
-		", Message: " << msg.message() << std::endl;
+	msg.setMessage(filename_, counter_, body);
+	msg.updateText();
 
 	return msg;
 }

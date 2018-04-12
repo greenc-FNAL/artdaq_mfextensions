@@ -8,7 +8,20 @@
 #include "fhiclcpp/ParameterSet.h"
 
 #include "mfextensions/Binaries/mvdlg.hh"
+
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic push 
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#endif
+
 #include "trace.h"
+
+#if GCC_VERSION >= 701000 || defined(__clang__) 
+#pragma GCC diagnostic pop 
+#endif
+
+
 #include "mvdlg.hh"
 
 // replace the ${..} part in the filename with env variable
@@ -116,7 +129,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 
 	connect(btnSearch, SIGNAL(clicked()), this, SLOT(searchMsg()));
 	connect(btnSearchClear,
-			SIGNAL(clicked()), this, SLOT(searchClear()));
+		SIGNAL(clicked()), this, SLOT(searchClear()));
 
 	connect(btnFilter, SIGNAL(clicked()), this, SLOT(setFilter()));
 
@@ -126,24 +139,24 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	connect(btnDebug, SIGNAL(clicked()), this, SLOT(setSevDebug()));
 
 	connect(sup_menu
-			, SIGNAL(triggered(QAction*))
-			, this
-			, SLOT(setSuppression(QAction*)));
+		, SIGNAL(triggered(QAction*))
+		, this
+		, SLOT(setSuppression(QAction*)));
 
 	connect(thr_menu
-			, SIGNAL(triggered(QAction*))
-			, this
-			, SLOT(setThrottling(QAction*)));
+		, SIGNAL(triggered(QAction*))
+		, this
+		, SLOT(setThrottling(QAction*)));
 
 	connect(vsSeverity
-			, SIGNAL(valueChanged(int))
-			, this
-			, SLOT(changeSeverity(int)));
+		, SIGNAL(valueChanged(int))
+		, this
+		, SLOT(changeSeverity(int)));
 
 	connect(&receivers_
-			, SIGNAL(newMessage(mf::MessageFacilityMsg const &))
-			, this
-			, SLOT(onNewMsg(mf::MessageFacilityMsg const &)));
+		, SIGNAL(newMessage(qt_mf_msg const &))
+		, this
+		, SLOT(onNewMsg(qt_mf_msg const &)));
 
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
 	connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
@@ -151,7 +164,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	allMessages.txtDisplay = txtMessages;
 	msgFilters_.push_back(allMessages);
 
-//https://stackoverflow.com/questions/2616483/close-button-only-for-some-tabs-in-qt
+	//https://stackoverflow.com/questions/2616483/close-button-only-for-some-tabs-in-qt
 	QTabBar *tabBar = tabWidget->findChild<QTabBar *>();
 	tabBar->setTabButton(0, QTabBar::RightSide, 0);
 	tabBar->setTabButton(0, QTabBar::LeftSide, 0);
@@ -216,8 +229,8 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const& ps, std::ve
 	{
 		std::string name = ps[i].get<std::string>("name");
 		t.push_back(throttle(name
-							 , ps[i].get<int>("limit", -1)
-							 , ps[i].get<long>("timespan", -1)));
+			, ps[i].get<int>("limit", -1)
+			, ps[i].get<long>("timespan", -1)));
 		act = menu->addAction(QString(name.c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
@@ -268,22 +281,22 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	if (lvl == "ERROR" || lvl == "error" || lvl == "3") { sevThresh = SERROR; }
 }
 
-bool msgViewerDlg::msg_throttled(mf::MessageFacilityMsg const& mfmsg)
+bool msgViewerDlg::msg_throttled(qt_mf_msg const& mfmsg)
 {
 	// suppression list
 
 	++nSupMsgs;
 
 	for (size_t i = 0; i < e_sup_host.size(); ++i)
-		if (e_sup_host[i].match(mfmsg.hostname()))
+		if (e_sup_host[i].match(mfmsg.host().toStdString()))
 			return true;
 
 	for (size_t i = 0; i < e_sup_app.size(); ++i)
-		if (e_sup_app[i].match(mfmsg.application()))
+		if (e_sup_app[i].match(mfmsg.app().toStdString()))
 			return true;
 
 	for (size_t i = 0; i < e_sup_cat.size(); ++i)
-		if (e_sup_cat[i].match(mfmsg.category()))
+		if (e_sup_cat[i].match(mfmsg.cat().toStdString()))
 			return true;
 
 	--nSupMsgs;
@@ -293,15 +306,15 @@ bool msgViewerDlg::msg_throttled(mf::MessageFacilityMsg const& mfmsg)
 	++nThrMsgs;
 
 	for (size_t i = 0; i < e_thr_host.size(); ++i)
-		if (e_thr_host[i].reach_limit(mfmsg.hostname(), mfmsg.timestamp()))
+		if (e_thr_host[i].reach_limit(mfmsg.host().toStdString(), mfmsg.time()))
 			return true;
 
 	for (size_t i = 0; i < e_thr_app.size(); ++i)
-		if (e_thr_app[i].reach_limit(mfmsg.application(), mfmsg.timestamp()))
+		if (e_thr_app[i].reach_limit(mfmsg.app().toStdString(), mfmsg.time()))
 			return true;
 
 	for (size_t i = 0; i < e_thr_cat.size(); ++i)
-		if (e_thr_cat[i].reach_limit(mfmsg.category(), mfmsg.timestamp()))
+		if (e_thr_cat[i].reach_limit(mfmsg.cat().toStdString(), mfmsg.time()))
 			return true;
 
 	--nThrMsgs;
@@ -331,7 +344,7 @@ void msgViewerDlg::readSettings()
 	settings.endGroup();
 }
 
-void msgViewerDlg::onNewMsg(mf::MessageFacilityMsg const& mfmsg)
+void msgViewerDlg::onNewMsg(qt_mf_msg const& mfmsg)
 {
 	// 21-Aug-2015, KAB: copying the incrementing (and displaying) of the number
 	// of messages to here. I'm also not sure if we want to
@@ -421,7 +434,7 @@ void msgViewerDlg::displayMsg(int display)
 	n = msgFilters_[display].msgs.size();
 	it = msgFilters_[display].msgs.begin();
 	QProgressDialog progress("Fetching data...", "Cancel"
-							 , 0, n / 1000, this);
+		, 0, n / 1000, this);
 
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000); // 2 seconds
@@ -522,7 +535,7 @@ msg_iters_t msgViewerDlg::list_intersect(msg_iters_t const& l1, msg_iters_t cons
 		}
 	}
 
-	TRACE(10, "list_intersect: output list has %zu entries", output.size());
+	TLOG(10) << "list_intersect: output list has " << output.size() << " entries";
 	return output;
 }
 
@@ -573,11 +586,11 @@ void msgViewerDlg::setFilter()
 		if (it != app_msgs_.end())
 		{
 			msg_iters_t temp(it->second);
-			TRACE(10, "setFilter: app " + appFilter[app].toStdString() + " has %zu messages", temp.size());
+			TLOG(10) << "setFilter: app " << appFilter[app].toStdString() << " has " << temp.size() << " messages";
 			result.merge(temp);
 		}
 	}
-	TRACE(10, "setFilter: result contains %zu messages", result.size());
+	TLOG(10) << "setFilter: result contains %zu messages", result.size();
 
 	first = true;
 	if (!hostFilter.isEmpty())
@@ -591,13 +604,13 @@ void msgViewerDlg::setFilter()
 			if (it != host_msgs_.end())
 			{
 				msg_iters_t temp(it->second);
-				TRACE(10, "setFilter: host " + hostFilter[host].toStdString() + " has %zu messages", temp.size());
+				TLOG(10) << "setFilter: host " << hostFilter[host].toStdString() << " has " << temp.size() << " messages";
 				hostResult.merge(temp);
 			}
 		}
 		if (result.empty()) { result = hostResult; }
 		else { result = list_intersect(result, hostResult); }
-		TRACE(10, "setFilter: result contains %zu messages", result.size());
+		TLOG(10) << "setFilter: result contains " << result.size() << " messages";
 	}
 
 	first = true;
@@ -612,13 +625,13 @@ void msgViewerDlg::setFilter()
 			if (it != cat_msgs_.end())
 			{
 				msg_iters_t temp(it->second);
-				TRACE(10, "setFilter: cat " + catFilter[cat].toStdString() + " has %zu messages", temp.size());
+				TLOG(10) << "setFilter: cat " << catFilter[cat].toStdString() << " has " << temp.size() << " messages";
 				catResult.merge(temp);
 			}
 		}
 		if (result.empty()) { result = catResult; }
 		else { result = list_intersect(result, catResult); }
-		TRACE(10, "setFilter: result contains %zu messages", result.size());
+		TLOG(10) << "setFilter: result contains " << result.size() << " messages";
 	}
 
 	// Create the filter expression
@@ -630,9 +643,9 @@ void msgViewerDlg::setFilter()
 	}
 	else
 	{
-		filterExpression = "(" + (catFilterExpression != "" ? catFilterExpression + ") && (" : "") 
-			+ hostFilterExpression 
-			+ (hostFilterExpression != "" && appFilterExpression != "" ? ") && (" : "") 
+		filterExpression = "(" + (catFilterExpression != "" ? catFilterExpression + ") && (" : "")
+			+ hostFilterExpression
+			+ (hostFilterExpression != "" && appFilterExpression != "" ? ") && (" : "")
 			+ appFilterExpression + ")";
 	}
 
