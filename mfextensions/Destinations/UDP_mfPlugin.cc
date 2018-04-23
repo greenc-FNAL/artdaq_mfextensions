@@ -285,8 +285,10 @@ namespace mfplugins
 #      if MESSAGEFACILITY_HEX_VERSION >= 0x20201 // an indication of s67
 		oss << pid_ << "|";
 		oss << mf::GetIteration() << "|"; // run/event no
+#else
 		oss << pid_ << "|"; // process id
 		oss << mf::MessageDrop::instance()->iteration << "|"; // run/event no
+#endif
 		oss << module << "|"; // module name
 #if MESSAGEFACILITY_HEX_VERSION >= 0x20201
 		oss << msg.filename() << "|" << std::to_string(msg.lineNumber()) << "|";
