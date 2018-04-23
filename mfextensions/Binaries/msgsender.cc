@@ -47,16 +47,16 @@ int main(int ac, char* av[])
 			("severity,s",
 			 po::value<std::string>(&severity)->default_value("info"),
 			 "severity of the message (error, warning, info, debug)")
-			("category,g",
-			 po::value<std::vector<std::string>>(&vcat)->default_value(vcat_def, "null"),
-			 "message id / categories")
-			("application,a",
-			 po::value<std::string>(&application)->default_value("msgsenderApplication"),
-			 "issuing application name")
-			("config,c",
-			 po::value<std::string>(&conf)->default_value(""),
-			 "MessageFacility configuration file")
-			("dump,d", po::bool_switch(&dump)->default_value(false));
+			 ("category,g",
+			  po::value<std::vector<std::string>>(&vcat)->default_value(vcat_def, "null"),
+			  "message id / categories")
+			  ("application,a",
+			   po::value<std::string>(&application)->default_value("msgsenderApplication"),
+			   "issuing application name")
+			   ("config,c",
+				po::value<std::string>(&conf)->default_value(""),
+				"MessageFacility configuration file")
+				("dump,d", po::bool_switch(&dump)->default_value(false));
 
 		po::options_description hidden("Hidden options");
 		hidden.add_options()
@@ -118,7 +118,7 @@ int main(int ac, char* av[])
 	// checking severity...
 	transform(severity.begin(), severity.end(), severity.begin(), ::toupper);
 	if ((severity != "ERROR") && (severity != "WARNING")
-	    && (severity != "INFO") && (severity != "DEBUG"))
+		&& (severity != "INFO") && (severity != "DEBUG"))
 	{
 		std::cerr << "Unknown severity level!\n";
 		return 1;
@@ -143,27 +143,13 @@ int main(int ac, char* av[])
 		std::string pstr(fhiclstream.str());
 		fhicl::make_ParameterSet(pstr, pset);
 	}
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // an indication of a switch from s48 to s50
-	else
-	{
-		pset = mf::MessageFacilityService::logConsole();
-	}
-#  endif
 
 	// start up message facility service
-#  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 	mf::StartMessageFacility(pset);
-#  else
-	mf::StartMessageFacility(mf::MessageFacilityService::MultiThread, pset);
-#  endif
 	if (dump)
 	{
 		std::cout << pset.to_indented_string() << std::endl;
 	}
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // an indication of a switch from s48 to s50
-	mf::SetModuleName("msgsenderModule");
-	mf::SetContext("msgsenderContext");
-#  endif
 	mf::SetApplicationName(application);
 
 	// logging message...

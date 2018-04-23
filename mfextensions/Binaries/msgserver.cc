@@ -19,13 +19,13 @@ int main(int argc, char* argv[])
 	// checking options
 	std::string filename;
 	std::string configFile;
-	
+
 	try
 	{
 		po::options_description cmdopt("Allowed options");
 		cmdopt.add_options()
 			("help,h", "display help message")
-		("config,c", po::value<std::string>(&configFile)->default_value(""),"Specify the FHiCL configuration file to use")
+			("config,c", po::value<std::string>(&configFile)->default_value(""), "Specify the FHiCL configuration file to use")
 			("filename,f",
 			 po::value<std::string>(&filename)->default_value("msg_archive"),
 			 "specify the message archive file name");
@@ -57,26 +57,20 @@ int main(int argc, char* argv[])
 
 
 	// Start MessageFacility Service
-#  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 	std::ostringstream descstr;
 	descstr << "";
 	fhicl::ParameterSet main_pset;
-	mf::StartMessageFacility( main_pset );
-#  else
-	mf::StartMessageFacility(
-		mf::MessageFacilityService::SingleThread,
-		mf::MessageFacilityService::logArchive(filename));
-#  endif
+	mf::StartMessageFacility(main_pset);
 
 	fhicl::ParameterSet pset;
 	auto maker = cet::filepath_maker();
 	fhicl::make_ParameterSet(configFile, maker, pset);
 	mfviewer::ReceiverManager rm(pset);
-	
-	
+
+
 	// Welcome message
-	std::cout << "Message Facility MsgServer is up and listening to configured Receivers" <<std::endl;
-	
+	std::cout << "Message Facility MsgServer is up and listening to configured Receivers" << std::endl;
+
 	// Command line message loop
 	std::string cmd;
 

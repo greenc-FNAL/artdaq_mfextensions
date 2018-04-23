@@ -6,10 +6,6 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-# include "messagefacility/MessageService/ELcontextSupplier.h"
-# include "messagefacility/MessageLogger/MessageDrop.h"
-#endif
 #include "messagefacility/Utilities/exception.h"
 #include "cetlib/compiler_macros.h"
 
@@ -31,9 +27,6 @@ namespace mfplugins
 {
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	using mf::service::ELcontextSupplier;
-# endif
 	using mf::ErrorObj;
 
 	/// <summary>
@@ -60,21 +53,13 @@ namespace mfplugins
 		ELTRACE(Parameters const& pset);
 #endif
 
-		virtual void fillPrefix(std::ostringstream&, const ErrorObj&
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-								, const ELcontextSupplier&
-# endif
-		) override;
+		virtual void fillPrefix(std::ostringstream&, const ErrorObj&) override;
 
 		virtual void fillUsrMsg(std::ostringstream&, const ErrorObj&) override;
 
 		virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
 
-		virtual void routePayload(const std::ostringstream&, const ErrorObj&
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-								  , const ELcontextSupplier&
-# endif
-		) override;
+		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
 
 	};
 
@@ -92,11 +77,11 @@ namespace mfplugins
 	{
 		size_t msk;
 
-		if (pset.get_if_present<size_t>("lvls",msk))
-			TRACE_CNTL("lvlmskS",msk); // the S mask for TRACE_NAME
+		if (pset.get_if_present<size_t>("lvls", msk))
+			TRACE_CNTL("lvlmskS", msk); // the S mask for TRACE_NAME
 
-		if (pset.get_if_present<size_t>("lvlm",msk))
-			TRACE_CNTL("lvlmskM",msk); // the M mask for TRACE_NAME
+		if (pset.get_if_present<size_t>("lvlm", msk))
+			TRACE_CNTL("lvlmskM", msk); // the M mask for TRACE_NAME
 
 		TLOG(TLVL_INFO) << "ELTRACE MessageLogger destination plugin initialized.";
 	}
@@ -106,7 +91,8 @@ namespace mfplugins
 	{
 		size_t msk;
 
-		if (pset().lvls() != 0) {
+		if (pset().lvls() != 0)
+		{
 			msk = pset().lvls();
 			TRACE_CNTL("lvlmskS", msk); // the S mask for TRACE_NAME
 		}
@@ -124,21 +110,12 @@ namespace mfplugins
 	//======================================================================
 	// Message prefix filler ( overriddes ELdestination::fillPrefix )
 	//======================================================================
-	void ELTRACE::fillPrefix(std::ostringstream& oss, const ErrorObj& msg
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-							 , ELcontextSupplier const&
-# endif
-	)
+	void ELTRACE::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 	{
 		const auto& xid = msg.xid();
 
-# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		oss << xid.application() << ", "; // application
 		oss << xid.id() << ": "; // category
-# else
-		oss << xid.application << ", "; // application
-		oss << xid.id << ": "; // category
-# endif
 		// oss << mf::MessageDrop::instance()->runEvent + ELstring(" "); // run/event no
 		// oss << xid.module+ELstring(": ");                            // module name
 	}
@@ -160,27 +137,16 @@ namespace mfplugins
 	//======================================================================
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
-	void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-							   , ELcontextSupplier const&
-# endif
-	)
+	void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 	{
 		const auto& xid = msg.xid();
 		auto message = oss.str();
 
-# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		auto level = xid.severity().getLevel();
-# else
-		auto level = xid.severity.getLevel();
-# endif
 		auto lvlNum = 0;
 
 		switch (level)
 		{
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		case mf::ELseverityLevel::ELsev_incidental:
-# endif
 		case mf::ELseverityLevel::ELsev_success:
 		case mf::ELseverityLevel::ELsev_zeroSeverity:
 		case mf::ELseverityLevel::ELsev_unspecified:
@@ -192,32 +158,29 @@ namespace mfplugins
 			break;
 
 		case mf::ELseverityLevel::ELsev_warning:
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		case mf::ELseverityLevel::ELsev_warning2:
-# endif
 			lvlNum = 1;
 			break;
 		}
 		TRACE(lvlNum, message); // this is the TRACE -- direct the message to memory and/or stdout
 	}
-	} // end namespace mfplugins
+} // end namespace mfplugins
 
-	//======================================================================
-	//
-	// makePlugin function
-	//
-	//======================================================================
+//======================================================================
+//
+// makePlugin function
+//
+//======================================================================
 
 #ifndef EXTERN_C_FUNC_DECLARE_START
 #define EXTERN_C_FUNC_DECLARE_START extern "C" {
 #endif
 
-	EXTERN_C_FUNC_DECLARE_START
-		auto makePlugin(const std::string&,
-						const fhicl::ParameterSet& pset)
-		{
-			return std::make_unique<mfplugins::ELTRACE>(pset);
-		}
+EXTERN_C_FUNC_DECLARE_START
+auto makePlugin(const std::string&,
+				const fhicl::ParameterSet& pset)
+{
+	return std::make_unique<mfplugins::ELTRACE>(pset);
+}
 	}
 
-	DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)
+DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)

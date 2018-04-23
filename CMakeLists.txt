@@ -31,8 +31,8 @@ set(CMAKE_MODULE_PATH #$ENV{ART_DIR}/Modules
 
 include(CetCMakeEnv)
 cet_cmake_env()
-check_ups_version(gcc $ENV{GCC_VERSION} v6_3_0 PRODUCT_OLDER_VAR STDCXX14)
-if(STDCXX14)
+check_ups_version(gcc $ENV{GCC_VERSION} v7_2_0 PRODUCT_OLDER_VAR STDCXX14)
+if(STDCXX14 AND NOT DEFINED ENV{CLANG_VERSION}) # CLANG uses CXX_STANDARD 17
 set(CMAKE_CXX_STANDARD 14)
 else()
 set(CMAKE_CXX_STANDARD 17)
@@ -81,12 +81,6 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC_RELAXED_MODE ON)
 find_package(Qt5Widgets)
 find_package(Qt5Core)
-
-
-check_ups_version(cetlib "$ENV{CETLIB_VERSION}" v2_02_00 PRODUCT_OLDER_VAR CETLIB_EXPOSES_OSTREAM_OWNER)
-if (CETLIB_EXPOSES_OSTREAM_OWNER)
-   add_definitions(-DCETLIB_EXPOSES_OSTREAM_OWNER)
-endif()
 
 # Debug streamer.
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)

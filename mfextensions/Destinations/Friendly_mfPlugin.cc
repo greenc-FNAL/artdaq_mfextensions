@@ -5,10 +5,6 @@
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/MessageService/ELostreamOutput.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-# include "messagefacility/MessageService/ELcontextSupplier.h"
-# include "messagefacility/MessageLogger/MessageDrop.h"
-#endif
 #include "messagefacility/Utilities/exception.h"
 #include "cetlib/compiler_macros.h"
 
@@ -47,11 +43,7 @@ namespace mfplugins
 		ELFriendly(Parameters const& pset);
 #endif
 
-#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		virtual void fillPrefix(std::ostringstream&, const ErrorObj&) override;
-#      else
-		virtual void fillPrefix(std::ostringstream&, const ErrorObj&, const ELcontextSupplier&) override;
-#      endif
 		virtual void fillUsrMsg(std::ostringstream&, const ErrorObj&) override;
 		virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override;
 
@@ -82,11 +74,7 @@ namespace mfplugins
 	//======================================================================
 	// Message prefix filler ( overriddes ELdestination::fillPrefix )
 	//======================================================================
-#  if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 	void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
-#  else
-	void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg, ELcontextSupplier const& contextSupplier)
-#  endif
 	{
 		//if (msg.is_verbatim()) return;
 
@@ -98,31 +86,17 @@ namespace mfplugins
 
 		auto const& xid = msg.xid();
 
-#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		auto id = xid.id();
 		auto app = xid.application();
 		auto module = xid.module();
 		auto subroutine = xid.subroutine();
-#      else
-		auto id = xid.id;
-		auto app = xid.application;
-		auto process = xid.process;
-		auto module = xid.module;
-		auto subroutine = xid.subroutine;
-		std::replace(process.begin(), process.end(), ' ', '-');
-#      define emitToken emit
-#      endif
 		std::replace(id.begin(), id.end(), ' ', '-');
 		std::replace(app.begin(), app.end(), ' ', '-');
 		std::replace(module.begin(), module.end(), ' ', '-');
 		std::replace(subroutine.begin(), subroutine.end(), ' ', '-');
 
 		emitToken(oss, "%MSG");
-#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		emitToken(oss, xid.severity().getSymbol());
-#      else
-		emit(oss, xid.severity.getSymbol());
-#      endif
 		emitToken(oss, delimeter_);
 		emitToken(oss, id);
 		emitToken(oss, msg.idOverflow());
@@ -131,7 +105,8 @@ namespace mfplugins
 
 		// Output serial number of message:
 		//
-		if (format_.want(SERIAL)) {
+		if (format_.want(SERIAL))
+		{
 			std::ostringstream s;
 			s << msg.serial();
 			emitToken(oss, "[serial #" + s.str() + "]");
@@ -141,25 +116,32 @@ namespace mfplugins
 		// Provide further identification:
 		//
 		bool needAspace = true;
-		if (format_.want(EPILOGUE_SEPARATE)) {
-			if (module.length() + subroutine.length() > 0) {
+		if (format_.want(EPILOGUE_SEPARATE))
+		{
+			if (module.length() + subroutine.length() > 0)
+			{
 				emitToken(oss, "\n");
 				needAspace = false;
 			}
-			else if (format_.want(TIMESTAMP) && !format_.want(TIME_SEPARATE)) {
+			else if (format_.want(TIMESTAMP) && !format_.want(TIME_SEPARATE))
+			{
 				emitToken(oss, "\n");
 				needAspace = false;
 			}
 		}
-		if (format_.want(MODULE) && (module.length() > 0)) {
-			if (needAspace) {
+		if (format_.want(MODULE) && (module.length() > 0))
+		{
+			if (needAspace)
+			{
 				emitToken(oss, delimeter_);
 				needAspace = false;
 			}
 			emitToken(oss, module + "  ");
 		}
-		if (format_.want(SUBROUTINE) && (subroutine.length() > 0)) {
-			if (needAspace) {
+		if (format_.want(SUBROUTINE) && (subroutine.length() > 0))
+		{
+			if (needAspace)
+			{
 				emitToken(oss, delimeter_);
 				needAspace = false;
 			}
@@ -169,12 +151,15 @@ namespace mfplugins
 
 		// Provide time stamp:
 		//
-		if (format_.want(TIMESTAMP)) {
-			if (format_.want(TIME_SEPARATE)) {
+		if (format_.want(TIMESTAMP))
+		{
+			if (format_.want(TIME_SEPARATE))
+			{
 				emitToken(oss, "\n");
 				needAspace = false;
 			}
-			if (needAspace) {
+			if (needAspace)
+			{
 				emitToken(oss, delimeter_);
 				needAspace = false;
 			}
@@ -184,21 +169,14 @@ namespace mfplugins
 
 		// Provide the context information:
 		//
-		if (format_.want(SOME_CONTEXT)) {
-			if (needAspace) {
+		if (format_.want(SOME_CONTEXT))
+		{
+			if (needAspace)
+			{
 				emitToken(oss, delimeter_);
 				needAspace = false;
 			}
-#          if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 			emitToken(oss, msg.context());
-#          else
-			if (format_.want(FULL_CONTEXT)) {
-				emit(oss, contextSupplier.fullContext());
-			}
-			else {
-				emit(oss, contextSupplier.context());
-			}
-#          endif
 		}
 
 	}
@@ -207,39 +185,44 @@ namespace mfplugins
 	//=============================================================================
 	void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg)
 	{
-	  if (!format_.want(TEXT)) return;
+		if (!format_.want(TEXT)) return;
 
 #if MESSAGEFACILITY_HEX_VERSION < 0x20201 // format changed to format_ for s67
-	  format_.preambleMode = false;
+		format_.preambleMode = false;
 #endif
-	  auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
-	  auto it = msg.items().cbegin();
+		auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
+		auto it = msg.items().cbegin();
 
-	  // Determine if file and line should be included
-	  if (true || !msg.is_verbatim()) {
+		// Determine if file and line should be included
+		if (true || !msg.is_verbatim())
+		{
 
-		// The first four items are { " ", "<FILENAME>", ":", "<LINE>" }
-		while (it != usrMsgStart) {
-		  if (!it->compare(" ") && !std::next(it)->compare("--")) {
-			// Do not emit if " --:0" is the match
-			std::advance(it,4);
-		  }
-		  else {
-			// Emit if <FILENAME> and <LINE> are meaningful
-			emitToken(oss, *it++);
-		  }
+			// The first four items are { " ", "<FILENAME>", ":", "<LINE>" }
+			while (it != usrMsgStart)
+			{
+				if (!it->compare(" ") && !std::next(it)->compare("--"))
+				{
+					// Do not emit if " --:0" is the match
+					std::advance(it, 4);
+				}
+				else
+				{
+					// Emit if <FILENAME> and <LINE> are meaningful
+					emitToken(oss, *it++);
+				}
+			}
+
+			// Check for user-requested line breaks
+			if (format_.want(NO_LINE_BREAKS)) emitToken(oss, " ==> ");
+			else emitToken(oss, "", true);
 		}
 
-		// Check for user-requested line breaks
-		if (format_.want(NO_LINE_BREAKS)) emitToken(oss, " ==> ");
-		else emitToken(oss, "", true);
-	  }
-
-	  // For verbatim (and user-supplied) messages, just print the contents
-	  auto const end = msg.items().cend();
-	  for (; it != end; ++it) {
-		emitToken(oss, *it);
-	  }
+		// For verbatim (and user-supplied) messages, just print the contents
+		auto const end = msg.items().cend();
+		for (; it != end; ++it)
+		{
+			emitToken(oss, *it);
+		}
 
 	}
 
@@ -247,10 +230,11 @@ namespace mfplugins
 	//=============================================================================
 	void ELFriendly::fillSuffix(std::ostringstream& oss, ErrorObj const& msg)
 	{
-		if ((true || !msg.is_verbatim()) && !format_.want(NO_LINE_BREAKS)) {
-		emitToken(oss,"\n%MSG");
-	  }
-	  oss << '\n';
+		if ((true || !msg.is_verbatim()) && !format_.want(NO_LINE_BREAKS))
+		{
+			emitToken(oss, "\n%MSG");
+		}
+		oss << '\n';
 	}
 
 
@@ -268,11 +252,11 @@ namespace mfplugins
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-	auto makePlugin(const std::string&,
-					const fhicl::ParameterSet& pset)
-	{
-		return std::make_unique<mfplugins::ELFriendly>(pset);
-	}
+auto makePlugin(const std::string&,
+				const fhicl::ParameterSet& pset)
+{
+	return std::make_unique<mfplugins::ELFriendly>(pset);
+}
 }
 
 DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)

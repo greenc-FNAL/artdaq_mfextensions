@@ -20,8 +20,7 @@ qt_mf_msg::qt_mf_msg(std::string hostname, std::string category, std::string app
 	, msg_("")
 	, application_(QString(application.c_str()).toHtmlEscaped())
 	, pid_(QString::number(pid))
-{
-}
+{}
 
 void qt_mf_msg::setSeverity(mf::ELseverityLevel sev)
 {
@@ -29,9 +28,6 @@ void qt_mf_msg::setSeverity(mf::ELseverityLevel sev)
 
 	switch (sevid)
 	{
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	case mf::ELseverityLevel::ELsev_incidental:
-#  endif
 	case mf::ELseverityLevel::ELsev_success:
 	case mf::ELseverityLevel::ELsev_zeroSeverity:
 	case mf::ELseverityLevel::ELsev_unspecified:
@@ -43,20 +39,10 @@ void qt_mf_msg::setSeverity(mf::ELseverityLevel sev)
 		break;
 
 	case mf::ELseverityLevel::ELsev_warning:
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	case mf::ELseverityLevel::ELsev_warning2:
-#  endif
 		sev_ = SWARNING;
 		break;
 
 	case mf::ELseverityLevel::ELsev_error:
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	case mf::ELseverityLevel::ELsev_error2:
-	case mf::ELseverityLevel::ELsev_next:
-	case mf::ELseverityLevel::ELsev_severe2:
-	case mf::ELseverityLevel::ELsev_abort:
-	case mf::ELseverityLevel::ELsev_fatal:
-#  endif
 	case mf::ELseverityLevel::ELsev_severe:
 	case mf::ELseverityLevel::ELsev_highestSeverity:
 		sev_ = SERROR;
@@ -129,7 +115,7 @@ void qt_mf_msg::updateText()
 		+ "PID " + pid_;
 
 	if (file_ != "")
-		text_ += QString(" / ") + file_	+ QString(":") + line_;
+		text_ += QString(" / ") + file_ + QString(":") + line_;
 
 	text_ += QString("<br>")
 		+ application_ + " / "
