@@ -9,10 +9,7 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-# include "messagefacility/MessageService/ELcontextSupplier.h"
-# include "messagefacility/MessageLogger/MessageDrop.h"
-#elif MESSAGEFACILITY_HEX_VERSION < 0x20201 //  v2_02_01 is s67
+#if MESSAGEFACILITY_HEX_VERSION < 0x20201 //  v2_02_01 is s67
 # include "messagefacility/MessageService/MessageDrop.h"
 #else
 # include "messagefacility/MessageLogger/MessageLogger.h"
@@ -40,9 +37,6 @@ namespace mfplugins
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	using mf::service::ELcontextSupplier;
-# endif
 
 	/// <summary>
 	/// SMTP Message Facility destination plugin (Using libcurl)
@@ -65,7 +59,7 @@ namespace mfplugins
 			fhicl::Atom<std::string> user{ fhicl::Name{ "smtp_username" },fhicl::Comment{ "Username for SMTP server" }, "" };
 			fhicl::Atom<std::string> pw{ fhicl::Name{ "smtp_password" },fhicl::Comment{ "Password for SMTP server" }, "" };
 			fhicl::Atom<bool> verifyCert{ fhicl::Name{ "verify_host_ssl_certificate" },fhicl::Comment{ "Whether to run full SSL verify on SMTP server in SMTPS mode" }, true };
-			fhicl::Atom<size_t> sendInterval{ fhicl::Name{ "email_send_interval_seconds" },fhicl::Comment{ "Only send email every N seconds" }, 15};
+			fhicl::Atom<size_t> sendInterval{ fhicl::Name{ "email_send_interval_seconds" },fhicl::Comment{ "Only send email every N seconds" }, 15 };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
@@ -82,11 +76,7 @@ namespace mfplugins
 			while (sending_thread_active_) usleep(1000);
 		}
 
-		virtual void routePayload(const std::ostringstream&, const ErrorObj& msg
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-			, const ELcontextSupplier&
-# endif
-		) override;
+		virtual void routePayload(const std::ostringstream&, const ErrorObj& msg) override;
 
 	private:
 		void send_message_();
@@ -239,19 +229,12 @@ namespace mfplugins
 
 	std::string ELSMTP::to_html(std::string msgString, const ErrorObj& msg)
 	{
-# if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		auto sevid = msg.xid().severity().getLevel();
-# else
-		auto sevid = msg.xid().severity.getLevel();
-# endif
 
 		QString text_ = QString("<font color=");
 
 		switch (sevid)
 		{
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		case mf::ELseverityLevel::ELsev_incidental:
-#  endif
 		case mf::ELseverityLevel::ELsev_success:
 		case mf::ELseverityLevel::ELsev_zeroSeverity:
 		case mf::ELseverityLevel::ELsev_unspecified:
@@ -263,20 +246,10 @@ namespace mfplugins
 			break;
 
 		case mf::ELseverityLevel::ELsev_warning:
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		case mf::ELseverityLevel::ELsev_warning2:
-#  endif
 			text_ += QString("#E08000>");
 			break;
 
 		case mf::ELseverityLevel::ELsev_error:
-#  if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		case mf::ELseverityLevel::ELsev_error2:
-		case mf::ELseverityLevel::ELsev_next:
-		case mf::ELseverityLevel::ELsev_severe2:
-		case mf::ELseverityLevel::ELsev_abort:
-		case mf::ELseverityLevel::ELsev_fatal:
-#  endif
 		case mf::ELseverityLevel::ELsev_severe:
 		case mf::ELseverityLevel::ELsev_highestSeverity:
 			text_ += QString("#FF0000>");
@@ -292,18 +265,12 @@ namespace mfplugins
 
 		text_ += QString("</font>");
 		return text_.toStdString();
-}
+	}
 
 	//======================================================================
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
-	void ELSMTP::routePayload(const std::ostringstream& oss
-#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		, const ErrorObj& msg, ELcontextSupplier const&
-#else
-		, const ErrorObj& msg
-#endif
-	)
+	void ELSMTP::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 	{
 		std::unique_lock<std::mutex>(message_mutex_);
 		message_contents_ << to_html(oss.str(), msg);
@@ -425,11 +392,11 @@ namespace mfplugins
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-	auto makePlugin(const std::string&,
-		const fhicl::ParameterSet& pset)
-	{
-		return std::make_unique<mfplugins::ELSMTP>(pset);
-	}
+auto makePlugin(const std::string&,
+				const fhicl::ParameterSet& pset)
+{
+	return std::make_unique<mfplugins::ELSMTP>(pset);
+}
 }
 
 DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)

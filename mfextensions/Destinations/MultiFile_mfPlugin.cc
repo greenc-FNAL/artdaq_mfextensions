@@ -4,10 +4,6 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 # include "messagefacility/Utilities/ELseverityLevel.h"
-#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-# include "messagefacility/MessageService/ELcontextSupplier.h"
-# include "messagefacility/MessageLogger/MessageDrop.h"
-#endif
 #include "messagefacility/Utilities/exception.h"
 #include "cetlib/compiler_macros.h"
 
@@ -18,9 +14,6 @@ namespace mfplugins
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
-#if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-	using mf::service::ELcontextSupplier;
-#endif
 
 	/// <summary>
 	/// Message Facility Destination which automatically opens files and sorts messages into them based on given criteria
@@ -37,7 +30,7 @@ namespace mfplugins
 			fhicl::Atom<bool> useApplication{ fhicl::Name{ "use_application" },fhicl::Comment{ "Use the application field when generating log file names" },true };
 			fhicl::Atom<bool> useCategory{ fhicl::Name{ "use_category" },fhicl::Comment{ "Use the category field when generating log file names" },false };
 			fhicl::Atom<bool> useModule{ fhicl::Name{ "use_module" },fhicl::Comment{ "Use the module field when generating log file names" },false };
-	};
+		};
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
 	public:
@@ -49,17 +42,9 @@ namespace mfplugins
 
 		virtual ~ELMultiFileOutput() {}
 
-		virtual void routePayload(const std::ostringstream&, const ErrorObj&
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-								  , const ELcontextSupplier&
-#endif
-		) override;
+		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
 
-		virtual void flush(
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-			const ELcontextSupplier&
-#endif
-		) override;
+		virtual void flush() override;
 
 	private:
 		std::string baseDir_;
@@ -70,7 +55,7 @@ namespace mfplugins
 		bool useApplication_;
 		bool useCategory_;
 		bool useModule_;
-	};
+		};
 
 	// END DECLARATION
 	//======================================================================
@@ -89,7 +74,8 @@ namespace mfplugins
 		, useHost_(pset.get<bool>("use_hostname", true))
 		, useApplication_(pset.get<bool>("use_application", true))
 		, useCategory_(pset.get<bool>("use_category", false))
-		, useModule_(pset.get<bool>("use_module", false)) { }
+		, useModule_(pset.get<bool>("use_module", false))
+	{}
 #else
 	ELMultiFileOutput::ELMultiFileOutput(Parameters const& pset)
 		: ELdestination(pset().elDestConfig())
@@ -98,62 +84,35 @@ namespace mfplugins
 		, useHost_(pset().useHostname())
 		, useApplication_(pset().useApplication())
 		, useCategory_(pset().useCategory())
-		, useModule_(pset().useModule()) { }
+		, useModule_(pset().useModule())
+	{}
 #endif
 
 	//======================================================================
 	// Message router ( overriddes ELdestination::routePayload )
 	//======================================================================
-	void ELMultiFileOutput::routePayload(const std::ostringstream& oss, const ErrorObj& msg
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-										 , ELcontextSupplier const& sup
-#endif
-	)
+	void ELMultiFileOutput::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 	{
 		const auto& xid = msg.xid();
 		std::string fileName = baseDir_ + "/";
-#      if MESSAGEFACILITY_HEX_VERSION >= 0x20002 // an indication of a switch from s48 to s50
 		if (useModule_) { fileName += xid.module() + "-"; }
 		if (useCategory_) { fileName += xid.id() + "-"; }
 		if (useApplication_) { fileName += xid.application() + "-"; }
 		if (useHost_) { fileName += xid.hostname() + "-"; }
 		fileName += std::to_string(xid.pid()) + ".log";
-#      else
-		if (useModule_) { fileName += xid.module + "-"; }
-		if (useCategory_) { fileName += xid.id + "-"; }
-		if (useApplication_) { fileName += xid.application + "-"; }
-		if (useHost_) { fileName += xid.hostname + "-"; }
-		fileName += std::to_string(xid.pid) + ".log";
-#      endif
 		if (outputs_.count(fileName) == 0)
 		{
-#ifndef CETLIB_EXPOSES_OSTREAM_OWNER // New cetlib
 			outputs_[fileName] = std::make_unique<cet::ostream_handle>(fileName.c_str(), append_ ? std::ios::app : std::ios::trunc);
-#else // Old cetlib
-	  outputs_[fileName] = std::make_unique<cet::ostream_owner>(fileName.c_str(), append_ ? std::ios::app : std::ios::trunc);
-#endif
 		}
 		*outputs_[fileName] << oss.str();
-		flush(
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-			sup
-#endif
-		);
+		flush();
 	}
 
-	void ELMultiFileOutput::flush(
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		ELcontextSupplier const&
-#endif
-	)
+	void ELMultiFileOutput::flush()
 	{
 		for (auto i = outputs_.begin(); i != outputs_.end(); ++i)
 		{
-#ifndef CETLIB_EXPOSES_OSTREAM_OWNER // New cetlib
 			(*i).second->flush();
-#else // Old cetlib
-	  (*i).second->stream().flush();
-#endif
 		}
 	}
 } // end namespace mfplugins
@@ -169,11 +128,11 @@ namespace mfplugins
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-	auto makePlugin(const std::string&,
-					const fhicl::ParameterSet& pset)
-	{
-		return std::make_unique<mfplugins::ELMultiFileOutput>(pset);
-	}
+auto makePlugin(const std::string&,
+				const fhicl::ParameterSet& pset)
+{
+	return std::make_unique<mfplugins::ELMultiFileOutput>(pset);
+}
 }
 
 DEFINE_BASIC_PLUGINTYPE_FUNC(mf::service::ELdestination)

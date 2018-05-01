@@ -133,9 +133,6 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 		if (++it != tokens.end()) { sev = mf::ELseverityLevel(*it); }
 		if (++it != tokens.end()) { category = *it; }
 		if (++it != tokens.end()) { application = *it; }
-# if MESSAGEFACILITY_HEX_VERSION < 0x20002 // v2_00_02 is s50, pre v2_00_02 is s48
-		if (++it != tokens.end()) {}
-# endif
 		prevIt = it;
 		try
 		{
