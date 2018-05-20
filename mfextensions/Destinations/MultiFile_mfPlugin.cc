@@ -42,8 +42,16 @@ namespace mfplugins
 
 		virtual ~ELMultiFileOutput() {}
 
+		/**
+		* \brief Serialize a MessageFacility message to the output
+		* \param o Stringstream object containing message data
+		* \param e MessageFacility object containing header information
+		*/
 		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
 
+		/**
+		* \brief Flush any text in the ostream buffer to disk
+		*/
 		virtual void flush() override;
 
 	private:

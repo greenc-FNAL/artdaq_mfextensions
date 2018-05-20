@@ -61,13 +61,31 @@ namespace mfplugins
 		ELUDP(Parameters const& pset);
 #endif
 
-		virtual void fillPrefix(std::ostringstream&, const ErrorObj&) override;
+		/**
+		* \brief Fill the "Prefix" portion of the message
+		* \param o Output stringstream
+		* \param e MessageFacility object containing header information
+		*/
+		virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
 
-		virtual void fillUsrMsg(std::ostringstream&, const ErrorObj&) override;
+		/**
+		* \brief Fill the "User Message" portion of the message
+		* \param o Output stringstream
+		* \param e MessageFacility object containing header information
+		*/
+		virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
 
+		/**
+		* \brief Fill the "Suffix" portion of the message (Unused)
+		*/
 		virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
 
-		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
+		/**
+		* \brief Serialize a MessageFacility message to the output
+		* \param o Stringstream object containing message data
+		* \param e MessageFacility object containing header information
+		*/
+		virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 	private:
 		void reconnect_(bool quiet = false);

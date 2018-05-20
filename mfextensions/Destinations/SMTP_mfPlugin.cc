@@ -76,7 +76,12 @@ namespace mfplugins
 			while (sending_thread_active_) usleep(1000);
 		}
 
-		virtual void routePayload(const std::ostringstream&, const ErrorObj& msg) override;
+		/**
+		* \brief Serialize a MessageFacility message to the output
+		* \param o Stringstream object containing message data
+		* \param msg MessageFacility object containing header information
+		*/
+		virtual void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
 
 	private:
 		void send_message_();

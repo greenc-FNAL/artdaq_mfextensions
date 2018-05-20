@@ -40,9 +40,16 @@ public:
 	/// <summary>
 	/// Construct a qt_mf_msg
 	/// </summary>
+	/// <param name="hostname">Hostname of the message source</param>
+	/// <param name="category">Category of the message</param>
+	/// <param name="application">Application of the message</param>
+	/// <param name="pid">PID of the message</param>
+	/// <param name="time">Timestamp of the message</param>
 	qt_mf_msg(std::string hostname, std::string category, std::string application, pid_t pid, timeval time);
 
+	/// Default message constructor
 	qt_mf_msg() {}
+	/// Default copy constructor
 	qt_mf_msg(const qt_mf_msg&) = default;
 
 	// get method

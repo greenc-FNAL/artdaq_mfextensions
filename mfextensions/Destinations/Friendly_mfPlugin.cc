@@ -43,9 +43,24 @@ namespace mfplugins
 		ELFriendly(Parameters const& pset);
 #endif
 
-		virtual void fillPrefix(std::ostringstream&, const ErrorObj&) override;
-		virtual void fillUsrMsg(std::ostringstream&, const ErrorObj&) override;
-		virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override;
+		/**
+		* \brief Fill the "Prefix" portion of the message
+		* \param o Output stringstream
+		* \param e MessageFacility object containing header information
+		*/
+		virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
+		/**
+		* \brief Fill the "User Message" portion of the message
+		* \param o Output stringstream
+		* \param e MessageFacility object containing header information
+		*/
+		virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
+		/**
+		* \brief Fill the "Suffix" portion of the message
+		* \param o Output stringstream
+		* \param e MessageFacility object containing header information
+		*/
+		virtual void fillSuffix(std::ostringstream& o, const ErrorObj& e) override;
 
 	private:
 		std::string delimeter_;
