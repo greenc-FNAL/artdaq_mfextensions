@@ -30,6 +30,11 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
 	Q_OBJECT
 
 public:
+	/**
+	 * \brief Message Viewer Dialog Constructor
+	 * \param conf Configuration filename (fhicl document)
+	 * \param parent Parent Qt window
+	 */
 	msgViewerDlg(std::string const& conf, QDialog* parent = 0);
 
 	virtual ~msgViewerDlg();
@@ -37,17 +42,26 @@ public:
 
 public slots:
 
+/// Pause message receiving
 	void pause();
 
+	/// Exit the program
 	void exit();
 
+	/// Clear the message buffer
 	void clear();
 
+	/// Switch to/from Short message mode
 	void shortMode();
 
+	/// Change the severity threshold
 	void changeSeverity(int sev);
 
 protected:
+	/**
+	 * \brief Perform actions on window close
+	 * \param event QCloseEvent data
+	 */
 	void closeEvent(QCloseEvent* event);
 
 private slots:
@@ -84,6 +98,8 @@ private:
 
 	// Display all messages stored in the buffer
 	void displayMsg(int display);
+
+	void UpdateTextAreaDisplay(QString text, QTextEdit* widget);
 
 	void updateDisplays();
 

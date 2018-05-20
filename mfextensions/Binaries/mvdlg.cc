@@ -2,6 +2,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QScrollBar>
 
 #include "cetlib/filepath_maker.h"
 #include "fhiclcpp/make_ParameterSet.h"
@@ -419,8 +420,7 @@ void msgViewerDlg::displayMsg(msgs_t::const_iterator it, int display)
 	}
 
 	auto txt = it->text(shortMode_);
-	msgFilters_[display].txtDisplay->append(txt);
-	msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
+	UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
 }
 
 void msgViewerDlg::displayMsg(int display)
@@ -458,7 +458,7 @@ void msgViewerDlg::displayMsg(int display)
 			++prog;
 			progress.setValue(prog);
 
-			msgFilters_[display].txtDisplay->append(txt);
+			UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
 			txt.clear();
 		}
 
@@ -471,10 +471,34 @@ void msgViewerDlg::displayMsg(int display)
 		lcdDisplayedMsgs->display(msgFilters_[display].nDisplayMsgs);
 	}
 
-	msgFilters_[display].txtDisplay->append(txt);
-	msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
+	UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
 
 	updating = false;
+}
+
+//https://stackoverflow.com/questions/21955923/prevent-a-qtextedit-widget-from-scrolling-when-there-is-a-selection
+void msgViewerDlg::UpdateTextAreaDisplay(QString text, QTextEdit* widget)
+{
+	const QTextCursor old_cursor = widget->textCursor();
+	const int old_scrollbar_value = widget->verticalScrollBar()->value();
+	const bool is_scrolled_down = old_scrollbar_value >= widget->verticalScrollBar()->maximum() * 0.95; // At least 95% scrolled down
+	
+	// Insert the text at the position of the cursor (which is the end of the document).
+	widget->append(text);
+
+	if (old_cursor.hasSelection() || !is_scrolled_down)
+	{
+		// The user has selected text or scrolled away from the bottom: maintain position.
+		widget->setTextCursor(old_cursor);
+		widget->verticalScrollBar()->setValue(old_scrollbar_value);
+	}
+	else
+	{
+		// The user hasn't selected any text and the scrollbar is at the bottom: scroll to the bottom.
+		widget->moveCursor(QTextCursor::End);
+		widget->verticalScrollBar()->setValue(widget->verticalScrollBar()->maximum());
+		widget->horizontalScrollBar()->setValue(0);
+	}
 }
 
 void msgViewerDlg::updateDisplays()
