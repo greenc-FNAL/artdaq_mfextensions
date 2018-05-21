@@ -156,7 +156,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 		if (debug_) { std::cout << "Message content: " << oss.str() << std::endl; }
 		message = oss.str();
 #if MESSAGEFACILITY_HEX_VERSION < 0x20201 // Sender and receiver version must match!
-		boost::regex fileLine("^\\s*([^:]*):(\\d+)(.*)");
+		boost::regex fileLine("^\\s*([^:]*\.[^:]{1,3}):(\\d+)(.*)");
 		if (boost::regex_search(message, res, fileLine))
 		{
 			file = std::string(res[1].first, res[1].second);
