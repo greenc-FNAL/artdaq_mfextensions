@@ -33,13 +33,22 @@ namespace mfplugins
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
 	public:
+		/// <summary>
+		/// ELANSI Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure ELANSI</param>
 #if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELANSI(const fhicl::ParameterSet& pset);
 #else
 		ELANSI(Parameters const& pset);
 #endif
 
-		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
+		/**
+		* \brief Serialize a MessageFacility message to the output
+		* \param o Stringstream object containing message data
+		* \param e MessageFacility object containing header information
+		*/
+		virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 	private:
 		bool bellError_;

@@ -37,6 +37,10 @@ namespace mfplugins
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
 	public:
+		/// <summary>
+		/// ELFriendly Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure ELFriendly</param>
 #if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELFriendly(const fhicl::ParameterSet& pset);
 #else

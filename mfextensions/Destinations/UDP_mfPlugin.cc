@@ -55,6 +55,10 @@ namespace mfplugins
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
 	public:
+		/// <summary>
+		/// ELUDP Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure ELUDP</param>
 #if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELUDP(const fhicl::ParameterSet& pset);
 #else

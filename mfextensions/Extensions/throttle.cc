@@ -8,7 +8,8 @@ throttle::throttle(std::string const& name, int limit, long timespan)
 	, timespan_(timespan)
 	, last_window_start_(0)
 	, count_(0)
-	, in_use_(true) {}
+	, in_use_(true)
+{}
 
 bool throttle::reach_limit(std::string const& name, timeval tm)
 {

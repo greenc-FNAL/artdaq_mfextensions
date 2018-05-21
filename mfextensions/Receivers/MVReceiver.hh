@@ -40,7 +40,7 @@ namespace mfviewer
 		/// Whether the MVRecevier should stop
 		/// </summary>
 		bool stopRequested_;
-	signals :
+	signals:
 		/// <summary>
 		/// When a message is received by the MVReceiver, this signal should be raised so that the connected listener can process it.
 		/// </summary>

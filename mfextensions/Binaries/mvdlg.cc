@@ -130,7 +130,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 
 	connect(btnSearch, SIGNAL(clicked()), this, SLOT(searchMsg()));
 	connect(btnSearchClear,
-		SIGNAL(clicked()), this, SLOT(searchClear()));
+			SIGNAL(clicked()), this, SLOT(searchClear()));
 
 	connect(btnFilter, SIGNAL(clicked()), this, SLOT(setFilter()));
 
@@ -140,24 +140,24 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	connect(btnDebug, SIGNAL(clicked()), this, SLOT(setSevDebug()));
 
 	connect(sup_menu
-		, SIGNAL(triggered(QAction*))
-		, this
-		, SLOT(setSuppression(QAction*)));
+			, SIGNAL(triggered(QAction*))
+			, this
+			, SLOT(setSuppression(QAction*)));
 
 	connect(thr_menu
-		, SIGNAL(triggered(QAction*))
-		, this
-		, SLOT(setThrottling(QAction*)));
+			, SIGNAL(triggered(QAction*))
+			, this
+			, SLOT(setThrottling(QAction*)));
 
 	connect(vsSeverity
-		, SIGNAL(valueChanged(int))
-		, this
-		, SLOT(changeSeverity(int)));
+			, SIGNAL(valueChanged(int))
+			, this
+			, SLOT(changeSeverity(int)));
 
 	connect(&receivers_
-		, SIGNAL(newMessage(qt_mf_msg const &))
-		, this
-		, SLOT(onNewMsg(qt_mf_msg const &)));
+			, SIGNAL(newMessage(qt_mf_msg const &))
+			, this
+			, SLOT(onNewMsg(qt_mf_msg const &)));
 
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
 	connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
@@ -230,8 +230,8 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const& ps, std::ve
 	{
 		std::string name = ps[i].get<std::string>("name");
 		t.push_back(throttle(name
-			, ps[i].get<int>("limit", -1)
-			, ps[i].get<long>("timespan", -1)));
+							 , ps[i].get<int>("limit", -1)
+							 , ps[i].get<long>("timespan", -1)));
 		act = menu->addAction(QString(name.c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
@@ -434,7 +434,7 @@ void msgViewerDlg::displayMsg(int display)
 	n = msgFilters_[display].msgs.size();
 	it = msgFilters_[display].msgs.begin();
 	QProgressDialog progress("Fetching data...", "Cancel"
-		, 0, n / 1000, this);
+							 , 0, n / 1000, this);
 
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000); // 2 seconds
@@ -482,7 +482,7 @@ void msgViewerDlg::UpdateTextAreaDisplay(QString text, QTextEdit* widget)
 	const QTextCursor old_cursor = widget->textCursor();
 	const int old_scrollbar_value = widget->verticalScrollBar()->value();
 	const bool is_scrolled_down = old_scrollbar_value >= widget->verticalScrollBar()->maximum() * 0.95; // At least 95% scrolled down
-	
+
 	// Insert the text at the position of the cursor (which is the end of the document).
 	widget->append(text);
 

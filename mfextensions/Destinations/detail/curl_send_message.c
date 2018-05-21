@@ -7,7 +7,7 @@
 static size_t payload_source(void *ptr, size_t size, size_t nmemb, void *userp)
 {
 	struct upload_status *upload_ctx = (struct upload_status *)userp;
-	size_t rdsize = size*nmemb;
+	size_t rdsize = size * nmemb;
 
 	if ((size == 0) || (nmemb == 0) || (rdsize < 1) || (upload_ctx->pos >= upload_ctx->size))
 	{

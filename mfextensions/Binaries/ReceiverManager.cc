@@ -17,7 +17,7 @@ mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
 			pluginType = plugin_pset.get<std::string>("receiverType", "unknown");
 			std::unique_ptr<mfviewer::MVReceiver> rcvr = makeMVReceiver(pluginType, plugin_pset);
 			connect(rcvr.get(), SIGNAL(NewMessage(qt_mf_msg const &)),
-			        this, SLOT(onNewMessage(qt_mf_msg const &)));
+					this, SLOT(onNewMessage(qt_mf_msg const &)));
 			receivers_.push_back(std::move(rcvr));
 		}
 		catch (...)

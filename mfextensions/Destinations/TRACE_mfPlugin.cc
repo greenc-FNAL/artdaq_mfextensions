@@ -47,6 +47,10 @@ namespace mfplugins
 
 	public:
 
+		/// <summary>
+		/// ELTRACE Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure ELTRACE</param>
 #if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELTRACE(const fhicl::ParameterSet& pset);
 #else

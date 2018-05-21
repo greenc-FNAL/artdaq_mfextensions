@@ -34,20 +34,26 @@ namespace mfplugins
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
 	public:
+		/// <summary>
+		/// ELMultiFileOutput Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure ELMultiFileOutput</param>
 #if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELMultiFileOutput(const fhicl::ParameterSet& pset);
 #else
 		ELMultiFileOutput(Parameters const& pset);
 #endif
-
+		/// <summary>
+		/// Default virtual Destructor
+		/// </summary>
 		virtual ~ELMultiFileOutput() {}
 
 		/**
 		* \brief Serialize a MessageFacility message to the output
-		* \param o Stringstream object containing message data
-		* \param e MessageFacility object containing header information
+		* \param oss Stringstream object containing message data
+		* \param msg MessageFacility object containing header information
 		*/
-		virtual void routePayload(const std::ostringstream&, const ErrorObj&) override;
+		virtual void routePayload(const std::ostringstream& oss, const ErrorObj& msg) override;
 
 		/**
 		* \brief Flush any text in the ostream buffer to disk
@@ -63,7 +69,7 @@ namespace mfplugins
 		bool useApplication_;
 		bool useCategory_;
 		bool useModule_;
-		};
+	};
 
 	// END DECLARATION
 	//======================================================================

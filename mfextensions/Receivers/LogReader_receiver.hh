@@ -22,14 +22,26 @@ namespace mfviewer
 	{
 		Q_OBJECT
 	public:
+		/// <summary>
+		/// LogReader Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure the LogReader</param>
+		explicit LogReader(fhicl::ParameterSet pset);
 
-		LogReader(fhicl::ParameterSet pset);
-
+		/// <summary>
+		/// LogReader Destructor
+		/// </summary>
 		virtual ~LogReader();
 
-		// Receiver Method
+		/// <summary>
+		/// Receiver loop method. Reads messages from file and emits newMessage signal
+		/// </summary>
 		void run();
 
+		/// <summary>
+		/// Read the next message from the input stream
+		/// </summary>
+		/// <returns>qt_mf_msg from log file</returns>
 		qt_mf_msg read_next(); // read next log
 
 	private:

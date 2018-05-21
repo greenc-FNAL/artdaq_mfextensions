@@ -13,7 +13,7 @@ namespace mfviewer
 	class MVReceiver;
 
 	std::unique_ptr<MVReceiver>
-	makeMVReceiver(std::string const& receiver_plugin_spec,
-	               fhicl::ParameterSet const& ps);
+		makeMVReceiver(std::string const& receiver_plugin_spec,
+					   fhicl::ParameterSet const& ps);
 }
 #endif /* mfextensions_Plugins_makeMVReceiver_h */

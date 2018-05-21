@@ -15,18 +15,39 @@ namespace mfviewer
 		Q_OBJECT
 
 	public:
-		ReceiverManager(fhicl::ParameterSet pset);
+		/// <summary>
+		/// ReceiverManager Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure ReceiverManager</param>
+		explicit ReceiverManager(fhicl::ParameterSet pset);
 
+		/// <summary>
+		/// ReceiverManager Destructor
+		/// </summary>
 		virtual ~ReceiverManager();
 
+		/// <summary>
+		/// Start all receivers
+		/// </summary>
 		void start();
 
+		/// <summary>
+		/// Stop all receivers
+		/// </summary>
 		void stop();
 
-		signals :
-		void newMessage(qt_mf_msg const&);
+	signals:
+		/// <summary>
+		/// Signal raised on new message
+		/// </summary>
+		/// <param name="msg">Message just received</param>
+		void newMessage(qt_mf_msg const& msg);
 
-	private slots:
+		private slots:
+		/// <summary>
+		/// Slot connected to receivers' newMessage signal
+		/// </summary>
+		/// <param name="mfmsg">Message received by receiver</param>
 		void onNewMessage(qt_mf_msg const& mfmsg);
 
 	private:

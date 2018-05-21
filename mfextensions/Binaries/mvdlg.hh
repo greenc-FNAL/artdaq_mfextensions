@@ -40,9 +40,9 @@ public:
 	virtual ~msgViewerDlg();
 
 
-public slots:
+	public slots:
 
-/// Pause message receiving
+	/// Pause message receiving
 	void pause();
 
 	/// Exit the program
@@ -64,7 +64,7 @@ protected:
 	 */
 	void closeEvent(QCloseEvent* event);
 
-private slots:
+	private slots:
 
 	void onNewMsg(qt_mf_msg const& mfmsg);
 
@@ -87,7 +87,7 @@ private slots:
 	void setSuppression(QAction* act);
 
 	void setThrottling(QAction* act);
-	
+
 	void tabWidgetCurrentChanged(int newTab);
 
 	void tabCloseRequested(int tabIndex);
@@ -115,7 +115,7 @@ private:
 	bool updateList(QListWidget* lw, M const& map);
 
 	void displayMsg(msgs_t::const_iterator it, int display);
-	
+
 	void readSettings();
 
 	void writeSettings();
@@ -154,7 +154,7 @@ private:
 	std::vector<throttle> e_thr_host;
 	std::vector<throttle> e_thr_app;
 	std::vector<throttle> e_thr_cat;
-	
+
 	// search string
 	QString searchStr;
 
@@ -165,7 +165,7 @@ private:
 	msg_iters_map_t host_msgs_;
 	msg_iters_map_t cat_msgs_;
 	msg_iters_map_t app_msgs_;
-	
+
 	// context menu for "suppression" and "throttling" button
 	QMenu* sup_menu;
 	QMenu* thr_menu;

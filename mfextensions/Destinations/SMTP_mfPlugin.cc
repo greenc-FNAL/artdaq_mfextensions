@@ -64,6 +64,10 @@ namespace mfplugins
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
 	public:
+		/// <summary>
+		/// ELSMTP Constructor
+		/// </summary>
+		/// <param name="pset">ParameterSet used to configure ELSMTP</param>
 #if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
 		ELSMTP(const fhicl::ParameterSet& pset);
 #else
