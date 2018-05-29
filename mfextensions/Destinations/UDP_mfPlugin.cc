@@ -20,10 +20,12 @@
 #include <ifaddrs.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include "mfextensions/Receivers/detail/TCPConnect.hh"
 
+#define TRACE_NAME "UDP_mfPlugin"
+#include "trace.h"
 
 // Boost includes
-#include <boost/asio.hpp>
 #include <boost/algorithm/string.hpp>
 
 #if MESSAGEFACILITY_HEX_VERSION < 0x20201 // format changed to format_ for s67
@@ -35,7 +37,6 @@ namespace mfplugins
 	using mf::service::ELdestination;
 	using mf::ELseverityLevel;
 	using mf::ErrorObj;
-	using boost::asio::ip::udp;
 
 	/// <summary>
 	/// Message Facility UDP Streamer Destination
@@ -51,6 +52,9 @@ namespace mfplugins
 			fhicl::Atom<int> error_report{ fhicl::Name{ "error_report_backoff_factor" },fhicl::Comment{ "Print an error message every N errors" },100 };
 			fhicl::Atom<std::string> host{ fhicl::Name{ "host" },fhicl::Comment{ "Address to send messages to" }, "227.128.12.27" };
 			fhicl::Atom<int> port{ fhicl::Name{ "port" },fhicl::Comment{ "Port to send messages to" },5140 };
+			fhicl::Atom<bool> multicast_enabled{ fhicl::Name{"multicast_enabled"},fhicl::Comment{"Whether messages should be sent via multicast"}, false };
+			/// "multicast_interface_ip" (Default: "0.0.0.0"): Use this hostname for multicast output (to assign to the proper NIC)
+			fhicl::Atom<std::string> output_address{ fhicl::Name{ "multicast_interface_ip" }, fhicl::Comment{ "Use this hostname for multicast output(to assign to the proper NIC)" }, "0.0.0.0" };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
 #endif
@@ -92,18 +96,20 @@ namespace mfplugins
 		virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 	private:
-		void reconnect_(bool quiet = false);
+		void reconnect_();
 
 		// Parameters
 		int error_report_backoff_factor_;
 		int error_max_;
 		std::string host_;
 		int port_;
+		bool multicast_enabled_;
+		std::string multicast_out_addr_;
+
+		int message_socket_;
+		struct sockaddr_in message_addr_;
 
 		// Other stuff
-		boost::asio::io_service io_service_;
-		udp::socket socket_;
-		udp::endpoint remote_endpoint_;
 		int consecutive_success_count_;
 		int error_count_;
 		int next_error_report_;
@@ -132,6 +138,8 @@ namespace mfplugins
 		, error_max_(pset.get<int>("error_turnoff_threshold", 0))
 		, host_(pset.get<std::string>("host", "227.128.12.27"))
 		, port_(pset.get<int>("port", 5140))
+		, multicast_enabled_(pset.get<bool>("multicast_enabled", false))
+		, multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", pset.get<std::string>("output_address", "0.0.0.0")))
 #else
 	ELUDP::ELUDP(Parameters const& pset)
 		: ELdestination(pset().elDestConfig())
@@ -139,18 +147,16 @@ namespace mfplugins
 		, error_max_(pset().error_max())
 		, host_(pset().host())
 		, port_(pset().port())
+		, multicast_enabled_(pset().multicast_enabled())
+		, multicast_out_addr_(pset().output_address())
 #endif
-		, io_service_()
-		, socket_(io_service_)
-		, remote_endpoint_()
+		, message_socket_(-1)
 		, consecutive_success_count_(0)
 		, error_count_(0)
 		, next_error_report_(1)
 		, seqNum_(0)
 		, pid_(static_cast<long>(getpid()))
 	{
-		reconnect_();
-
 		// hostname
 		char hostname_c[1024];
 		hostname_ = (gethostname(hostname_c, 1023) == 0) ? hostname_c : "Unkonwn Host";
@@ -244,43 +250,65 @@ namespace mfplugins
 #endif
 	}
 
-	void ELUDP::reconnect_(bool quiet)
+	void ELUDP::reconnect_()
 	{
-		boost::system::error_code ec;
-		socket_.open(udp::v4());
-		socket_.set_option(boost::asio::socket_base::reuse_address(true), ec);
-		if (ec && !quiet)
+		message_socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if (message_socket_ < 0)
 		{
-			std::cerr << "An error occurred setting reuse_address to true: "
-				<< ec.message() << std::endl;
+			TLOG(TLVL_ERROR) << "I failed to create the socket for sending Data messages! err=" << strerror(errno);
+			exit(1);
+		}
+		int sts = ResolveHost(host_.c_str(), port_, message_addr_);
+		if (sts == -1)
+		{
+			TLOG(TLVL_ERROR) << "Unable to resolve Data message address, err=" << strerror(errno);
+			exit(1);
 		}
 
-		if (boost::iequals(host_, "Broadcast") || host_ == "255.255.255.255")
+		if (multicast_out_addr_ == "0.0.0.0")
 		{
-			socket_.set_option(boost::asio::socket_base::broadcast(true), ec);
-			remote_endpoint_ = udp::endpoint(boost::asio::ip::address_v4::broadcast(), port_);
-		}
-		else
-		{
-			udp::resolver resolver(io_service_);
-			udp::resolver::query query(udp::v4(), host_, std::to_string(port_));
-			remote_endpoint_ = *resolver.resolve(query);
-		}
-
-		socket_.connect(remote_endpoint_, ec);
-		if (ec)
-		{
-			if (!quiet)
+			multicast_out_addr_.reserve(HOST_NAME_MAX);
+			sts = gethostname(&multicast_out_addr_[0], HOST_NAME_MAX);
+			if (sts < 0)
 			{
-				std::cerr << "An Error occurred in connect(): " << ec.message() << std::endl
-					<< "  endpoint = " << remote_endpoint_ << std::endl;
+				TLOG(TLVL_ERROR) << "Could not get current hostname,  err=" << strerror(errno);
+				exit(1);
 			}
-			error_count_++;
 		}
-		//else {
-		//  std::cout << "Successfully connected to remote endpoint = " << remote_endpoint_
-		//            << std::endl;
-		//}
+
+		if (multicast_out_addr_ != "localhost")
+		{
+			struct in_addr addr;
+			sts = GetInterfaceForNetwork(multicast_out_addr_.c_str(), addr);
+			//sts = ResolveHost(multicast_out_addr_.c_str(), addr);
+			if (sts == -1)
+			{
+				TLOG(TLVL_ERROR) << "Unable to resolve multicast interface address, err=" << strerror(errno);
+				exit(1);
+			}
+
+			if (setsockopt(message_socket_, IPPROTO_IP, IP_MULTICAST_IF, &addr, sizeof(addr)) == -1)
+			{
+				TLOG(TLVL_ERROR) << "Cannot set outgoing interface, err=" << strerror(errno);
+				exit(1);
+			}
+		}
+		int yes = 1;
+		if (setsockopt(message_socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0)
+		{
+			TLOG(TLVL_ERROR) << "Unable to enable port reuse on message socket, err=" << strerror(errno);
+			exit(1);
+		}
+		if (setsockopt(message_socket_, IPPROTO_IP, IP_MULTICAST_LOOP, &yes, sizeof(yes)) < 0)
+		{
+			TLOG(TLVL_ERROR) << "Unable to enable multicast loopback on message socket, err=" << strerror(errno);
+			exit(1);
+		}
+		if (setsockopt(message_socket_, SOL_SOCKET, SO_BROADCAST, (void*)&yes, sizeof(int)) == -1)
+		{
+			TLOG(TLVL_ERROR) << "Cannot set message socket to broadcast, err=" << strerror(errno);
+			exit(1);
+		}
 	}
 
 	//======================================================================
@@ -340,45 +368,33 @@ namespace mfplugins
 	//======================================================================
 	void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj&)
 	{
+		if (message_socket_ == -1) reconnect_();
 		if (error_count_ < error_max_ || error_max_ == 0)
 		{
-			auto pid = pid_;
-			//std::cout << oss.str() << std::endl;
-			auto string = "UDPMFMESSAGE" + std::to_string(pid) + "|" + oss.str();
-			//std::cout << string << std::endl;
-			auto message = boost::asio::buffer(string);
-			bool error = true;
-			try
+			char str[INET_ADDRSTRLEN];
+			inet_ntop(AF_INET, &(message_addr_.sin_addr), str, INET_ADDRSTRLEN);
+
+			auto string = "UDPMFMESSAGE" + std::to_string(pid_) + "|" + oss.str();
+			auto sts = sendto(message_socket_, string.c_str(), string.size(), 0, (struct sockaddr *)&message_addr_, sizeof(message_addr_));
+
+			if (sts < 0)
 			{
-				socket_.send_to(message, remote_endpoint_);
+				consecutive_success_count_ = 0;
+				++error_count_;
+				if (error_count_ == next_error_report_)
+				{
+					TLOG(TLVL_ERROR) << "Error sending message " << seqNum_ << " to " << host_ << ", errno=" << errno << " (" << strerror(errno) << ")";
+					next_error_report_ *= error_report_backoff_factor_;
+				}
+			}
+			else
+			{
 				++consecutive_success_count_;
 				if (consecutive_success_count_ >= 5)
 				{
 					error_count_ = 0;
 					next_error_report_ = 1;
 				}
-				error = false;
-			}
-			catch (boost::system::system_error& err)
-			{
-				consecutive_success_count_ = 0;
-				++error_count_;
-				if (error_count_ == next_error_report_)
-				{
-					std::cerr << "An exception occurred when trying to send message " << std::to_string(seqNum_) << " to "
-						<< remote_endpoint_ << std::endl
-						<< "  message = " << oss.str() << std::endl
-						<< "  exception = " << err.what() << std::endl;
-					next_error_report_ *= error_report_backoff_factor_;
-				}
-			}
-			if (error)
-			{
-				try
-				{
-					reconnect_(true);
-				}
-				catch (...) {}
 			}
 		}
 	}
@@ -396,7 +412,7 @@ namespace mfplugins
 
 EXTERN_C_FUNC_DECLARE_START
 auto makePlugin(const std::string&,
-				const fhicl::ParameterSet& pset)
+	const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELUDP>(pset);
 }

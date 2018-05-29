@@ -5,9 +5,6 @@
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
-#include <boost/asio.hpp>
-using boost::asio::ip::udp;
-
 namespace mfviewer
 {
 	/// <summary>
@@ -48,11 +45,13 @@ namespace mfviewer
 		static bool validate_packet(std::string input);
 
 	private:
-		int port_;
-		boost::asio::io_service io_service_;
-		udp::socket socket_;
-		char buffer_[0x10000];
-		bool debug_;
+		void setupMessageListener_();
+
+		int message_port_;
+		std::string message_addr_;
+		bool multicast_enable_;
+		std::string multicast_out_addr_;
+		int message_socket_;
 	};
 }
 
