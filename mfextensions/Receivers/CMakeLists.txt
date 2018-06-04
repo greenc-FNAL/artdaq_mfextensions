@@ -25,7 +25,7 @@ basic_plugin("UDP" "receiver"
   Qt5::Core
   pthread
 )
- 
+
 #get_cmake_property(_variableNames VARIABLES)
 #foreach (_variableName ${_variableNames})
 #    message(STATUS "${_variableName}=${${_variableName}}")
@@ -42,5 +42,5 @@ basic_plugin("LogReader" "receiver"
   Qt5::Core
 )
 
-install_headers()
-install_source()
+install_headers(SUBDIRS detail)
+install_source(SUBDIRS detail)

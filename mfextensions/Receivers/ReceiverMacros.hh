@@ -25,6 +25,6 @@ namespace mfviewer
   EXTERN_C_FUNC_DECLARE_START                                      \
   std::unique_ptr<mfviewer::MVReceiver>                          \
   make(fhicl::ParameterSet const & ps) {                         \
-    return std::unique_ptr<mfviewer::MVReceiver>(new klass(ps)); \
+	return std::unique_ptr<mfviewer::MVReceiver>(new klass(ps)); \
   }}
 #endif /* mfextensions_Receivers_RecevierMacros_h */

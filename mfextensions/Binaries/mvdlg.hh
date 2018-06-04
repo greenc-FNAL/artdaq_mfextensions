@@ -30,27 +30,41 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
 	Q_OBJECT
 
 public:
+	/**
+	 * \brief Message Viewer Dialog Constructor
+	 * \param conf Configuration filename (fhicl document)
+	 * \param parent Parent Qt window
+	 */
 	msgViewerDlg(std::string const& conf, QDialog* parent = 0);
 
 	virtual ~msgViewerDlg();
 
 
-public slots:
+	public slots:
 
+	/// Pause message receiving
 	void pause();
 
+	/// Exit the program
 	void exit();
 
+	/// Clear the message buffer
 	void clear();
 
+	/// Switch to/from Short message mode
 	void shortMode();
 
+	/// Change the severity threshold
 	void changeSeverity(int sev);
 
 protected:
+	/**
+	 * \brief Perform actions on window close
+	 * \param event QCloseEvent data
+	 */
 	void closeEvent(QCloseEvent* event);
 
-private slots:
+	private slots:
 
 	void onNewMsg(qt_mf_msg const& mfmsg);
 
@@ -73,7 +87,7 @@ private slots:
 	void setSuppression(QAction* act);
 
 	void setThrottling(QAction* act);
-	
+
 	void tabWidgetCurrentChanged(int newTab);
 
 	void tabCloseRequested(int tabIndex);
@@ -84,6 +98,8 @@ private:
 
 	// Display all messages stored in the buffer
 	void displayMsg(int display);
+
+	void UpdateTextAreaDisplay(QString text, QTextEdit* widget);
 
 	void updateDisplays();
 
@@ -99,7 +115,7 @@ private:
 	bool updateList(QListWidget* lw, M const& map);
 
 	void displayMsg(msgs_t::const_iterator it, int display);
-	
+
 	void readSettings();
 
 	void writeSettings();
@@ -138,7 +154,7 @@ private:
 	std::vector<throttle> e_thr_host;
 	std::vector<throttle> e_thr_app;
 	std::vector<throttle> e_thr_cat;
-	
+
 	// search string
 	QString searchStr;
 
@@ -149,7 +165,7 @@ private:
 	msg_iters_map_t host_msgs_;
 	msg_iters_map_t cat_msgs_;
 	msg_iters_map_t app_msgs_;
-	
+
 	// context menu for "suppression" and "throttling" button
 	QMenu* sup_menu;
 	QMenu* thr_menu;

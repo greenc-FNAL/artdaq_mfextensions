@@ -1,91 +1,130 @@
+#define TRACE_NAME "UDP_Receiver"
+
 #include "mfextensions/Receivers/UDP_receiver.hh"
 #include "mfextensions/Receivers/ReceiverMacros.hh"
+#include "mfextensions/Receivers/detail/TCPConnect.hh"
 #include "messagefacility/Utilities/ELseverityLevel.h"
 #include <boost/tokenizer.hpp>
 #include <boost/regex.hpp>
 #include <sstream>
+#include <sys/poll.h>
 
 mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
-, port_(pset.get<int>("port", 5140))
-, io_service_()
-, socket_(io_service_)
-, debug_(pset.get<bool>("debug_mode", false))
+, message_port_(pset.get<int>("port", 5140))
+, message_addr_(pset.get<std::string>("message_address", "227.128.12.27"))
+, multicast_enable_(pset.get<bool>("multicast_enable", false))
+, multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", "0.0.0.0"))
+, message_socket_(-1)
 {
-	//std::cout << "UDPReceiver Constructor" << std::endl;
-	boost::system::error_code ec;
-	udp::endpoint listen_endpoint(boost::asio::ip::address::from_string("0.0.0.0"), port_);
-	socket_.open(listen_endpoint.protocol());
-	boost::asio::socket_base::reuse_address option(true);
-	socket_.set_option(option, ec);
-	if (ec)
-	{
-		std::cerr << "An error occurred setting reuse_address: " << ec.message() << std::endl;
-	}
-	socket_.bind(listen_endpoint, ec);
-
-	if (ec)
-	{
-		std::cerr << "An error occurred in bind(): " << ec.message() << std::endl;
-	}
-
-	if (pset.get<bool>("multicast_enable", false))
-	{
-		std::string multicast_address_string = pset.get<std::string>("multicast_address", "227.128.12.27");
-		auto multicast_address = boost::asio::ip::address::from_string(multicast_address_string);
-		boost::asio::ip::multicast::join_group group_option(multicast_address);
-		socket_.set_option(group_option, ec);
-		if (ec)
-		{
-			std::cerr << "An error occurred joining the multicast group " << multicast_address_string
-				<< ": " << ec.message() << std::endl;
-		}
-
-		boost::asio::ip::multicast::enable_loopback loopback_option(true);
-		socket_.set_option(loopback_option, ec);
-
-		if (ec)
-		{
-			std::cerr << "An error occurred setting the multicast loopback option: " << ec.message() << std::endl;
-		}
-	}
-	if (debug_) { std::cout << "UDPReceiver Constructor Done" << std::endl; }
+	TLOG(TLVL_TRACE) << "UDPReceiver Constructor";
 }
+
+
+void mfviewer::UDPReceiver::setupMessageListener_()
+{
+	TLOG(TLVL_INFO) << "Setting up message listen socket, address=" << message_addr_ << ":" << message_port_;
+	message_socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (message_socket_ < 0)
+	{
+		TLOG(TLVL_ERROR) << "Error creating socket for receiving messages! err=" << strerror(errno);
+		exit(1);
+	}
+
+	struct sockaddr_in si_me_request;
+
+	int yes = 1;
+	if (setsockopt(message_socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0)
+	{
+		TLOG(TLVL_ERROR) << "Unable to enable port reuse on message socket, err=" << strerror(errno);
+		exit(1);
+	}
+	memset(&si_me_request, 0, sizeof(si_me_request));
+	si_me_request.sin_family = AF_INET;
+	si_me_request.sin_port = htons(message_port_);
+	si_me_request.sin_addr.s_addr = htonl(INADDR_ANY);
+	if (bind(message_socket_, (struct sockaddr *)&si_me_request, sizeof(si_me_request)) == -1)
+	{
+		TLOG(TLVL_ERROR) << "Cannot bind message socket to port " << message_port_ << ", err=" << strerror(errno);
+		exit(1);
+	}
+
+	if (message_addr_ != "localhost" && multicast_enable_)
+	{
+		struct ip_mreq mreq;
+		int sts = ResolveHost(message_addr_.c_str(), mreq.imr_multiaddr);
+		if (sts == -1)
+		{
+			TLOG(TLVL_ERROR) << "Unable to resolve multicast message address, err=" << strerror(errno);
+			exit(1);
+		}
+		sts = GetInterfaceForNetwork(multicast_out_addr_.c_str(), mreq.imr_interface);
+		if (sts == -1)
+		{
+			TLOG(TLVL_ERROR) << "Unable to resolve hostname for " << multicast_out_addr_;
+			exit(1);
+		}
+		if (setsockopt(message_socket_, IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq)) < 0)
+		{
+			TLOG(TLVL_ERROR) << "Unable to join multicast group, err=" << strerror(errno);
+			exit(1);
+		}
+	}
+	TLOG(TLVL_INFO) << "Done setting up message receive socket";
+}
+
 
 mfviewer::UDPReceiver::~UDPReceiver()
 {
-	if (debug_) { std::cout << "Closing UDP Socket" << std::endl; }
-	socket_.close();
+	TLOG(TLVL_DEBUG) << "Closing message receive socket";
+	close(message_socket_);
+	message_socket_ = -1;
 }
 
 void mfviewer::UDPReceiver::run()
 {
 	while (!stopRequested_)
 	{
-		if (socket_.available() <= 0)
+		if (message_socket_ == -1) setupMessageListener_();
+
+		int ms_to_wait = 10;
+		struct pollfd ufds[1];
+		ufds[0].fd = message_socket_;
+		ufds[0].events = POLLIN | POLLPRI | POLLERR;
+		int rv = poll(ufds, 1, ms_to_wait);
+
+		// Continue loop if no message received or message does not have correct event ID
+		if (rv <= 0 || (ufds[0].revents != POLLIN && ufds[0].revents != POLLPRI))
 		{
-			usleep(10000);
+			if (rv == 1 && (ufds[0].revents & (POLLNVAL | POLLERR | POLLHUP)))
+			{
+				close(message_socket_);
+				message_socket_ = -1;
+			}
+			if (stopRequested_)
+			{
+				break;
+			}
+			continue;
+		}
+
+		char buffer[TRACE_STREAMER_MSGMAX + 1];
+		auto packetSize = read(message_socket_, &buffer, TRACE_STREAMER_MSGMAX);
+		if (packetSize < 0)
+		{
+			TLOG(TLVL_ERROR) << "Error receiving message, errno=" << errno << " (" << strerror(errno) << ")";
 		}
 		else
 		{
-			//usleep(500000);
-			udp::endpoint remote_endpoint;
-			boost::system::error_code ec;
-			size_t packetSize = socket_.receive_from(boost::asio::buffer(buffer_), remote_endpoint, 0, ec);
-			if (debug_) { std::cout << "Recieved message; validating...(packetSize=" << packetSize << ")" << std::endl; }
-			std::string message(buffer_, buffer_ + packetSize);
-			if (ec)
+			TLOG(TLVL_TRACE) << "Recieved message; validating...(packetSize=" << packetSize << ")";
+			std::string message(buffer, buffer + packetSize);
+			if (validate_packet(message))
 			{
-				std::cerr << "Recieved error code: " << ec.message() << std::endl;
-			}
-			else if (packetSize > 0 && validate_packet(message))
-			{
-				if (debug_) { std::cout << "Valid UDP Message received! Sending to GUI!" << std::endl; }
+				TLOG(TLVL_TRACE) << "Valid UDP Message received! Sending to GUI!";
 				emit NewMessage(read_msg(message));
-				//std::cout << std::endl << std::endl;
 			}
 		}
 	}
-	std::cout << "UDPReceiver shutting down!" << std::endl;
+	TLOG(TLVL_INFO) << "UDPReceiver shutting down!";
 }
 
 qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
@@ -96,7 +135,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 	int pid = 0;
 	int seqNum = 0;
 
-	if (debug_) { std::cout << "Recieved MF/Syslog message with contents: " << input << std::endl; }
+	TLOG(TLVL_TRACE) << "Recieved MF/Syslog message with contents: " << input;
 
 	boost::char_separator<char> sep("|", "", boost::keep_empty_tokens);
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
@@ -153,8 +192,18 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 			else { first = false; }
 			oss << *it;
 		}
-		if (debug_) { std::cout << "Message content: " << oss.str() << std::endl; }
+		TLOG(TLVL_TRACE) << "Message content: " << oss.str();
 		message = oss.str();
+#if MESSAGEFACILITY_HEX_VERSION < 0x20201 // Sender and receiver version must match!
+		boost::regex fileLine("^\\s*([^:]*\\.[^:]{1,3}):(\\d+)(.*)");
+		if (boost::regex_search(message, res, fileLine))
+		{
+			file = std::string(res[1].first, res[1].second);
+			line = std::string(res[2].first, res[2].second);
+			std::string messagetmp = std::string(res[3].first, res[3].second);
+			message = messagetmp;
+		}
+#endif
 	}
 
 	qt_mf_msg msg(hostname, category, application, pid, tv);
@@ -175,12 +224,12 @@ bool mfviewer::UDPReceiver::validate_packet(std::string input)
 	// Run some checks on the input packet
 	if (input.find("MF") == std::string::npos)
 	{
-		std::cout << "Failed to find \"MF\" in message: " << input << std::endl;
+		TLOG(TLVL_WARNING) << "Failed to find \"MF\" in message: " << input;
 		return false;
 	}
 	if (input.find("|") == std::string::npos)
 	{
-		std::cout << "Failed to find | separator character in message: " << input << std::endl;
+		TLOG(TLVL_WARNING) << "Failed to find | separator character in message: " << input;
 		return false;
 	}
 	return true;

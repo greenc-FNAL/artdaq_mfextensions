@@ -40,9 +40,16 @@ public:
 	/// <summary>
 	/// Construct a qt_mf_msg
 	/// </summary>
+	/// <param name="hostname">Hostname of the message source</param>
+	/// <param name="category">Category of the message</param>
+	/// <param name="application">Application of the message</param>
+	/// <param name="pid">PID of the message</param>
+	/// <param name="time">Timestamp of the message</param>
 	qt_mf_msg(std::string hostname, std::string category, std::string application, pid_t pid, timeval time);
 
+	/// Default message constructor
 	qt_mf_msg() {}
+	/// Default copy constructor
 	qt_mf_msg(const qt_mf_msg&) = default;
 
 	// get method
@@ -88,15 +95,52 @@ public:
 	/// <returns>Message sequence number</returns>
 	size_t seq() const { return seq_; }
 
+	/// <summary>
+	/// Set the Severity of the message (MF levels)
+	/// </summary>
+	/// <param name="sev">Severity level of the message</param>
 	void setSeverity(mf::ELseverityLevel sev);
+	/// <summary>
+	/// Set the severity code of the message (Viewer levels)
+	/// </summary>
+	/// <param name="sev">Severity code of the message</param>
 	void setSeverityLevel(sev_code_t sev) { sev_ = sev; }
+	/// <summary>
+	/// Set the message
+	/// </summary>
+	/// <param name="prefix">Message prefix</param>
+	/// <param name="iteration">Message iteration (run/event no)</param>
+	/// <param name="msg">Message text</param>
 	void setMessage(std::string prefix, int iteration, std::string msg);
+	/// <summary>
+	/// Set the hostaddr field
+	/// </summary>
+	/// <param name="hostaddr">Host address of message source</param>
 	void setHostAddr(std::string hostaddr) { hostaddr_ = QString(hostaddr.c_str()).toHtmlEscaped(); }
+	/// <summary>
+	/// Set the file name field
+	/// </summary>
+	/// <param name="file">File generating message</param>
 	void setFileName(std::string file) { file_ = QString(file.c_str()).toHtmlEscaped(); }
+	/// <summary>
+	/// Set the line number field
+	/// </summary>
+	/// <param name="line">Line number in file</param>
 	void setLineNumber(std::string line) { line_ = QString(line.c_str()).toHtmlEscaped(); }
+	/// <summary>
+	/// Set the module name
+	/// </summary>
+	/// <param name="module">Module generating message</param>
 	void setModule(std::string module) { module_ = QString(module.c_str()).toHtmlEscaped(); }
+	/// <summary>
+	/// Set the Event ID of the message
+	/// </summary>
+	/// <param name="eventID">Event ID to set</param>
 	void setEventID(std::string eventID) { eventID_ = QString(eventID.c_str()).toHtmlEscaped(); }
 
+	/// <summary>
+	/// Parse fields and create HTML string representing message
+	/// </summary>
 	void updateText();
 private:
 

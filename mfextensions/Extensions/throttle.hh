@@ -33,6 +33,10 @@ public:
 	/// <returns>Whether the message should be throttled</returns>
 	bool reach_limit(std::string const& name, timeval tm);
 
+	/// <summary>
+	/// Enable or disable this throttle
+	/// </summary>
+	/// <param name="flag">Whether the throttle should be enabled</param>
 	void use(bool flag) { in_use_ = flag; }
 
 private:

@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 			}
 
 			else if ((!strcmp(argv[i], "-c") || !strcmp(argv[i], "--configuration"))
-			         && i < argc - 1)
+					 && i < argc - 1)
 			{
 				conf = std::string(argv[i + 1]);
 				++i;
