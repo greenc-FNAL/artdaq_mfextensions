@@ -115,11 +115,11 @@ void mfviewer::UDPReceiver::run()
 		}
 		else
 		{
-			TLOG(TLVL_DEBUG) << "Recieved message; validating...(packetSize=" << packetSize << ")";
+			TLOG(TLVL_TRACE) << "Recieved message; validating...(packetSize=" << packetSize << ")";
 			std::string message(buffer, buffer + packetSize);
 			if (validate_packet(message))
 			{
-				TLOG(TLVL_DEBUG) << "Valid UDP Message received! Sending to GUI!";
+				TLOG(TLVL_TRACE) << "Valid UDP Message received! Sending to GUI!";
 				emit NewMessage(read_msg(message));
 			}
 		}
@@ -135,7 +135,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 	int pid = 0;
 	int seqNum = 0;
 
-	TLOG(TLVL_DEBUG) << "Recieved MF/Syslog message with contents: " << input;
+	TLOG(TLVL_TRACE) << "Recieved MF/Syslog message with contents: " << input;
 
 	boost::char_separator<char> sep("|", "", boost::keep_empty_tokens);
 	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
@@ -192,7 +192,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 			else { first = false; }
 			oss << *it;
 		}
-		TLOG(TLVL_DEBUG) << "Message content: " << oss.str();
+		TLOG(TLVL_TRACE) << "Message content: " << oss.str();
 		message = oss.str();
 #if MESSAGEFACILITY_HEX_VERSION < 0x20201 // Sender and receiver version must match!
 		boost::regex fileLine("^\\s*([^:]*\\.[^:]{1,3}):(\\d+)(.*)");
