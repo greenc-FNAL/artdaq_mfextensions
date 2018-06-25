@@ -193,7 +193,7 @@ namespace mfplugins
 			if (needAspace)
 			{
 				emitToken(oss, delimeter_);
-				needAspace = false;
+				//needAspace = false; // Uncomment this line if more fields are added in the future
 			}
 			emitToken(oss, msg.context());
 		}

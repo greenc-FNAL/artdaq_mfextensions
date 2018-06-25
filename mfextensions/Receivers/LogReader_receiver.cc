@@ -79,7 +79,7 @@ qt_mf_msg mfviewer::LogReader::read_next()
 	getline(log_, line);
 
 	std::string category, application, eventID;
-	timeval tv;
+	timeval tv = { 0, 0 };
 	sev_code_t sev = SERROR;
 
 	if (boost::regex_search(line, what_, metadata_1))

@@ -131,7 +131,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 {
 	std::string hostname, category, application, message, hostaddr, file, line, module, eventID;
 	mf::ELseverityLevel sev;
-	timeval tv;
+	timeval tv = { 0, 0 };
 	int pid = 0;
 	int seqNum = 0;
 
