@@ -28,24 +28,18 @@ namespace mfplugins
 	/// </summary>
 	class ELFriendly : public ELostreamOutput
 	{
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
 		struct Config
 		{
 			fhicl::TableFragment<ELostreamOutput::Config> elOstrConfig;
 			fhicl::Atom<std::string> delimiter{ fhicl::Name{ "field_delimiter" },fhicl::Comment{ "String to print between each message field" },"  " };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
-#endif
 	public:
 		/// <summary>
 		/// ELFriendly Constructor
 		/// </summary>
 		/// <param name="pset">ParameterSet used to configure ELFriendly</param>
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-		ELFriendly(const fhicl::ParameterSet& pset);
-#else
 		ELFriendly(Parameters const& pset);
-#endif
 
 		/**
 		* \brief Fill the "Prefix" portion of the message
@@ -79,15 +73,10 @@ namespace mfplugins
 	// ELFriendly c'tor
 	//======================================================================
 
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-	ELFriendly::ELFriendly(const fhicl::ParameterSet& pset)
-		: ELostreamOutput(pset, cet::ostream_handle{ std::cout }, false)
-		, delimeter_(pset.get<std::string>("field_delimeter", "  "))
-#else
+
 	ELFriendly::ELFriendly(Parameters const& pset)
 		: ELostreamOutput(pset().elOstrConfig(), cet::ostream_handle{ std::cout }, false)
 		, delimeter_(pset().delimiter())
-#endif
 	{}
 
 	//======================================================================

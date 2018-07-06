@@ -19,7 +19,6 @@ namespace mfplugins
 	/// </summary>
 	class ELANSI : public ELdestination
 	{
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
 		struct Config
 		{
 			fhicl::TableFragment<ELdestination::Config> elDestConfig;
@@ -31,17 +30,13 @@ namespace mfplugins
 			fhicl::Atom<std::string> debugColor{ fhicl::Name{ "debug_ansi_color" },fhicl::Comment{ "ANSI Color string for Debug Messages" }, "\033[39m" };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
-#endif
+
 	public:
 		/// <summary>
 		/// ELANSI Constructor
 		/// </summary>
 		/// <param name="pset">ParameterSet used to configure ELANSI</param>
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-		ELANSI(const fhicl::ParameterSet& pset);
-#else
 		ELANSI(Parameters const& pset);
-#endif
 
 		/**
 		* \brief Serialize a MessageFacility message to the output
@@ -68,16 +63,6 @@ namespace mfplugins
 	// ELANSI c'tor
 	//======================================================================
 
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-	ELANSI::ELANSI(const fhicl::ParameterSet& pset)
-		: ELdestination(pset)
-		, bellError_(pset.get<bool>("bell_on_error", true))
-		, blinkError_(pset.get<bool>("blink_error_messages", false))
-		, errorColor_(pset.get<std::string>("error_ansi_color", "\033[1m\033[91m"))
-		, warningColor_(pset.get<std::string>("warning_ansi_color", "\033[1m\033[93m"))
-		, infoColor_(pset.get<std::string>("info_ansi_color", "\033[92m"))
-		, debugColor_(pset.get<std::string>("debug_ansi_color", "\033[39m"))
-#else
 	ELANSI::ELANSI(Parameters const& pset)
 		: ELdestination(pset().elDestConfig())
 		, bellError_(pset().bellOnError())
@@ -86,7 +71,6 @@ namespace mfplugins
 		, warningColor_(pset().warningColor())
 		, infoColor_(pset().infoColor())
 		, debugColor_(pset().debugColor())
-#endif
 	{
 		//std::cout << "ANSI Plugin configured with ParameterSet: " << pset.to_string() << std::endl;
 	}

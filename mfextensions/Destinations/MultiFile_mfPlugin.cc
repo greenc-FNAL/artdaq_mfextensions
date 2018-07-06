@@ -20,7 +20,6 @@ namespace mfplugins
 	/// </summary>
 	class ELMultiFileOutput : public ELdestination
 	{
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
 		struct Config
 		{
 			fhicl::TableFragment<ELdestination::Config> elDestConfig;
@@ -32,17 +31,14 @@ namespace mfplugins
 			fhicl::Atom<bool> useModule{ fhicl::Name{ "use_module" },fhicl::Comment{ "Use the module field when generating log file names" },false };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
-#endif
+
 	public:
 		/// <summary>
 		/// ELMultiFileOutput Constructor
 		/// </summary>
 		/// <param name="pset">ParameterSet used to configure ELMultiFileOutput</param>
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-		ELMultiFileOutput(const fhicl::ParameterSet& pset);
-#else
 		ELMultiFileOutput(Parameters const& pset);
-#endif
+
 		/// <summary>
 		/// Default virtual Destructor
 		/// </summary>
@@ -79,18 +75,6 @@ namespace mfplugins
 	//======================================================================
 	// ELMultiFileOutput c'tor
 	//======================================================================
-
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-	ELMultiFileOutput::ELMultiFileOutput(const fhicl::ParameterSet& pset)
-		: ELdestination(pset)
-		, baseDir_(pset.get<std::string>("base_directory", "/tmp"))
-		, append_(pset.get<bool>("append", true))
-		, useHost_(pset.get<bool>("use_hostname", true))
-		, useApplication_(pset.get<bool>("use_application", true))
-		, useCategory_(pset.get<bool>("use_category", false))
-		, useModule_(pset.get<bool>("use_module", false))
-	{}
-#else
 	ELMultiFileOutput::ELMultiFileOutput(Parameters const& pset)
 		: ELdestination(pset().elDestConfig())
 		, baseDir_(pset().baseDir())
@@ -100,7 +84,6 @@ namespace mfplugins
 		, useCategory_(pset().useCategory())
 		, useModule_(pset().useModule())
 	{}
-#endif
 
 	//======================================================================
 	// Message router ( overriddes ELdestination::routePayload )

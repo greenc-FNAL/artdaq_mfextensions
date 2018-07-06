@@ -44,7 +44,6 @@ namespace mfplugins
 	/// </summary>
 	class ELUDP : public ELdestination
 	{
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
 		struct Config
 		{
 			fhicl::TableFragment<ELdestination::Config> elDestConfig;
@@ -57,17 +56,13 @@ namespace mfplugins
 			fhicl::Atom<std::string> output_address{ fhicl::Name{ "multicast_interface_ip" }, fhicl::Comment{ "Use this hostname for multicast output(to assign to the proper NIC)" }, "0.0.0.0" };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
-#endif
+
 	public:
 		/// <summary>
 		/// ELUDP Constructor
 		/// </summary>
 		/// <param name="pset">ParameterSet used to configure ELUDP</param>
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-		ELUDP(const fhicl::ParameterSet& pset);
-#else
 		ELUDP(Parameters const& pset);
-#endif
 
 		/**
 		* \brief Fill the "Prefix" portion of the message
@@ -131,16 +126,6 @@ namespace mfplugins
 	// ELUDP c'tor
 	//======================================================================
 
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-	ELUDP::ELUDP(const fhicl::ParameterSet& pset)
-		: ELdestination(pset)
-		, error_report_backoff_factor_(pset.get<int>("error_report_backoff_factor", 100))
-		, error_max_(pset.get<int>("error_turnoff_threshold", 0))
-		, host_(pset.get<std::string>("host", "227.128.12.27"))
-		, port_(pset.get<int>("port", 5140))
-		, multicast_enabled_(pset.get<bool>("multicast_enabled", false))
-		, multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", pset.get<std::string>("output_address", "0.0.0.0")))
-#else
 	ELUDP::ELUDP(Parameters const& pset)
 		: ELdestination(pset().elDestConfig())
 		, error_report_backoff_factor_(pset().error_report())
@@ -149,7 +134,6 @@ namespace mfplugins
 		, port_(pset().port())
 		, multicast_enabled_(pset().multicast_enabled())
 		, multicast_out_addr_(pset().output_address())
-#endif
 		, message_socket_(-1)
 		, consecutive_success_count_(0)
 		, error_count_(0)

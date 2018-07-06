@@ -1,8 +1,6 @@
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20106 // v2_01_06 => cetlib v3_02_00 => new clang support
 #include "cetlib/ProvideMakePluginMacros.h"
-#endif
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
@@ -35,7 +33,6 @@ namespace mfplugins
 	class ELTRACE : public ELdestination
 	{
 
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
 		struct Config
 		{
 			fhicl::TableFragment<ELdestination::Config> elDestConfig;
@@ -43,7 +40,6 @@ namespace mfplugins
 			fhicl::Atom<size_t> lvlm{ fhicl::Name{ "lvlm" },fhicl::Comment{ "TRACE level mask for Memory output" },0 };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
-#endif
 
 	public:
 
@@ -51,11 +47,7 @@ namespace mfplugins
 		/// ELTRACE Constructor
 		/// </summary>
 		/// <param name="pset">ParameterSet used to configure ELTRACE</param>
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-		ELTRACE(const fhicl::ParameterSet& pset);
-#else
 		ELTRACE(Parameters const& pset);
-#endif
 
 		/**
 		* \brief Fill the "Prefix" portion of the message
@@ -93,21 +85,6 @@ namespace mfplugins
 	//======================================================================
 	// ELTRACE c'tor
 	//======================================================================
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103
-	ELTRACE::ELTRACE(const fhicl::ParameterSet& pset)
-		: ELdestination(pset)
-	{
-		size_t msk;
-
-		if (pset.get_if_present<size_t>("lvls", msk))
-			TRACE_CNTL("lvlmskS", msk); // the S mask for TRACE_NAME
-
-		if (pset.get_if_present<size_t>("lvlm", msk))
-			TRACE_CNTL("lvlmskM", msk); // the M mask for TRACE_NAME
-
-		TLOG(TLVL_INFO) << "ELTRACE MessageLogger destination plugin initialized.";
-	}
-#else
 	ELTRACE::ELTRACE(Parameters const& pset)
 		: ELdestination(pset().elDestConfig())
 	{
@@ -126,8 +103,6 @@ namespace mfplugins
 
 		TLOG(TLVL_INFO) << "ELTRACE MessageLogger destination plugin initialized.";
 	}
-
-#endif
 
 	//======================================================================
 	// Message prefix filler ( overriddes ELdestination::fillPrefix )

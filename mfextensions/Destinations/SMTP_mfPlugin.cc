@@ -1,10 +1,8 @@
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
 #include "fhiclcpp/types/ConfigurationTable.h"
 #include "fhiclcpp/types/Sequence.h"
 #include "fhiclcpp/types/TableFragment.h"
-#endif
 
 
 #include "messagefacility/MessageService/ELdestination.h"
@@ -43,7 +41,6 @@ namespace mfplugins
 	/// </summary>
 	class ELSMTP : public ELdestination
 	{
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20103
 		struct Config
 		{
 			using strings_t = fhicl::Sequence<std::string>::default_type;
@@ -62,17 +59,13 @@ namespace mfplugins
 			fhicl::Atom<size_t> sendInterval{ fhicl::Name{ "email_send_interval_seconds" },fhicl::Comment{ "Only send email every N seconds" }, 15 };
 		};
 		using Parameters = fhicl::WrappedTable<Config>;
-#endif
+
 	public:
 		/// <summary>
 		/// ELSMTP Constructor
 		/// </summary>
 		/// <param name="pset">ParameterSet used to configure ELSMTP</param>
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-		ELSMTP(const fhicl::ParameterSet& pset);
-#else
 		ELSMTP(Parameters const& pset);
-#endif
 
 		~ELSMTP()
 		{
@@ -125,25 +118,6 @@ namespace mfplugins
 	//======================================================================
 	// ELSMTP c'tor
 	//======================================================================
-
-#if MESSAGEFACILITY_HEX_VERSION < 0x20103 // v2_01_03 is s58, pre v2_01_03 is s50
-	ELSMTP::ELSMTP(const fhicl::ParameterSet& pset)
-		: ELdestination(pset)
-		, smtp_host_(pset.get<std::string>("host", "smtp.fnal.gov"))
-		, port_(pset.get<int>("port", 25))
-		, to_(pset.get<std::vector<std::string>>("to_addresses"))
-		, from_(pset.get<std::string>("from_address"))
-		, subject_(pset.get<std::string>("subject", "MessageFacility SMTP Message Digest"))
-		, message_prefix_(pset.get<std::string>("message_header", ""))
-		, pid_(static_cast<long>(getpid()))
-		, use_ssl_(pset.get<bool>("use_smtps", false))
-		, username_(pset.get<std::string>("smtp_username", ""))
-		, password_(pset.get<std::string>("smtp_password", ""))
-		, ssl_verify_host_cert_(pset.get<bool>("verify_host_ssl_certificate", true))
-		, sending_thread_active_(false)
-		, abort_sleep_(false)
-		, send_interval_s_(pset.get<size_t>("email_send_interval_seconds", 15))
-#else
 	ELSMTP::ELSMTP(Parameters const& pset)
 		: ELdestination(pset().elDestConfig())
 		, smtp_host_(pset().host())
@@ -160,7 +134,6 @@ namespace mfplugins
 		, sending_thread_active_(false)
 		, abort_sleep_(false)
 		, send_interval_s_(pset().sendInterval())
-#endif
 	{
 		// hostname
 		char hostname_c[1024];
