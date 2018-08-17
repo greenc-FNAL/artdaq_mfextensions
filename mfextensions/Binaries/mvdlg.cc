@@ -10,7 +10,6 @@
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
-
 #if GCC_VERSION >= 701000 || defined(__clang__) 
 #pragma GCC diagnostic push 
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
@@ -21,7 +20,6 @@
 #if GCC_VERSION >= 701000 || defined(__clang__) 
 #pragma GCC diagnostic pop 
 #endif
-
 
 #include "mvdlg.hh"
 
@@ -35,9 +33,7 @@ process_fname(std::string& fname)
 
 	const size_t npos = std::string::npos;
 
-	if ((sub_start == npos && sub_end != npos)
-		|| (sub_start != npos && sub_end == npos)
-		|| (sub_start > sub_end))
+	if ((sub_start == npos && sub_end != npos) || (sub_start != npos && sub_end == npos) || (sub_start > sub_end))
 	{
 		throw std::runtime_error("Unrecognized configuration file. Use default configuration instead.");
 	}
@@ -139,25 +135,13 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	connect(btnInfo, SIGNAL(clicked()), this, SLOT(setSevInfo()));
 	connect(btnDebug, SIGNAL(clicked()), this, SLOT(setSevDebug()));
 
-	connect(sup_menu
-			, SIGNAL(triggered(QAction*))
-			, this
-			, SLOT(setSuppression(QAction*)));
+	connect(sup_menu, SIGNAL(triggered(QAction *)), this, SLOT(setSuppression(QAction *)));
 
-	connect(thr_menu
-			, SIGNAL(triggered(QAction*))
-			, this
-			, SLOT(setThrottling(QAction*)));
+	connect(thr_menu, SIGNAL(triggered(QAction *)), this, SLOT(setThrottling(QAction *)));
 
-	connect(vsSeverity
-			, SIGNAL(valueChanged(int))
-			, this
-			, SLOT(changeSeverity(int)));
+	connect(vsSeverity, SIGNAL(valueChanged(int)), this, SLOT(changeSeverity(int)));
 
-	connect(&receivers_
-			, SIGNAL(newMessage(qt_mf_msg const &))
-			, this
-			, SLOT(onNewMsg(qt_mf_msg const &)));
+	connect(&receivers_, SIGNAL(newMessage(qt_mf_msg const &)), this, SLOT(onNewMsg(qt_mf_msg const &)));
 
 	connect(tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabWidgetCurrentChanged(int)));
 	connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
@@ -170,8 +154,10 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	tabBar->setTabButton(0, QTabBar::RightSide, 0);
 	tabBar->setTabButton(0, QTabBar::LeftSide, 0);
 
-	if (simpleRender) btnRMode->setChecked(true);
-	else btnRMode->setChecked(false);
+	if (simpleRender)
+		btnRMode->setChecked(true);
+	else
+		btnRMode->setChecked(false);
 
 	btnRMode->setEnabled(false);
 
@@ -229,9 +215,7 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const& ps, std::ve
 	for (size_t i = 0; i < ps.size(); ++i)
 	{
 		std::string name = ps[i].get<std::string>("name");
-		t.push_back(throttle(name
-							 , ps[i].get<int>("limit", -1)
-							 , ps[i].get<long>("timespan", -1)));
+		t.push_back(throttle(name, ps[i].get<int>("limit", -1), ps[i].get<long>("timespan", -1)));
 		act = menu->addAction(QString(name.c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
@@ -408,7 +392,6 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 	return update;
 }
 
-
 void msgViewerDlg::displayMsg(msgs_t::const_iterator it, int display)
 {
 	if (it->sev() < sevThresh) return;
@@ -433,13 +416,12 @@ void msgViewerDlg::displayMsg(int display)
 
 	n = msgFilters_[display].msgs.size();
 	it = msgFilters_[display].msgs.begin();
-	QProgressDialog progress("Fetching data...", "Cancel"
-							 , 0, n / 1000, this);
+	QProgressDialog progress("Fetching data...", "Cancel", 0, n / 1000, this);
 
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000); // 2 seconds
 
-	QString txt;
+	QString txt = "";
 	int i = 0, prog = 0;
 
 	updating = true;
@@ -458,8 +440,11 @@ void msgViewerDlg::displayMsg(int display)
 			++prog;
 			progress.setValue(prog);
 
+			if (txt.length())
+			{
 			UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
 			txt.clear();
+		}
 		}
 
 		if (progress.wasCanceled())
@@ -550,7 +535,10 @@ msg_iters_t msgViewerDlg::list_intersect(msg_iters_t const& l1, msg_iters_t cons
 	while (it1 != l1.end() && it2 != l2.end())
 	{
 		if (*it1 < *it2) { ++it1; }
-		else if (*it2 < *it1) { ++it2; }
+		else if (*it2 < *it1)
+		{
+			++it2;
+		}
 		else
 		{
 			output.push_back(*it1);
@@ -589,9 +577,7 @@ void msgViewerDlg::setFilter()
 	lwApplication->setCurrentRow(-1, QItemSelectionModel::Clear);
 	lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear);
 
-	if (hostFilter.isEmpty()
-		&& appFilter.isEmpty()
-		&& catFilter.isEmpty())
+	if (hostFilter.isEmpty() && appFilter.isEmpty() && catFilter.isEmpty())
 	{
 		return;
 	}
@@ -633,7 +619,10 @@ void msgViewerDlg::setFilter()
 			}
 		}
 		if (result.empty()) { result = hostResult; }
-		else { result = list_intersect(result, hostResult); }
+		else
+		{
+			result = list_intersect(result, hostResult);
+		}
 		TLOG(10) << "setFilter: result contains " << result.size() << " messages";
 	}
 
@@ -654,7 +643,10 @@ void msgViewerDlg::setFilter()
 			}
 		}
 		if (result.empty()) { result = catResult; }
-		else { result = list_intersect(result, catResult); }
+		else
+		{
+			result = list_intersect(result, catResult);
+		}
 		TLOG(10) << "setFilter: result contains " << result.size() << " messages";
 	}
 
@@ -667,10 +659,7 @@ void msgViewerDlg::setFilter()
 	}
 	else
 	{
-		filterExpression = "(" + (catFilterExpression != "" ? catFilterExpression + ") && (" : "")
-			+ hostFilterExpression
-			+ (hostFilterExpression != "" && appFilterExpression != "" ? ") && (" : "")
-			+ appFilterExpression + ")";
+		filterExpression = "(" + (catFilterExpression != "" ? catFilterExpression + ") && (" : "") + hostFilterExpression + (hostFilterExpression != "" && appFilterExpression != "" ? ") && (" : "") + appFilterExpression + ")";
 	}
 
 	// Add the tab and populate it
