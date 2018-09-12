@@ -5,7 +5,6 @@
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
 #include "messagefacility/Utilities/ELseverityLevel.h"
 #include <boost/tokenizer.hpp>
-#include <boost/regex.hpp>
 #include <sstream>
 #include <sys/poll.h>
 
@@ -15,6 +14,8 @@ mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset) : MVReceiver(pset)
 , multicast_enable_(pset.get<bool>("multicast_enable", false))
 , multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", "0.0.0.0"))
 , message_socket_(-1)
+, timestamp_regex_("(\\d{2}-[^-]*-\\d{4}\\s\\d{2}:\\d{2}:\\d{2})")
+, file_line_regex_("^\\s*([^:]*\\.[^:]{1,3}):(\\d+)(.*)")
 {
 	TLOG(TLVL_TRACE) << "UDPReceiver Constructor";
 }
@@ -143,9 +144,8 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 	tokenizer::iterator it = tokens.begin();
 
 	//There may be syslog garbage in the first token before the timestamp...
-	boost::regex timestamp(".*?(\\d{2}-[^-]*-\\d{4}\\s\\d{2}:\\d{2}:\\d{2})");
 	boost::smatch res;
-	while (it != tokens.end() && !boost::regex_search(*it, res, timestamp))
+	while (it != tokens.end() && !boost::regex_search(*it, res, timestamp_regex_))
 	{
 		++it;
 	}
@@ -195,8 +195,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 		TLOG(TLVL_TRACE) << "Message content: " << oss.str();
 		message = oss.str();
 #if MESSAGEFACILITY_HEX_VERSION < 0x20201 // Sender and receiver version must match!
-		boost::regex fileLine("^\\s*([^:]*\\.[^:]{1,3}):(\\d+)(.*)");
-		if (boost::regex_search(message, res, fileLine))
+		if (boost::regex_search(message, res, file_line_regex_))
 		{
 			file = std::string(res[1].first, res[1].second);
 			line = std::string(res[2].first, res[2].second);

@@ -4,6 +4,7 @@
 #include "mfextensions/Receivers/MVReceiver.hh"
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
+#include <boost/regex.hpp>
 
 namespace mfviewer
 {
@@ -52,6 +53,9 @@ namespace mfviewer
 		bool multicast_enable_;
 		std::string multicast_out_addr_;
 		int message_socket_;
+
+		boost::regex timestamp_regex_;
+		boost::regex file_line_regex_;
 	};
 }
 
