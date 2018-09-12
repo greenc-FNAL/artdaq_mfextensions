@@ -108,7 +108,7 @@ private:
 	// test if the message is suppressed or throttled
 	bool msg_throttled(qt_mf_msg const& mfmsg);
 
-	unsigned int update_index(msgs_t::iterator it, bool deleteIt = false);
+	unsigned int update_index(msgs_t::iterator it);
 
 	// Update the list. Returns true if there's a change in the selection
 	// before and after the update. e.g., the selected entry has been deleted
@@ -131,7 +131,6 @@ private:
 	//---------------------------------------------------------------------------
 
 private:
-	bool updating;
 	bool paused;
 	bool shortMode_;
 
@@ -146,9 +145,6 @@ private:
 
 	// Rendering messages in speed mode or full mode
 	bool simpleRender;
-
-	// severity threshold
-	sev_code_t sevThresh;
 
 	// suppression regex
 	std::vector<suppress> e_sup_host;
@@ -187,8 +183,13 @@ private:
 		QStringList appFilter;
 		QStringList catFilter;
 		QTextEdit* txtDisplay;
+
+		// severity threshold
+		sev_code_t sevThresh;
 	};
 	std::vector<MsgFilterDisplay> msgFilters_;
+
+	mutable std::mutex updating_mutex_;
 };
 
 enum list_mask_t

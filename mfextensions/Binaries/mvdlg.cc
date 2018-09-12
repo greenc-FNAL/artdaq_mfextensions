@@ -83,7 +83,6 @@ readConf(std::string const& fname)
 
 msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	: QDialog(parent)
-	, updating(false)
 	, paused(false)
 	, shortMode_(false)
 	, nMsgs(0)
@@ -92,7 +91,6 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	, nFilters(0)
 	, nDeleted(0)
 	, simpleRender(true)
-	, sevThresh(SINFO)
 	, searchStr("")
 	, msg_pool_()
 	, host_msgs_()
@@ -148,6 +146,9 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	connect(tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
 	MsgFilterDisplay allMessages;
 	allMessages.txtDisplay = txtMessages;
+	allMessages.nDisplayMsgs = 0;
+	allMessages.nDisplayedDeletedMsgs = 0;
+	allMessages.sevThresh = SINFO;
 	msgFilters_.push_back(allMessages);
 
 	//https://stackoverflow.com/questions/2616483/close-button-only-for-some-tabs-in-qt
@@ -162,7 +163,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 
 	btnRMode->setEnabled(false);
 
-	changeSeverity(sevThresh);
+	changeSeverity(SINFO);
 
 	QTextDocument* doc = new QTextDocument(txtMessages);
 	txtMessages->setDocument(doc);
@@ -259,12 +260,6 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	thr_menu->addSeparator();
 
 	pset_to_throttle(thr_cat, e_thr_cat, thr_menu);
-
-	auto lvl = conf.get<std::string>("threshold", "INFO");
-	if (lvl == "DEBUG" || lvl == "debug" || lvl == "0") { sevThresh = SDEBUG; }
-	if (lvl == "INFO" || lvl == "info" || lvl == "1") { sevThresh = SINFO; }
-	if (lvl == "WARN" || lvl == "warn" || lvl == "2") { sevThresh = SWARNING; }
-	if (lvl == "ERROR" || lvl == "error" || lvl == "3") { sevThresh = SERROR; }
 
 	maxMsgs = conf.get<size_t>("max_message_buffer_size", 100000);
 	maxDeletedMsgs = conf.get<size_t>("max_displayed_deleted_messages", 1000);
@@ -385,25 +380,41 @@ void msgViewerDlg::onNewMsg(qt_mf_msg const& mfmsg)
 
 void msgViewerDlg::removeMsg(msgs_t::iterator it)
 {
-	update_index(it, true);
+	std::unique_lock<std::mutex> lk(updating_mutex_);
+	QString const& app = it->app();
+	QString const& cat = it->cat();
+	QString const& host = it->host();
 
-	bool msgThresh = it->sev() >= sevThresh;
+	auto catIter = std::find(cat_msgs_[cat].begin(), cat_msgs_[cat].end(), it);
+	auto hostIter = std::find(host_msgs_[host].begin(), host_msgs_[host].end(), it);
+	auto appIter = std::find(app_msgs_[app].begin(), app_msgs_[app].end(), it);
+	if (catIter != cat_msgs_[cat].end()) cat_msgs_[cat].erase(catIter);
+	if (hostIter != host_msgs_[host].end()) host_msgs_[host].erase(hostIter);
+	if (appIter != app_msgs_[app].end()) app_msgs_[app].erase(appIter);
+
+	if (app_msgs_[app].size() == 0) updateList<msg_iters_map_t>(lwApplication, app_msgs_);
+	if (cat_msgs_[cat].size() == 0) updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
+	if (host_msgs_[host].size() == 0) updateList<msg_iters_map_t>(lwHost, host_msgs_);
+
 
 	for (size_t d = 0; d < msgFilters_.size(); ++d)
 	{
 		bool hostMatch = msgFilters_[d].hostFilter.contains(it->host(), Qt::CaseInsensitive) || msgFilters_[d].hostFilter.size() == 0;
 		bool appMatch = msgFilters_[d].appFilter.contains(it->app(), Qt::CaseInsensitive) || msgFilters_[d].appFilter.size() == 0;
 		bool catMatch = msgFilters_[d].catFilter.contains(it->cat(), Qt::CaseInsensitive) || msgFilters_[d].catFilter.size() == 0;
+		bool sevMatch = it->sev() >= msgFilters_[d].sevThresh;
 
 		// Check to display the message
 		if (hostMatch && appMatch && catMatch)
 		{
 			auto filterIt = std::find(msgFilters_[d].msgs.begin(), msgFilters_[d].msgs.end(), it);
-			msgFilters_[d].msgs.erase(filterIt);
-			if (msgThresh)
+			if (filterIt != msgFilters_[d].msgs.end()) msgFilters_[d].msgs.erase(filterIt);
+
+			if (sevMatch)
 			{
 				if (++msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs))
 				{
+					lk.unlock();
 					displayMsg(d);
 				}
 			}
@@ -420,8 +431,9 @@ void msgViewerDlg::removeMsg(msgs_t::iterator it)
 
 }
 
-unsigned int msgViewerDlg::update_index(msgs_t::iterator it, bool deleteIt)
+unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 {
+	std::unique_lock<std::mutex> lk(updating_mutex_);
 	QString const& app = it->app();
 	QString const& cat = it->cat();
 	QString const& host = it->host();
@@ -432,28 +444,17 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it, bool deleteIt)
 	if (host_msgs_.find(host) == host_msgs_.end()) update |= LIST_HOST;
 	if (app_msgs_.find(app) == app_msgs_.end()) update |= LIST_APP;
 
-	if (!deleteIt)
-	{
 		cat_msgs_[cat].push_back(it);
 		host_msgs_[host].push_back(it);
 		app_msgs_[app].push_back(it);
-	}
-	else
-	{
-		auto catIter = std::find(cat_msgs_[cat].begin(), cat_msgs_[cat].end(), it);
-		auto hostIter = std::find(host_msgs_[host].begin(), host_msgs_[host].end(), it);
-		auto appIter = std::find(app_msgs_[app].begin(), app_msgs_[app].end(), it);
-		cat_msgs_[cat].erase(catIter);
-		host_msgs_[host].erase(hostIter);
-		app_msgs_[app].erase(appIter);
-	}
 
 	return update;
 }
 
 void msgViewerDlg::displayMsg(msgs_t::const_iterator it, int display)
 {
-	if (it->sev() < sevThresh) return;
+	if (it->sev() < msgFilters_[display].sevThresh) return;
+	std::unique_lock<std::mutex> lk(updating_mutex_);
 
 	msgFilters_[display].nDisplayMsgs++;
 	if (display == tabWidget->currentIndex())
@@ -467,6 +468,7 @@ void msgViewerDlg::displayMsg(msgs_t::const_iterator it, int display)
 
 void msgViewerDlg::displayMsg(int display)
 {
+	std::unique_lock<std::mutex> lk(updating_mutex_);
 	int n = 0;
 	msgFilters_[display].txtDisplay->clear();
 	msgFilters_[display].nDisplayMsgs = 0;
@@ -484,11 +486,10 @@ void msgViewerDlg::displayMsg(int display)
 	QString txt = "";
 	int i = 0, prog = 0;
 
-	updating = true;
 
 	for (; it != msgFilters_[display].msgs.end(); ++it, ++i)
 	{
-		if (it->get()->sev() >= sevThresh)
+		if (it->get()->sev() >= msgFilters_[display].sevThresh)
 		{
 			txt += it->get()->text(shortMode_);
 			++msgFilters_[display].nDisplayMsgs;
@@ -517,8 +518,6 @@ void msgViewerDlg::displayMsg(int display)
 	}
 
 	UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
-
-	updating = false;
 }
 
 //https://stackoverflow.com/questions/21955923/prevent-a-qtextedit-widget-from-scrolling-when-there-is-a-selection
@@ -744,6 +743,7 @@ void msgViewerDlg::setFilter()
 	filteredMessages.txtDisplay = txtDisplay;
 	filteredMessages.nDisplayMsgs = result.size();
 	filteredMessages.nDisplayedDeletedMsgs = 0;
+	filteredMessages.sevThresh = SINFO;
 	msgFilters_.push_back(filteredMessages);
 
 	tabWidget->addTab(newTab, newTabTitle);
@@ -776,6 +776,7 @@ void msgViewerDlg::exit()
 void msgViewerDlg::clear()
 {
 	int ret = QMessageBox::question(this, tr("Message Viewer"), tr("Are you sure you want to clear all received messages?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+	std::unique_lock<std::mutex> lk(updating_mutex_);
 	switch (ret)
 	{
 	case QMessageBox::Yes:
@@ -824,6 +825,7 @@ void msgViewerDlg::shortMode()
 
 void msgViewerDlg::changeSeverity(int sev)
 {
+	auto display = tabWidget->currentIndex();
 	switch (sev)
 	{
 	case SERROR:
@@ -841,47 +843,51 @@ void msgViewerDlg::changeSeverity(int sev)
 	default: setSevDebug();
 	}
 
-	updateDisplays();
+	displayMsg(display);
 }
 
 void msgViewerDlg::setSevError()
 {
-	sevThresh = SERROR;
+	auto display = tabWidget->currentIndex();
+	msgFilters_[display].sevThresh = SERROR;
 	btnError->setChecked(true);
 	btnWarning->setChecked(false);
 	btnInfo->setChecked(false);
 	btnDebug->setChecked(false);
-	vsSeverity->setValue(sevThresh);
+	vsSeverity->setValue(SERROR);
 }
 
 void msgViewerDlg::setSevWarning()
 {
-	sevThresh = SWARNING;
+	auto display = tabWidget->currentIndex();
+	msgFilters_[display].sevThresh = SWARNING;
 	btnError->setChecked(false);
 	btnWarning->setChecked(true);
 	btnInfo->setChecked(false);
 	btnDebug->setChecked(false);
-	vsSeverity->setValue(sevThresh);
+	vsSeverity->setValue(SWARNING);
 }
 
 void msgViewerDlg::setSevInfo()
 {
-	sevThresh = SINFO;
+	auto display = tabWidget->currentIndex();
+	msgFilters_[display].sevThresh = SINFO;
 	btnError->setChecked(false);
 	btnWarning->setChecked(false);
 	btnInfo->setChecked(true);
 	btnDebug->setChecked(false);
-	vsSeverity->setValue(sevThresh);
+	vsSeverity->setValue(SINFO);
 }
 
 void msgViewerDlg::setSevDebug()
 {
-	sevThresh = SDEBUG;
+	auto display = tabWidget->currentIndex();
+	msgFilters_[display].sevThresh = SDEBUG;
 	btnError->setChecked(false);
 	btnWarning->setChecked(false);
 	btnInfo->setChecked(false);
 	btnDebug->setChecked(true);
-	vsSeverity->setValue(sevThresh);
+	vsSeverity->setValue(SDEBUG);
 }
 
 void msgViewerDlg::renderMode()
@@ -990,6 +996,22 @@ void msgViewerDlg::tabWidgetCurrentChanged(int newTab)
 		{
 			items[0]->setSelected(true);
 		}
+	}
+
+	switch (msgFilters_[newTab].sevThresh)
+	{
+	case SDEBUG:
+		setSevDebug();
+		break;
+	case SINFO:
+		setSevInfo();
+		break;
+	case SWARNING:
+		setSevWarning();
+		break;
+	default:
+		setSevError();
+		break;
 	}
 }
 
