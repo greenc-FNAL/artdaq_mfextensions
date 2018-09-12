@@ -402,7 +402,7 @@ void msgViewerDlg::removeMsg(msgs_t::iterator it)
 			msgFilters_[d].msgs.erase(filterIt);
 			if (msgThresh)
 			{
-				if (++msgFilters_[d].nDisplayedDeletedMsgs > maxDeletedMsgs)
+				if (++msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs))
 				{
 					displayMsg(d);
 				}
