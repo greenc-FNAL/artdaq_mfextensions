@@ -262,7 +262,7 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	pset_to_throttle(thr_cat, e_thr_cat, thr_menu);
 
 	maxMsgs = conf.get<size_t>("max_message_buffer_size", 100000);
-	maxDeletedMsgs = conf.get<size_t>("max_displayed_deleted_messages", 1000);
+	maxDeletedMsgs = conf.get<size_t>("max_displayed_deleted_messages", 100000);
 }
 
 bool msgViewerDlg::msg_throttled(qt_mf_msg const& mfmsg)
@@ -412,7 +412,7 @@ void msgViewerDlg::removeMsg(msgs_t::iterator it)
 
 			if (sevMatch)
 			{
-				if (++msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs))
+				if (++msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs) && maxDeletedMsgs > 0)
 				{
 					lk.unlock();
 					displayMsg(d);

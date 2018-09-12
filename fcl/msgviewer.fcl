@@ -1,5 +1,5 @@
 max_message_buffer_size: 100000 # Set to 0 to store all messages
-max_displayed_deleted_messages: 1000 # Set to 0 to never reset displays based on deleted message count
+max_displayed_deleted_messages: 100000 # Set to 0 to never reset displays based on deleted message count
 
 suppress :
 {
