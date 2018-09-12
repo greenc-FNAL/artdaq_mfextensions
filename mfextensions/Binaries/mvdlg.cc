@@ -90,6 +90,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	, nSupMsgs(0)
 	, nThrMsgs(0)
 	, nFilters(0)
+	, nDeleted(0)
 	, simpleRender(true)
 	, sevThresh(SINFO)
 	, searchStr("")
@@ -264,6 +265,8 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	if (lvl == "INFO" || lvl == "info" || lvl == "1") { sevThresh = SINFO; }
 	if (lvl == "WARN" || lvl == "warn" || lvl == "2") { sevThresh = SWARNING; }
 	if (lvl == "ERROR" || lvl == "error" || lvl == "3") { sevThresh = SERROR; }
+
+	maxMsgs = conf.get<size_t>("max_message_buffer_size", 100000);
 }
 
 bool msgViewerDlg::msg_throttled(qt_mf_msg const& mfmsg)
@@ -348,6 +351,12 @@ void msgViewerDlg::onNewMsg(qt_mf_msg const& mfmsg)
 
 	// push the message to the message pool
 	msg_pool_.emplace_back(mfmsg);
+
+	while (maxMsgs > 0 && msg_pool_.size() > maxMsgs)
+	{
+		removeMsg(msg_pool_.begin());
+	}
+
 	msgs_t::iterator it = --msg_pool_.end();
 
 	// update corresponding lists of index
@@ -373,7 +382,44 @@ void msgViewerDlg::onNewMsg(qt_mf_msg const& mfmsg)
 	}
 }
 
-unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
+void msgViewerDlg::removeMsg(msgs_t::iterator it)
+{
+	update_index(it, true);
+
+	bool msgThresh = it->sev() >= sevThresh;
+
+	for (size_t d = 0; d < msgFilters_.size(); ++d)
+	{
+		bool hostMatch = msgFilters_[d].hostFilter.contains(it->host(), Qt::CaseInsensitive) || msgFilters_[d].hostFilter.size() == 0;
+		bool appMatch = msgFilters_[d].appFilter.contains(it->app(), Qt::CaseInsensitive) || msgFilters_[d].appFilter.size() == 0;
+		bool catMatch = msgFilters_[d].catFilter.contains(it->cat(), Qt::CaseInsensitive) || msgFilters_[d].catFilter.size() == 0;
+
+		// Check to display the message
+		if (hostMatch && appMatch && catMatch)
+		{
+			auto filterIt = std::find(msgFilters_[d].msgs.begin(), msgFilters_[d].msgs.end(), it);
+			msgFilters_[d].msgs.erase(filterIt);
+			if (msgThresh)
+			{
+				if (++msgFilters_[d].nDisplayedDeletedMsgs > 1000)
+				{
+					displayMsg(d);
+				}
+			}
+		}
+		if ((int)d == tabWidget->currentIndex())
+		{
+			lcdDisplayedDeleted->display(msgFilters_[d].nDisplayedDeletedMsgs);
+		}
+	}
+
+	msg_pool_.erase(it);
+	++nDeleted;
+	lcdDeletedCount->display(nDeleted);
+
+}
+
+unsigned int msgViewerDlg::update_index(msgs_t::iterator it, bool deleteIt)
 {
 	QString const& app = it->app();
 	QString const& cat = it->cat();
@@ -385,9 +431,21 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 	if (host_msgs_.find(host) == host_msgs_.end()) update |= LIST_HOST;
 	if (app_msgs_.find(app) == app_msgs_.end()) update |= LIST_APP;
 
-	cat_msgs_[cat].push_back(it);
-	host_msgs_[host].push_back(it);
-	app_msgs_[app].push_back(it);
+	if (!deleteIt)
+	{
+		cat_msgs_[cat].push_back(it);
+		host_msgs_[host].push_back(it);
+		app_msgs_[app].push_back(it);
+	}
+	else
+	{
+		auto catIter = std::find(cat_msgs_[cat].begin(), cat_msgs_[cat].end(), it);
+		auto hostIter = std::find(host_msgs_[host].begin(), host_msgs_[host].end(), it);
+		auto appIter = std::find(app_msgs_[app].begin(), app_msgs_[app].end(), it);
+		cat_msgs_[cat].erase(catIter);
+		host_msgs_[host].erase(hostIter);
+		app_msgs_[app].erase(appIter);
+	}
 
 	return update;
 }
@@ -411,6 +469,7 @@ void msgViewerDlg::displayMsg(int display)
 	int n = 0;
 	msgFilters_[display].txtDisplay->clear();
 	msgFilters_[display].nDisplayMsgs = 0;
+	msgFilters_[display].nDisplayedDeletedMsgs = 0;
 
 	msg_iters_t::const_iterator it;
 
@@ -683,6 +742,7 @@ void msgViewerDlg::setFilter()
 	filteredMessages.catFilter = catFilter;
 	filteredMessages.txtDisplay = txtDisplay;
 	filteredMessages.nDisplayMsgs = result.size();
+	filteredMessages.nDisplayedDeletedMsgs = 0;
 	msgFilters_.push_back(filteredMessages);
 
 	tabWidget->addTab(newTab, newTabTitle);
@@ -721,6 +781,7 @@ void msgViewerDlg::clear()
 		nMsgs = 0;
 		nSupMsgs = 0;
 		nThrMsgs = 0;
+		nDeleted = 0;
 		msg_pool_.clear();
 		host_msgs_.clear();
 		cat_msgs_.clear();
@@ -733,6 +794,7 @@ void msgViewerDlg::clear()
 			display.txtDisplay->clear();
 			display.msgs.clear();
 			display.nDisplayMsgs = 0;
+			display.nDisplayedDeletedMsgs = 0;
 		}
 
 		lcdMsgs->display(nMsgs);

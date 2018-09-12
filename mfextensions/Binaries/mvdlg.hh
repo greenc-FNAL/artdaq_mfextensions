@@ -103,10 +103,12 @@ private:
 
 	void updateDisplays();
 
+	void removeMsg(msgs_t::iterator it);
+
 	// test if the message is suppressed or throttled
 	bool msg_throttled(qt_mf_msg const& mfmsg);
 
-	unsigned int update_index(msgs_t::iterator it);
+	unsigned int update_index(msgs_t::iterator it, bool deleteIt = false);
 
 	// Update the list. Returns true if there's a change in the selection
 	// before and after the update. e.g., the selected entry has been deleted
@@ -138,6 +140,8 @@ private:
 	int nSupMsgs; // suppressed msgs
 	int nThrMsgs; // throttled msgs
 	int nFilters;
+	size_t maxMsgs; // Maximum number of messages to store
+	int nDeleted;
 
 	// Rendering messages in speed mode or full mode
 	bool simpleRender;
@@ -176,6 +180,7 @@ private:
 	struct MsgFilterDisplay
 	{
 		int nDisplayMsgs;
+		int nDisplayedDeletedMsgs;
 		msg_iters_t msgs;
 		QStringList hostFilter;
 		QStringList appFilter;

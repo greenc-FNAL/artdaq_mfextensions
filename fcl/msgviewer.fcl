@@ -1,5 +1,7 @@
 threshold: INFO # DEBUG, INFO, WARN, ERROR
 
+max_message_buffer_size: 100000 # Set to 0 to store all messages
+
 suppress :
 {
   hosts : [ ]
