@@ -267,6 +267,7 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	if (lvl == "ERROR" || lvl == "error" || lvl == "3") { sevThresh = SERROR; }
 
 	maxMsgs = conf.get<size_t>("max_message_buffer_size", 100000);
+	maxDeletedMsgs = conf.get<size_t>("max_displayed_deleted_messages", 1000);
 }
 
 bool msgViewerDlg::msg_throttled(qt_mf_msg const& mfmsg)
@@ -401,7 +402,7 @@ void msgViewerDlg::removeMsg(msgs_t::iterator it)
 			msgFilters_[d].msgs.erase(filterIt);
 			if (msgThresh)
 			{
-				if (++msgFilters_[d].nDisplayedDeletedMsgs > 1000)
+				if (++msgFilters_[d].nDisplayedDeletedMsgs > maxDeletedMsgs)
 				{
 					displayMsg(d);
 				}

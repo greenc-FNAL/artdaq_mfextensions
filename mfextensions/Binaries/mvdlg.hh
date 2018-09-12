@@ -141,6 +141,7 @@ private:
 	int nThrMsgs; // throttled msgs
 	int nFilters;
 	size_t maxMsgs; // Maximum number of messages to store
+	size_t maxDeletedMsgs; // Maximum number of deleted messages to display
 	int nDeleted;
 
 	// Rendering messages in speed mode or full mode
