@@ -52,6 +52,8 @@ public:
 	/// Default copy constructor
 	qt_mf_msg(const qt_mf_msg&) = default;
 
+	virtual ~qt_mf_msg() = default;
+
 	// get method
 	/// <summary>
 	/// Get the text of the message

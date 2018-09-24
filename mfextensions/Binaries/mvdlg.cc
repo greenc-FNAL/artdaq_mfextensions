@@ -392,9 +392,21 @@ void msgViewerDlg::removeMsg(msgs_t::iterator it)
 	if (hostIter != host_msgs_[host].end()) host_msgs_[host].erase(hostIter);
 	if (appIter != app_msgs_[app].end()) app_msgs_[app].erase(appIter);
 
-	if (app_msgs_[app].size() == 0) updateList<msg_iters_map_t>(lwApplication, app_msgs_);
-	if (cat_msgs_[cat].size() == 0) updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
-	if (host_msgs_[host].size() == 0) updateList<msg_iters_map_t>(lwHost, host_msgs_);
+	if (app_msgs_[app].size() == 0)
+	{
+		app_msgs_.erase(app);
+		updateList<msg_iters_map_t>(lwApplication, app_msgs_);
+	}
+	if (cat_msgs_[cat].size() == 0)
+	{
+		cat_msgs_.erase(cat);
+		updateList<msg_iters_map_t>(lwCategory, cat_msgs_);
+	}
+	if (host_msgs_[host].size() == 0)
+	{
+		host_msgs_.erase(host);
+		updateList<msg_iters_map_t>(lwHost, host_msgs_);
+	}
 
 
 	for (size_t d = 0; d < msgFilters_.size(); ++d)
