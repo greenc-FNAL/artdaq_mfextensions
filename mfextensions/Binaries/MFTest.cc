@@ -1,5 +1,10 @@
 //#define NDEBUG
+
+#if MESSAGEFACILITY_HEX_VERSION < 0x20300
 #define ML_DEBUG  // always enable debug
+#else
+#define MF_DEBUG
+#endif
 
 #include <stdlib.h>
 #include <cstdio>
@@ -66,7 +71,11 @@ int main() {
     mf::LogError("catError") << "Error information. " << i;
     mf::LogWarning("catWarning") << "Warning information. " << i;
     mf::LogInfo("catInfo") << "Info information. " << i;
+#if MESSAGEFACILITY_HEX_VERSION < 0x20300
     LOG_DEBUG("debug") << "DEBUG information. " << i;
+#else
+    MF_LOG_DEBUG("debug") << "DEBUG information. " << i;
+#endif
 
     // sleep(1);
     usleep(400000);
