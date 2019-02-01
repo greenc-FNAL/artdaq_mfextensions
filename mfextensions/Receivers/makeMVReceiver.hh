@@ -8,12 +8,9 @@
 #include <memory>
 #include <string>
 
-namespace mfviewer
-{
-	class MVReceiver;
+namespace mfviewer {
+class MVReceiver;
 
-	std::unique_ptr<MVReceiver>
-		makeMVReceiver(std::string const& receiver_plugin_spec,
-					   fhicl::ParameterSet const& ps);
-}
+std::unique_ptr<MVReceiver> makeMVReceiver(std::string const& receiver_plugin_spec, fhicl::ParameterSet const& ps);
+}  // namespace mfviewer
 #endif /* mfextensions_Plugins_makeMVReceiver_h */

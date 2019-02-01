@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_03_02a
+parent artdaq_mfextensions	v1_03_03
 defaultqual	e15:s64
 
 # These optional lines define the installed directories where
@@ -17,12 +17,12 @@ bindir      fq_dir      bin
 
 #
 product		version		optional
+messagefacility v2_02_04        s73
 messagefacility v2_02_01        s67
 messagefacility v2_01_06        s65
 messagefacility v2_01_06        s64
-messagefacility v2_00_02        s50
 qt              v5_10_1a
-TRACE           v3_13_07        -       only_for_build
+TRACE           v3_13_11        -       only_for_build
 cetbuildtools	v7_02_01	-	only_for_build
 end_product_list
 
@@ -30,6 +30,10 @@ end_product_list
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier		messagefacility  	  qt    TRACE   notes
+c2:s73:debug      	c2:debug    	          c2   -nq-    -std=c++17
+c2:s73:prof      	c2:prof    	          c2   -nq-    -std=c++17
+e17:s73:debug      	e17:debug    	          e17   -nq-    -std=c++17
+e17:s73:prof      	e17:prof    	          e17   -nq-    -std=c++17
 c2:s67:debug      	c2:debug    	          c2   -nq-    -std=c++17
 c2:s67:prof      	c2:prof    	          c2   -nq-    -std=c++17
 e17:s67:debug      	e17:debug    	          e17   -nq-    -std=c++17
@@ -44,8 +48,6 @@ c2:s64:debug      	c2:debug    	          c2   -nq-    -std=c++17
 c2:s64:prof      	c2:prof    	          c2   -nq-    -std=c++17
 e15:s64:debug      	e15:debug    	          e15   -nq-    -std=c++14
 e15:s64:prof      	e15:prof    	          e15   -nq-    -std=c++14
-e14:s50:debug      	e14:debug    	          e14   -nq-    -std=c++14
-e14:s50:prof      	e14:prof    	          e14   -nq-    -std=c++14
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:
