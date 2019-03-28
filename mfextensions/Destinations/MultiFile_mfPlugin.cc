@@ -18,20 +18,35 @@ using mf::service::ELdestination;
 /// Message Facility Destination which automatically opens files and sorts messages into them based on given criteria
 /// </summary>
 class ELMultiFileOutput : public ELdestination {
+	public:
+  /**
+   * \brief Configuration parameters for ELMultiFileOutput
+   */
   struct Config {
+	  /// ELdestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
-    fhicl::Atom<std::string> baseDir{fhicl::Name{"base_directory"},
-                                     fhicl::Comment{"Directory where log files will be created"}, "/tmp"};
-    fhicl::Atom<bool> append{fhicl::Name{"append"}, fhicl::Comment{"Append to existing log files"}, true};
-    fhicl::Atom<bool> useHostname{fhicl::Name{"use_hostname"},
-                                  fhicl::Comment{"Use the hostname when generating log file names"}, true};
-    fhicl::Atom<bool> useApplication{fhicl::Name{"use_application"},
-                                     fhicl::Comment{"Use the application field when generating log file names"}, true};
-    fhicl::Atom<bool> useCategory{fhicl::Name{"use_category"},
-                                  fhicl::Comment{"Use the category field when generating log file names"}, false};
-    fhicl::Atom<bool> useModule{fhicl::Name{"use_module"},
+	/// "base_directory" (Default: "/tmp"): Directory where log files will be created
+    fhicl::Atom<std::string> baseDir = fhicl::Atom<std::string>{
+        fhicl::Name{"base_directory"}, fhicl::Comment{"Directory where log files will be created"}, "/tmp"};
+    /// "append" (Default: true): Append to existing log files
+    fhicl::Atom<bool> append =
+        fhicl::Atom<bool>{fhicl::Name{"append"}, fhicl::Comment{"Append to existing log files"}, true};
+    /// "use_hostname" (Default: true): Use the hostname when generating log file names
+    fhicl::Atom<bool> useHostname = fhicl::Atom<bool>{
+        fhicl::Name{"use_hostname"}, fhicl::Comment{"Use the hostname when generating log file names"}, true};
+    /// "use_application" (Default: true): Use the application field when generating log file names
+    fhicl::Atom<bool> useApplication =
+        fhicl::Atom<bool>{fhicl::Name{"use_application"},
+                          fhicl::Comment{"Use the application field when generating log file names"}, true};
+    /// "use_category" (Default: false): Use the category field when generating log file names
+    fhicl::Atom<bool> useCategory = fhicl::Atom<bool>{
+        fhicl::Name{"use_category"}, fhicl::Comment{"Use the category field when generating log file names"}, false};
+    /// "use_module" (Default: false): Use the module field when generating log file names
+    fhicl::Atom<bool> useModule = fhicl::Atom<bool>{
+        fhicl::Name{"use_module"},
                                 fhicl::Comment{"Use the module field when generating log file names"}, false};
   };
+  /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
 
  public:
