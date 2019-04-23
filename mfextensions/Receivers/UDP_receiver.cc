@@ -143,7 +143,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input) {
       if (++it != tokens.end()) {
         seqNum = std::stoi(*it);
       }
-    } catch (std::invalid_argument e) {
+    } catch (const std::invalid_argument& e) {
       it = prevIt;
     }
     if (++it != tokens.end()) {
@@ -166,7 +166,7 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input) {
       if (++it != tokens.end()) {
         pid = std::stol(*it);
       }
-    } catch (std::invalid_argument e) {
+    } catch (const std::invalid_argument& e) {
       it = prevIt;
     }
     if (++it != tokens.end()) {
