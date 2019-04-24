@@ -42,23 +42,35 @@ using mf::service::ELdestination;
 /// Formats messages into a delimited string and sends via UDP
 /// </summary>
 class ELUDP : public ELdestination {
+ public:
+  /**
+   * \brief Configuration Parameters for ELUDP
+   */
   struct Config {
+	  /// ELDestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
-    fhicl::Atom<int> error_max{
+	/// "error_turnoff_threshold" (Default: 0): Number of errors before turning off destination (default: 0, don't turn off)"
+    fhicl::Atom<int> error_max = fhicl::Atom<int>{
         fhicl::Name{"error_turnoff_threshold"},
         fhicl::Comment{"Number of errors before turning off destination (default: 0, don't turn off)"}, 0};
-    fhicl::Atom<int> error_report{fhicl::Name{"error_report_backoff_factor"},
+	/// "error_report_backoff_factor" (Default: 100): Print an error message every N errors
+    fhicl::Atom<int> error_report = fhicl::Atom<int>{fhicl::Name{"error_report_backoff_factor"},
                                   fhicl::Comment{"Print an error message every N errors"}, 100};
-    fhicl::Atom<std::string> host{fhicl::Name{"host"}, fhicl::Comment{"Address to send messages to"}, "227.128.12.27"};
-    fhicl::Atom<int> port{fhicl::Name{"port"}, fhicl::Comment{"Port to send messages to"}, 5140};
-    fhicl::Atom<bool> multicast_enabled{fhicl::Name{"multicast_enabled"},
+	/// "host" (Default: "227.128.12.27"): Address to send messages to
+    fhicl::Atom<std::string> host =
+        fhicl::Atom<std::string>{fhicl::Name{"host"}, fhicl::Comment{"Address to send messages to"}, "227.128.12.27"};
+	/// "port" (Default: 5140): Port to send messages to
+    fhicl::Atom<int> port = fhicl::Atom<int>{fhicl::Name{"port"}, fhicl::Comment{"Port to send messages to"}, 5140};
+	/// "multicast_enabled" (Default: false): Whether messages should be sent via multicast
+    fhicl::Atom<bool> multicast_enabled = fhicl::Atom<bool>{
+        fhicl::Name{"multicast_enabled"},
                                         fhicl::Comment{"Whether messages should be sent via multicast"}, false};
-    /// "multicast_interface_ip" (Default: "0.0.0.0"): Use this hostname for multicast output (to assign to the proper
-    /// NIC)
-    fhicl::Atom<std::string> output_address{
+    /// "multicast_interface_ip" (Default: "0.0.0.0"): Use this hostname for multicast output (to assign to the proper NIC)
+    fhicl::Atom<std::string> output_address = fhicl::Atom<std::string>{
         fhicl::Name{"multicast_interface_ip"},
         fhicl::Comment{"Use this hostname for multicast output(to assign to the proper NIC)"}, "0.0.0.0"};
   };
+  /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
 
  public:

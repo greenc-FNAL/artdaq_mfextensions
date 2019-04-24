@@ -26,11 +26,19 @@ using mf::ErrorObj;
 /// Parser-Friendly Message Facility destination plugin
 /// </summary>
 class ELFriendly : public ELostreamOutput {
+public:
+  /**
+   * \brief Configuration Parameters for ELFriendly
+   */
   struct Config {
+	  /// Configuration parameters for ELostreamOutput
     fhicl::TableFragment<ELostreamOutput::Config> elOstrConfig;
-    fhicl::Atom<std::string> delimiter{fhicl::Name{"field_delimiter"},
+	/// "field_delimiter" (Default: "  "): String to print between each message field
+    fhicl::Atom<std::string> delimiter = fhicl::Atom<std::string>{
+        fhicl::Name{"field_delimiter"},
                                        fhicl::Comment{"String to print between each message field"}, "  "};
   };
+  /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
 
  public:
