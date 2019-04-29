@@ -263,7 +263,7 @@ std::string ELSMTP::to_html(std::string msgString, const ErrorObj& msg) {
 // Message router ( overriddes ELdestination::routePayload )
 //======================================================================
 void ELSMTP::routePayload(const std::ostringstream& oss, const ErrorObj& msg) {
-  std::unique_lock<std::mutex>(message_mutex_);
+  std::lock_guard<std::mutex> lk(message_mutex_);
   message_contents_ << to_html(oss.str(), msg);
 
   if (!sending_thread_active_) {
@@ -282,7 +282,7 @@ void ELSMTP::send_message_() {
 
   std::string payload;
   {
-    std::unique_lock<std::mutex> lk(message_mutex_);
+    std::lock_guard<std::mutex> lk(message_mutex_);
     payload = message_contents_.str();
     message_contents_.str("");
   }
