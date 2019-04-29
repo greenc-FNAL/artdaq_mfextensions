@@ -38,28 +38,53 @@ using mf::service::ELdestination;
 /// SMTP Message Facility destination plugin (Using libcurl)
 /// </summary>
 class ELSMTP : public ELdestination {
-  struct Config {
+ public:
+  /**
+   * \brief Configuration parameters for ELSMTP
+   */
+	  struct Config {
+		  /// Array of strings
     using strings_t = fhicl::Sequence<std::string>::default_type;
-
+	/// ELDestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
-    fhicl::Atom<std::string> host{fhicl::Name{"host"}, fhicl::Comment{"SMTP Server hostname"}, "smtp.fnal.gov"};
-    fhicl::Atom<int> port{fhicl::Name{"port"}, fhicl::Comment{"SMTP Server port"}, 25};
-    fhicl::Sequence<std::string> to{fhicl::Name{"to_addresses"},
+	/// "host" (Default: "smtp.fnal.gov"): SMTP Server hostname
+    fhicl::Atom<std::string> host = fhicl::Atom<std::string>{fhicl::Name{"host"}, fhicl::Comment{"SMTP Server hostname"}, "smtp.fnal.gov"};
+	/// "port" (Default: 25): SMTP Server port
+    fhicl::Atom<int> port = fhicl::Atom<int>{fhicl::Name{"port"}, fhicl::Comment{"SMTP Server port"}, 25};
+    /// "to_addresses" (Default: {}): The list of email addresses that SMTP mfPlugin should sent to
+    fhicl::Sequence<std::string> to = fhicl::Sequence<std::string>{
+        fhicl::Name{"to_addresses"},
                                     fhicl::Comment{"The list of email addresses that SMTP mfPlugin should sent to"},
                                     strings_t{}};
-    fhicl::Atom<std::string> from{fhicl::Name{"from_address"}, fhicl::Comment{"Source email address"}};
-    fhicl::Atom<std::string> subject{fhicl::Name{"subject"}, fhicl::Comment{"Subject of the email message"},
+    /// "from_address" (REQUIRED): Source email address
+    fhicl::Atom<std::string> from =
+        fhicl::Atom<std::string>{fhicl::Name{"from_address"}, fhicl::Comment{"Source email address"}};
+    /// "subject" (Default: "MessageFacility SMTP Message Digest"): Subject of the email message
+    fhicl::Atom<std::string> subject = fhicl::Atom<std::string>{
+        fhicl::Name{"subject"}, fhicl::Comment{"Subject of the email message"},
                                      "MessageFacility SMTP Message Digest"};
-    fhicl::Atom<std::string> messageHeader{fhicl::Name{"message_header"},
+    /// "message_header" (Default: ""): String to preface messages with in email body
+    fhicl::Atom<std::string> messageHeader = fhicl::Atom<std::string>{
+        fhicl::Name{"message_header"},
                                            fhicl::Comment{"String to preface messages with in email body"}, ""};
-    fhicl::Atom<bool> useSmtps{fhicl::Name{"use_smtps"}, fhicl::Comment{"Use SMTPS protocol"}, false};
-    fhicl::Atom<std::string> user{fhicl::Name{"smtp_username"}, fhicl::Comment{"Username for SMTP server"}, ""};
-    fhicl::Atom<std::string> pw{fhicl::Name{"smtp_password"}, fhicl::Comment{"Password for SMTP server"}, ""};
-    fhicl::Atom<bool> verifyCert{fhicl::Name{"verify_host_ssl_certificate"},
+    /// "use_smtps" (Default: false): Use SMTPS protocol
+    fhicl::Atom<bool> useSmtps =
+        fhicl::Atom<bool>{fhicl::Name{"use_smtps"}, fhicl::Comment{"Use SMTPS protocol"}, false};
+    /// "smtp_username" (Default: ""): Username for SMTP server
+    fhicl::Atom<std::string> user =
+        fhicl::Atom<std::string>{fhicl::Name{"smtp_username"}, fhicl::Comment{"Username for SMTP server"}, ""};
+    /// "smtp_password" (Default: ""): Password for SMTP server
+    fhicl::Atom<std::string> pw =
+        fhicl::Atom<std::string>{fhicl::Name{"smtp_password"}, fhicl::Comment{"Password for SMTP server"}, ""};
+    /// "verify_host_ssl_certificate" (Default: true): Whether to run full SSL verify on SMTP server in SMTPS mode
+    fhicl::Atom<bool> verifyCert =
+        fhicl::Atom<bool>{fhicl::Name{"verify_host_ssl_certificate"},
                                  fhicl::Comment{"Whether to run full SSL verify on SMTP server in SMTPS mode"}, true};
-    fhicl::Atom<size_t> sendInterval{fhicl::Name{"email_send_interval_seconds"},
-                                     fhicl::Comment{"Only send email every N seconds"}, 15};
+    /// "email_send_interval_seconds" (Default: 15): Only send email every N seconds
+    fhicl::Atom<size_t> sendInterval = fhicl::Atom<size_t>{fhicl::Name{"email_send_interval_seconds"},
+                                                                fhicl::Comment{"Only send email every N seconds"}, 15};
   };
+	  /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
 
  public:
@@ -238,7 +263,7 @@ std::string ELSMTP::to_html(std::string msgString, const ErrorObj& msg) {
 // Message router ( overriddes ELdestination::routePayload )
 //======================================================================
 void ELSMTP::routePayload(const std::ostringstream& oss, const ErrorObj& msg) {
-  std::unique_lock<std::mutex>(message_mutex_);
+  std::lock_guard<std::mutex> lk(message_mutex_);
   message_contents_ << to_html(oss.str(), msg);
 
   if (!sending_thread_active_) {
@@ -257,7 +282,7 @@ void ELSMTP::send_message_() {
 
   std::string payload;
   {
-    std::unique_lock<std::mutex> lk(message_mutex_);
+    std::lock_guard<std::mutex> lk(message_mutex_);
     payload = message_contents_.str();
     message_contents_.str("");
   }
