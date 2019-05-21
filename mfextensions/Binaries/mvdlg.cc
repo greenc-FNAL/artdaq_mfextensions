@@ -108,6 +108,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 
   // slots
   connect(btnPause, SIGNAL(clicked()), this, SLOT(pause()));
+  connect(btnScrollToBottom, SIGNAL(clicked()), this, SLOT(scrollToBottom()));
   connect(btnExit, SIGNAL(clicked()), this, SLOT(exit()));
   connect(btnClear, SIGNAL(clicked()), this, SLOT(clear()));
 
@@ -491,10 +492,14 @@ void msgViewerDlg::UpdateTextAreaDisplay(QString text, QTextEdit* widget) {
   const bool is_scrolled_down =
       old_scrollbar_value >= widget->verticalScrollBar()->maximum() * 0.95;  // At least 95% scrolled down
 
+  if (!paused && !is_scrolled_down) {
+    pause();
+  }
+
   // Insert the text at the position of the cursor (which is the end of the document).
   widget->append(text);
 
-  if (old_cursor.hasSelection() || !is_scrolled_down) {
+  if (old_cursor.hasSelection() || paused) {
     // The user has selected text or scrolled away from the bottom: maintain position.
     widget->setTextCursor(old_cursor);
     widget->verticalScrollBar()->setValue(old_scrollbar_value);
@@ -504,6 +509,15 @@ void msgViewerDlg::UpdateTextAreaDisplay(QString text, QTextEdit* widget) {
     widget->verticalScrollBar()->setValue(widget->verticalScrollBar()->maximum());
     widget->horizontalScrollBar()->setValue(0);
   }
+}
+
+void msgViewerDlg::scrollToBottom() {
+  int display = tabWidget->currentIndex();
+  msgFilters_[display].txtDisplay->moveCursor(QTextCursor::End);
+  msgFilters_[display].txtDisplay->verticalScrollBar()->setValue(
+      msgFilters_[display].txtDisplay->verticalScrollBar()->maximum());
+  msgFilters_[display].txtDisplay->horizontalScrollBar()->setValue(0);
+
 }
 
 void msgViewerDlg::updateDisplays() {
@@ -695,11 +709,12 @@ void msgViewerDlg::setFilter() {
 void msgViewerDlg::pause() {
   if (!paused) {
     paused = true;
-    btnPause->setText("Resume");
+    btnPause->setText("Resume Scrolling");
     // QMessageBox::about(this, "About MsgViewer", "Message receiving paused ...");
   } else {
     paused = false;
-    btnPause->setText("Pause");
+    btnPause->setText("Pause Scrolling");
+    scrollToBottom();
   }
 }
 
