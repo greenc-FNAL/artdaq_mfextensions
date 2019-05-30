@@ -56,7 +56,7 @@ int ResolveHost(char const* host_in, in_addr& addr) {
   }
   TLOG(TLVL_INFO) << "Resolving host " << host;
 
-  bzero((char*)&addr, sizeof(addr));
+  memset(&addr, 0, sizeof(addr));
 
   if (regex_match(host.c_str(), mm, std::regex("\\d+(\\.\\d+){3}")))
     inet_aton(host.c_str(), &addr);
@@ -95,7 +95,7 @@ int GetInterfaceForNetwork(char const* host_in, in_addr& addr) {
   }
   TLOG(TLVL_INFO) << "Resolving ip " << host;
 
-  bzero((char*)&addr, sizeof(addr));
+  memset(&addr, 0, sizeof(addr));
 
   if (regex_match(host.c_str(), mm, std::regex("\\d+(\\.\\d+){3}"))) {
     in_addr desired_host;
@@ -178,7 +178,7 @@ int ResolveHost(char const* host_in, int dflt_port, sockaddr_in& sin) {
 
   if (host == "localhost") host = "127.0.0.1";
 
-  bzero((char*)&sin, sizeof(sin));
+  memset(&sin, 0, sizeof(sin));
   sin.sin_family = AF_INET;
   sin.sin_port = htons(port);  // just a guess at an open port
 
