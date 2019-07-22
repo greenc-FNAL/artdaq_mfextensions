@@ -15,6 +15,7 @@
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #endif
 
+#define TRACE_NAME "MessageViewer"
 #include "trace.h"
 
 #if GCC_VERSION >= 701000 || defined(__clang__)
