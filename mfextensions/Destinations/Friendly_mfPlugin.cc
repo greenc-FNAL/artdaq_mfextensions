@@ -13,9 +13,6 @@
 #include <iostream>
 #include <memory>
 
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // format changed to format_ for s67
-#define format_ format
-#endif
 
 namespace mfplugins {
 using namespace mf::service;
@@ -90,9 +87,6 @@ void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 
 // Output the prologue:
 //
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // format changed to format_ for s67
-  format_.preambleMode = true;
-#endif
 
   auto const& xid = msg.xid();
 
@@ -180,9 +174,6 @@ void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg) {
   if (!format_.want(TEXT)) return;
 
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // format changed to format_ for s67
-  format_.preambleMode = false;
-#endif
   auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
   auto it = msg.items().cbegin();
 
