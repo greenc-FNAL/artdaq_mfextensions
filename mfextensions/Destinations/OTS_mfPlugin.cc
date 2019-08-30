@@ -42,7 +42,8 @@ class ELOTS : public ELdestination {
     /// ELDestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
     fhicl::Atom<std::string> format_string = fhicl::Atom<std::string>{
-        fhicl::Name{"format_string"}, fhicl::Comment{"Format specifier for printing to console. %% => '%' ... "}, ""};
+        fhicl::Name{"format_string"}, fhicl::Comment{"Format specifier for printing to console. %% => '%' ... "},
+		"%L:%N:%f [%u]	%m"};
   };
   /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
@@ -86,6 +87,7 @@ class ELOTS : public ELdestination {
   std::string hostname_;
   std::string hostaddr_;
   std::string app_;
+  std::string format_string_;
 };
 
 // END DECLARATION
@@ -96,7 +98,11 @@ class ELOTS : public ELdestination {
 // ELOTS c'tor
 //======================================================================
 
-ELOTS::ELOTS(Parameters const& pset) : ELdestination(pset().elDestConfig()), pid_(static_cast<long>(getpid())) {
+ELOTS::ELOTS(Parameters const& pset)
+	: ELdestination(pset().elDestConfig()),
+	  pid_(static_cast<long>(getpid())),
+	  format_string_(pset().format_string())
+{
   // hostname
   char hostname_c[1024];
   hostname_ = (gethostname(hostname_c, 1023) == 0) ? hostname_c : "Unkonwn Host";
@@ -186,17 +192,34 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
   auto id = xid.id();
   auto module = xid.module();
   auto app = app_;
+  char *cp = &format_string_[0];
 
-  oss << format_.timestamp(msg.timestamp()) << ": ";  // timestamp
-  oss << app << " (";                                 // application
-  oss << pid_ << ") ";
-  oss << hostname_ << " (";                // host name
-  oss << hostaddr_ << "): ";               // host address
-  oss << xid.severity().getName() << "|";  // severity
-  oss << id << "|";                        // category
+  for (; *cp; ++cp) {
+	  if (*cp != '%') {
+		  oss << *cp;
+		  continue;
+	  }
+	  if (*++cp == '\0') { // inc pas '%' and check if end
+		  // ending '%' gets printed
+		  oss << *cp;
+		  break; // done
+	  }
+	  switch (*cp) {
+	  case 'A':oss<<app;break;                               // application
+	  case 'a':oss<<hostaddr_;break;                         // host address
+	  case 'f':oss<<msg.filename();break;                    // filename
+	  case 'h':oss<<hostname_;break;                         // host name
+	  case 'L':oss<<xid.severity().getName();break;          // severity
+	  case 'm':break;
+	  case 'N':oss<<id;break;                                // category
                                            // oss << mf::GetIteration() << "|";  // run/event no #pre-events
                                            // oss << module << "|";              // module name # Early
-  oss << msg.filename() << ":[" << std::to_string(msg.lineNumber()) << "]: ";
+	  case 'P':oss<<pid_;break;                              // processID
+	  case 'T':oss<<format_.timestamp(msg.timestamp());break;// timestamp
+	  case 'u':oss<<std::to_string(msg.lineNumber());break;  // linenumber
+	  default: oss<<'%'<<*cp;break;        // unknown - just print it w/ it's '%'
+	  }
+  }
 }
 
 //======================================================================

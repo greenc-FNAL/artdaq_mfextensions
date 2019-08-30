@@ -116,6 +116,7 @@ destinations : {\n\
 int main(  int	argc, char *argv[] )
 {
 	setenv( "TRACE_MSG_MAX", "0", 0 );
+    setenv( "TRACE_LIMIT_MS", "5,50,500", 0 ); // equiv to TRACE_CNTL( "limit_ms", 5L, 50L, 500L )
 	TRACE_CNTL( "reset" );
 	fhicl::ParameterSet pset;
 	if (argc == 2 && strcmp(argv[1],"test")==0) {
