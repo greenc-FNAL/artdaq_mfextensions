@@ -160,5 +160,8 @@ int main(  int	argc, char *argv[] )
 	for (auto ii=0; ii<1000; ++ii)
 		TRACEN_( TRACE_NAME, 1, "this is a TRACE_ " << ii );
 	TRACE( 1, "end TRACE" );
+
+	for (auto ii=0; ii<2; ++ii)
+		::mf::LogTrace{"simply",__FILE__,__LINE__} << "this is a test";
 	return (0);
 }   // main
