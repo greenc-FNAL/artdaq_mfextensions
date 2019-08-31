@@ -11,6 +11,8 @@ destinations : {
 	type: OTS
 	threshold: DEBUG
 	#format_string:"%T %L:%N:%f [%u]	%m"
+	format_string:"%%MSG-%s %N: %d %T %r %f:%u\n%m\n%%MSG"
+	#filename_delimit:"/srcs/"
 	format: { timestamp: "%FT%T%z" }
     }
 }

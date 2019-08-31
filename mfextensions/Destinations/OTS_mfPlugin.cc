@@ -44,6 +44,9 @@ class ELOTS : public ELdestination {
     fhicl::Atom<std::string> format_string = fhicl::Atom<std::string>{
         fhicl::Name{"format_string"}, fhicl::Comment{"Format specifier for printing to console. %% => '%' ... "},
 		"%L:%N:%f [%u]	%m"};
+    fhicl::Atom<std::string> filename_delimit = fhicl::Atom<std::string>{
+        fhicl::Name{"filename_delimit"}, fhicl::Comment{"Grab path after this. \"/src/\" /x/srcs/y/z.cc => y/z.cc"},
+		"/"};
   };
   /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
@@ -88,6 +91,7 @@ class ELOTS : public ELdestination {
   std::string hostaddr_;
   std::string app_;
   std::string format_string_;
+  std::string filename_delimit_;
 };
 
 // END DECLARATION
@@ -101,7 +105,8 @@ class ELOTS : public ELdestination {
 ELOTS::ELOTS(Parameters const& pset)
 	: ELdestination(pset().elDestConfig()),
 	  pid_(static_cast<long>(getpid())),
-	  format_string_(pset().format_string())
+	  format_string_(pset().format_string()),
+	  filename_delimit_(pset().filename_delimit())
 {
   // hostname
   char hostname_c[1024];
@@ -152,18 +157,6 @@ ELOTS::ELOTS(Parameters const& pset)
     }
   }
 
-#if 0
-		// get process name from '/proc/pid/exe'
-		std::string exe;
-		std::ostringstream pid_ostr;
-		pid_ostr << "/proc/" << pid_ << "/exe";
-		exe = realpath(pid_ostr.str().c_str(), NULL);
-
-		size_t end = exe.find('\0');
-		size_t start = exe.find_last_of('/', end);
-
-		app_ = exe.substr(start + 1, end - start - 1);
-#else
   // get process name from '/proc/pid/cmdline'
   std::stringstream ss;
   ss << "//proc//" << pid_ << "//cmdline";
@@ -180,7 +173,6 @@ ELOTS::ELOTS(Parameters const& pset)
   size_t start = procinfo.find_last_of('/', end);
 
   app_ = procinfo.substr(start + 1, end - start - 1);
-#endif
 }
 
 //======================================================================
@@ -193,6 +185,8 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
   auto module = xid.module();
   auto app = app_;
   char *cp = &format_string_[0];
+  char sev;
+  std::ostringstream tmposs;
 
   for (; *cp; ++cp) {
 	  if (*cp != '%') {
@@ -207,17 +201,27 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 	  switch (*cp) {
 	  case 'A':oss<<app;break;                               // application
 	  case 'a':oss<<hostaddr_;break;                         // host address
-	  case 'f':oss<<msg.filename();break;                    // filename
+	  case 'd':oss<<module;break;                            // module name # Early
+	  case 'f':                                              // filename
+		  if (filename_delimit_.size()==0)      oss<<msg.filename();
+		  else if (filename_delimit_.size()==1) oss<<(strrchr(&msg.filename()[0],filename_delimit_[0]) ? strrchr(&msg.filename()[0],filename_delimit_[0])+1 : msg.filename());
+		  else                                  oss<< (strstr(&msg.filename()[0],&filename_delimit_[0]) ? strstr(&msg.filename()[0],&filename_delimit_[0])+filename_delimit_.size() : msg.filename());
+		  break;
 	  case 'h':oss<<hostname_;break;                         // host name
 	  case 'L':oss<<xid.severity().getName();break;          // severity
-	  case 'm':break;
+	  case 'm':
+		  for (auto const& val : msg.items()) tmposs << val; // Print the contents.
+		  if (tmposs.str().compare(0, 1, "\n")==0) tmposs.str().erase(0, 1); // remove leading "\n" if present
+		  oss << tmposs.str();
+		  break;
 	  case 'N':oss<<id;break;                                // category
-                                           // oss << mf::GetIteration() << "|";  // run/event no #pre-events
-                                           // oss << module << "|";              // module name # Early
 	  case 'P':oss<<pid_;break;                              // processID
+	  case 'r':oss<< mf::GetIteration();break;               // run/iteration/event no #pre-events
+	  case 's':sev=xid.severity().getName()[0]|0x20;oss<<sev;break;// severity lower case
 	  case 'T':oss<<format_.timestamp(msg.timestamp());break;// timestamp
 	  case 'u':oss<<std::to_string(msg.lineNumber());break;  // linenumber
-	  default: oss<<'%'<<*cp;break;        // unknown - just print it w/ it's '%'
+	  case '%':oss<<'%';break;                               // a '%' character
+	  default: oss<<'%'<<*cp;break;                          // unknown - just print it w/ it's '%'
 	  }
   }
 }
@@ -225,17 +229,8 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 //======================================================================
 // Message filler ( overriddes ELdestination::fillUsrMsg )
 //======================================================================
-void ELOTS::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg) {
-  std::ostringstream tmposs;
-  // Print the contents.
-  for (auto const& val : msg.items()) {
-    tmposs << val;
-  }
-
-  // remove leading "\n" if present
-  const std::string& usrMsg = !tmposs.str().compare(0, 1, "\n") ? tmposs.str().erase(0, 1) : tmposs.str();
-
-  oss << usrMsg;
+void ELOTS::fillUsrMsg(std::ostringstream& oss __attribute__((__unused__)), const ErrorObj& msg __attribute__((__unused__))) {
+	return; // UsrMsg filled above
 }
 
 //======================================================================

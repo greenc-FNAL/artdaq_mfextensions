@@ -150,6 +150,8 @@ int main(  int	argc, char *argv[] )
 
 	TLOG_ERROR("mf_test_category") << "hello - this is an mf::LogError(\"mf_test_category\")";
 	mf::LogAbsolute("abs_category/id") << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
+	mf::LogAbsolute("abs_category/id",__FILE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
+	mf::LogAbsolute("abs_category/id",__FILE__,__LINE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 
 	TRACE( 1,"start 1000 LOG_DEBUG" );
 	for (auto ii=0; ii<1000; ++ii)
