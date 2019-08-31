@@ -148,7 +148,8 @@ int main(  int	argc, char *argv[] )
 
 	// else total mf default
 
-	TLOG_ERROR("mf_test_category") << "hello - this is an mf::LogError(\"mf_test_category\")";
+	TRACE( 1, "\nHello\n" );
+	TLOG_ERROR("mf_test_category") << "hello - this is an mf::LogError(\"mf_test_category\")\n";
 	mf::LogAbsolute("abs_category/id") << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 	mf::LogAbsolute("abs_category/id",__FILE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 	mf::LogAbsolute("abs_category/id",__FILE__,__LINE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
