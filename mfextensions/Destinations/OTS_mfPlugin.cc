@@ -188,6 +188,7 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
   char sev;
   std::ostringstream tmposs;
   std::string        ossstr;
+  ossstr.reserve(1000);
 
   for (; *cp; ++cp) {
 	  if (*cp != '%') {
@@ -211,8 +212,8 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 	  case 'h':oss<<hostname_;break;                         // host name
 	  case 'L':oss<<xid.severity().getName();break;          // severity
 	  case 'm':                                              // message
-		  for (auto const& val : msg.items()) tmposs<<val;// Print the contents.
-		  ossstr = tmposs.str(); // must copy incase I need to erase -- do one copy
+            for (auto const& val : msg.items()) ossstr += val;   // Print the contents.
+		  //ossstr = tmposs.str(); // must copy incase I need to erase -- do one copy
 		  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
 		  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
 		  oss << ossstr;
