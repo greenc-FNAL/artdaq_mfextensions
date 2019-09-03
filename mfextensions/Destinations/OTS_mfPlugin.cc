@@ -186,9 +186,9 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
   auto app = app_;
   char *cp = &format_string_[0];
   char sev;
-  std::ostringstream tmposs;
+  bool msg_printed=false;
   std::string        ossstr;
-  ossstr.reserve(1000);
+  //ossstr.reserve(100);
 
   for (; *cp; ++cp) {
 	  if (*cp != '%') {
@@ -212,11 +212,12 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 	  case 'h':oss<<hostname_;break;                         // host name
 	  case 'L':oss<<xid.severity().getName();break;          // severity
 	  case 'm':                                              // message
-            for (auto const& val : msg.items()) ossstr += val;   // Print the contents.
-		  // ossstr = tmposs.str(); // must copy incase I need to erase -- do one copy to do 2 compares...
+		  //ossstr.clear();						 // incase message is repeated
+		  for (auto const& val : msg.items()) ossstr += val;   // Print the contents.
 		  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
 		  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
 		  oss << ossstr;
+		  msg_printed=true;
 		  break;
 	  case 'N':oss<<id;break;                                // category
 	  case 'P':oss<<pid_;break;                              // processID
@@ -227,6 +228,12 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 	  case '%':oss<<'%';break;                               // a '%' character
 	  default: oss<<'%'<<*cp;break;                          // unknown - just print it w/ it's '%'
 	  }
+  }
+  if(!msg_printed) {
+	  for (auto const& val : msg.items()) ossstr += val;   // Print the contents.
+	  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
+	  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
+	  oss << ossstr;
   }
 }
 
