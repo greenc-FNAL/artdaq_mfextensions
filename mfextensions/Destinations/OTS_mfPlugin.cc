@@ -212,10 +212,14 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 	  case 'L':oss<<xid.severity().getName();break;          // severity
 	  case 'm':                                              // message
 		  for (auto const& val : msg.items()) tmposs<<val;// Print the contents.
-		  ossstr = tmposs.str(); // must copy incase I need to erase -- do one copy
+# if 1
+		  ossstr = tmposs.str(); // must copy incase I need to erase -- do one copy to do 2 compares...
 		  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
 		  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
 		  oss << ossstr;
+# else
+		  oss << tmposs.str();
+# endif
 		  break;
 	  case 'N':oss<<id;break;                                // category
 	  case 'P':oss<<pid_;break;                              // processID
