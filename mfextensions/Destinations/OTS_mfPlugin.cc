@@ -41,11 +41,13 @@ class ELOTS : public ELdestination {
   struct Config {
     /// ELDestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
+	/// format_string (Default: "%L:%N:%f [%u]	%m"): Format specifier for printing to console. %% => '%' ... 
     fhicl::Atom<std::string> format_string = fhicl::Atom<std::string>{
         fhicl::Name{"format_string"}, fhicl::Comment{"Format specifier for printing to console. %% => '%' ... "},
 		"%L:%N:%f [%u]	%m"};
+	/// filename_delimit (Default: "/"): Grab path after this. "/srcs/" /x/srcs/y/z.cc => y/z.cc
     fhicl::Atom<std::string> filename_delimit = fhicl::Atom<std::string>{
-        fhicl::Name{"filename_delimit"}, fhicl::Comment{"Grab path after this. \"/src/\" /x/srcs/y/z.cc => y/z.cc"},
+        fhicl::Name{"filename_delimit"}, fhicl::Comment{"Grab path after this. \"/srcs/\" /x/srcs/y/z.cc => y/z.cc"},
 		"/"};
   };
   /// Used for ParameterSet validation
