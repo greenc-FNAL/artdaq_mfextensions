@@ -34,6 +34,14 @@ ${MF_MESSAGESERVICE}
 	${CETLIB_EXCEPT}
   pthread
 )
+basic_plugin( "OTS" "mfPlugin"
+  ${MESSAGEFACILITY_LIBS}
+${MF_MESSAGESERVICE}
+    ${FHICLCPP}
+    ${CETLIB}
+	${CETLIB_EXCEPT}
+)
+
 
 basic_plugin( "TRACE" "mfPlugin"
   ${MESSAGEFACILITY_LIBS}

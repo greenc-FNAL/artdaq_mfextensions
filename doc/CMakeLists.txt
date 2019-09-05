@@ -33,7 +33,7 @@ if(DOXYGEN_FOUND)
 			set(EXCLUDE_FILES "${EXCLUDE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/../${file}")
 		endforeach()
 	endif()
-	
+
 	add_custom_target(${product}_doc ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${product}.tag)
 
 	set(TAG_FILES "")
@@ -49,6 +49,8 @@ if(DOXYGEN_FOUND)
         endif()
 	endif()
 	
+	string(REPLACE ";" " " DOXYGEN_INCLUDE_PATH "${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES}")
+
 	configure_file(${DOXYFILE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	configure_file(${DOXYFILE_DIR}/header.html.in ${CMAKE_CURRENT_BINARY_DIR}/header.html @ONLY)
 	add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${product}.tag
