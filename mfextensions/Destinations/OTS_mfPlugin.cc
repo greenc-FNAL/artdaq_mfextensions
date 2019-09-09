@@ -216,9 +216,11 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 	  case 'm':                                              // message
 		  //ossstr.clear();						 // incase message is repeated
 		  for (auto const& val : msg.items()) ossstr += val;   // Print the contents.
-		  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
-		  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
-		  oss << ossstr;
+		  if (ossstr.size()) { // allow/check for "no message"
+			  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
+			  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
+			  oss << ossstr;
+		  }
 		  msg_printed=true;
 		  break;
 	  case 'N':oss<<id;break;                                // category
