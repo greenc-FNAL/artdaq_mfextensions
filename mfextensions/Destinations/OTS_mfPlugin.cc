@@ -41,14 +41,14 @@ class ELOTS : public ELdestination {
   struct Config {
     /// ELDestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
-	/// format_string (Default: "%L:%N:%f [%u]	%m"): Format specifier for printing to console. %% => '%' ... 
+    /// format_string (Default: "%L:%N:%f [%u]	%m"): Format specifier for printing to console. %% => '%' ...
     fhicl::Atom<std::string> format_string = fhicl::Atom<std::string>{
         fhicl::Name{"format_string"}, fhicl::Comment{"Format specifier for printing to console. %% => '%' ... "},
-		"%L:%N:%f [%u]	%m"};
-	/// filename_delimit (Default: "/"): Grab path after this. "/srcs/" /x/srcs/y/z.cc => y/z.cc
-    fhicl::Atom<std::string> filename_delimit = fhicl::Atom<std::string>{
-        fhicl::Name{"filename_delimit"}, fhicl::Comment{"Grab path after this. \"/srcs/\" /x/srcs/y/z.cc => y/z.cc"},
-		"/"};
+        "%L:%N:%f [%u]	%m"};
+    /// filename_delimit (Default: "/"): Grab path after this. "/srcs/" /x/srcs/y/z.cc => y/z.cc
+    fhicl::Atom<std::string> filename_delimit =
+        fhicl::Atom<std::string>{fhicl::Name{"filename_delimit"},
+                                 fhicl::Comment{"Grab path after this. \"/srcs/\" /x/srcs/y/z.cc => y/z.cc"}, "/"};
   };
   /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
@@ -105,11 +105,10 @@ class ELOTS : public ELdestination {
 //======================================================================
 
 ELOTS::ELOTS(Parameters const& pset)
-	: ELdestination(pset().elDestConfig()),
-	  pid_(static_cast<long>(getpid())),
-	  format_string_(pset().format_string()),
-	  filename_delimit_(pset().filename_delimit())
-{
+    : ELdestination(pset().elDestConfig()),
+      pid_(static_cast<long>(getpid())),
+      format_string_(pset().format_string()),
+      filename_delimit_(pset().filename_delimit()) {
   // hostname
   char hostname_c[1024];
   hostname_ = (gethostname(hostname_c, 1023) == 0) ? hostname_c : "Unkonwn Host";
@@ -186,66 +185,103 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
   auto id = xid.id();
   auto module = xid.module();
   auto app = app_;
-  char *cp = &format_string_[0];
+  char* cp = &format_string_[0];
   char sev;
-  bool msg_printed=false;
-  std::string        ossstr;
-  //ossstr.reserve(100);
+  bool msg_printed = false;
+  std::string ossstr;
+  // ossstr.reserve(100);
 
   for (; *cp; ++cp) {
-	  if (*cp != '%') {
-		  oss << *cp;
-		  continue;
-	  }
-	  if (*++cp == '\0') { // inc pas '%' and check if end
-		  // ending '%' gets printed
-		  oss << *cp;
-		  break; // done
-	  }
-	  switch (*cp) {
-	  case 'A':oss<<app;break;                               // application
-	  case 'a':oss<<hostaddr_;break;                         // host address
-	  case 'd':oss<<module;break;                            // module name # Early
-	  case 'f':                                              // filename
-		  if (filename_delimit_.size()==0)      oss<<msg.filename();
-		  else if (filename_delimit_.size()==1) oss<<(strrchr(&msg.filename()[0],filename_delimit_[0]) ? strrchr(&msg.filename()[0],filename_delimit_[0])+1 : msg.filename());
-		  else                                  oss<< (strstr(&msg.filename()[0],&filename_delimit_[0]) ? strstr(&msg.filename()[0],&filename_delimit_[0])+filename_delimit_.size() : msg.filename());
-		  break;
-	  case 'h':oss<<hostname_;break;                         // host name
-	  case 'L':oss<<xid.severity().getName();break;          // severity
-	  case 'm':                                              // message
-		  //ossstr.clear();						 // incase message is repeated
-		  for (auto const& val : msg.items()) ossstr += val;   // Print the contents.
-		  if (ossstr.size()) { // allow/check for "no message"
-			  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
-			  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
-			  oss << ossstr;
-		  }
-		  msg_printed=true;
-		  break;
-	  case 'N':oss<<id;break;                                // category
-	  case 'P':oss<<pid_;break;                              // processID
-	  case 'r':oss<< mf::GetIteration();break;               // run/iteration/event no #pre-events
-	  case 's':sev=xid.severity().getName()[0]|0x20;oss<<sev;break;// severity lower case
-	  case 'T':oss<<format_.timestamp(msg.timestamp());break;// timestamp
-	  case 'u':oss<<std::to_string(msg.lineNumber());break;  // linenumber
-	  case '%':oss<<'%';break;                               // a '%' character
-	  default: oss<<'%'<<*cp;break;                          // unknown - just print it w/ it's '%'
-	  }
+    if (*cp != '%') {
+      oss << *cp;
+      continue;
+    }
+    if (*++cp == '\0') {  // inc pas '%' and check if end
+      // ending '%' gets printed
+      oss << *cp;
+      break;  // done
+    }
+    switch (*cp) {
+      case 'A':
+        oss << app;
+        break;  // application
+      case 'a':
+        oss << hostaddr_;
+        break;  // host address
+      case 'd':
+        oss << module;
+        break;   // module name # Early
+      case 'f':  // filename
+        if (filename_delimit_.size() == 0)
+          oss << msg.filename();
+        else if (filename_delimit_.size() == 1)
+          oss << (strrchr(&msg.filename()[0], filename_delimit_[0])
+                      ? strrchr(&msg.filename()[0], filename_delimit_[0]) + 1
+                      : msg.filename());
+        else
+          oss << (strstr(&msg.filename()[0], &filename_delimit_[0])
+                      ? strstr(&msg.filename()[0], &filename_delimit_[0]) + filename_delimit_.size()
+                      : msg.filename());
+        break;
+      case 'h':
+        oss << hostname_;
+        break;  // host name
+      case 'L':
+        oss << xid.severity().getName();
+        break;   // severity
+      case 'm':  // message
+        // ossstr.clear();						 // incase message is repeated
+        for (auto const& val : msg.items()) ossstr += val;          // Print the contents.
+        if (ossstr.size()) {                                        // allow/check for "no message"
+          if (ossstr.compare(0, 1, "\n") == 0) ossstr.erase(0, 1);  // remove leading "\n" if present
+          if (ossstr.compare(ossstr.size() - 1, 1, "\n") == 0)
+            ossstr.erase(ossstr.size() - 1, 1);  // remove trailing "\n" if present
+          oss << ossstr;
+        }
+        msg_printed = true;
+        break;
+      case 'N':
+        oss << id;
+        break;  // category
+      case 'P':
+        oss << pid_;
+        break;  // processID
+      case 'r':
+        oss << mf::GetIteration();
+        break;  // run/iteration/event no #pre-events
+      case 's':
+        sev = xid.severity().getName()[0] | 0x20;
+        oss << sev;
+        break;  // severity lower case
+      case 'T':
+        oss << format_.timestamp(msg.timestamp());
+        break;  // timestamp
+      case 'u':
+        oss << std::to_string(msg.lineNumber());
+        break;  // linenumber
+      case '%':
+        oss << '%';
+        break;  // a '%' character
+      default:
+        oss << '%' << *cp;
+        break;  // unknown - just print it w/ it's '%'
+    }
   }
-  if(!msg_printed) {
-	  for (auto const& val : msg.items()) ossstr += val;   // Print the contents.
-	  if (ossstr.compare(0, 1, "\n")==0) ossstr.erase(0, 1); // remove leading "\n" if present
-	  if (ossstr.compare(ossstr.size()-1, 1, "\n")==0) ossstr.erase(ossstr.size()-1, 1); // remove trailing "\n" if present
-	  oss << ossstr;
+  if (!msg_printed) {
+    for (auto const& val : msg.items()) ossstr += val;        // Print the contents.
+    if (ossstr.compare(0, 1, "\n") == 0) ossstr.erase(0, 1);  // remove leading "\n" if present
+    if (ossstr.compare(ossstr.size() - 1, 1, "\n") == 0)
+      ossstr.erase(ossstr.size() - 1, 1);  // remove trailing "\n" if present
+    oss << ossstr;
   }
 }
 
 //======================================================================
 // Message filler ( overriddes ELdestination::fillUsrMsg )
 //======================================================================
-void ELOTS::fillUsrMsg(std::ostringstream& oss __attribute__((__unused__)), const ErrorObj& msg __attribute__((__unused__))) {
-	return; // UsrMsg filled above
+void ELOTS::fillUsrMsg(std::ostringstream& oss __attribute__((__unused__)),
+                       const ErrorObj& msg __attribute__((__unused__))) {
+  return;  // UsrMsg filled above
 }
 
 //======================================================================

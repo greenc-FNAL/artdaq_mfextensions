@@ -1,9 +1,9 @@
- // This file (mf_test.cc) was created by Ron Rechenmacher <ron@fnal.gov> on
- // Apr 27, 2017. "TERMS AND CONDITIONS" governing this file are in the README
- // or COPYING file. If you do not have such a file, one can be obtained by
- // contacting Ron or Fermi Lab in Batavia IL, 60510, phone: 630-840-3000.
- // $RCSfile: mf_test.cc,v $
- // rev="$Revision: 1.5 $$Date: 2017/10/10 14:31:02 $";
+// This file (mf_test.cc) was created by Ron Rechenmacher <ron@fnal.gov> on
+// Apr 27, 2017. "TERMS AND CONDITIONS" governing this file are in the README
+// or COPYING file. If you do not have such a file, one can be obtained by
+// contacting Ron or Fermi Lab in Batavia IL, 60510, phone: 630-840-3000.
+// $RCSfile: mf_test.cc,v $
+// rev="$Revision: 1.5 $$Date: 2017/10/10 14:31:02 $";
 
 // link with libMF_MessageLogger
 #if 0
@@ -30,16 +30,16 @@ g++ -g -Wall -I$MESSAGEFACILITY_INC -I$CETLIB_INC -I$CETLIB_EXCEPT_INC -I$FHICLC
 ./mf_cout_vs_TRACE_printf test
 #endif
 
-
-#include "messagefacility/MessageLogger/MessageLogger.h"
+#include <stdlib.h>  // setenv
+#include <string>
+#include "TRACE/tracemf.h"  // TRACE
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/make_ParameterSet.h"
-#include <string>
-#include <stdlib.h>				// setenv
-#include "TRACE/tracemf.h"				// TRACE
+#include "messagefacility/MessageLogger/MessageLogger.h"
 //#include "TRACE/trace.h"				// TRACE
 
-const char *mf_test_config="\
+const char *mf_test_config =
+    "\
 debugModules : [\"*\"]\n\
 suppressInfo : []\n\
 #    threshold : DEBUG\n\
@@ -69,7 +69,8 @@ destinations : {\n\
 }\n\
 ";
 
-const char *mf_friendly_config="\
+const char *mf_friendly_config =
+    "\
 debugModules : [\"*\"]\n\
 suppressInfo : []\n\
 #    threshold : DEBUG\n\
@@ -99,7 +100,8 @@ destinations : {\n\
 }\n\
 ";
 
-const char *mf_TRACE_config="\
+const char *mf_TRACE_config =
+    "\
 debugModules : [\"*\"]\n\
 suppressInfo : []\n\
 #    threshold : DEBUG\n\
@@ -113,58 +115,54 @@ destinations : {\n\
 }\n\
 ";
 
-int main(  int	argc, char *argv[] )
-{
-	setenv( "TRACE_MSG_MAX", "0", 0 );
-    setenv( "TRACE_LIMIT_MS", "5,50,500", 0 ); // equiv to TRACE_CNTL( "limit_ms", 5L, 50L, 500L )
-	TRACE_CNTL( "reset" );
-	fhicl::ParameterSet pset;
-	if (argc == 2 && strcmp(argv[1],"test")==0) {
-		std::string pstr(mf_test_config);
-		fhicl::make_ParameterSet(pstr, pset);
-        // ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
-	} else if (argc == 2 && strcmp(argv[1],"TRACE")==0) {
-		std::string pstr(mf_TRACE_config);
-		fhicl::make_ParameterSet(pstr, pset);
-        // ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
-	} else if (argc == 2 && strcmp(argv[1],"friendly")==0) {
-		std::string pstr(mf_friendly_config);
-		fhicl::make_ParameterSet(pstr, pset);
-        // ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
-	} else if (argc == 2) {
-		// i.e ./MessageFacility.cfg
-        setenv( "FHICL_FILE_PATH",".",0 );
-		cet::filepath_maker fpm;
-		fhicl::make_ParameterSet(argv[1],fpm,pset );
-	}
-# if   defined(__cplusplus)      &&      (__cplusplus == 201300L)
-	mf::StartMessageFacility( mf::MessageFacilityService::MultiThread, pset );
-	mf::SetApplicationName(std::string("myAppName"));
+int main(int argc, char *argv[]) {
+  setenv("TRACE_MSG_MAX", "0", 0);
+  setenv("TRACE_LIMIT_MS", "5,50,500", 0);  // equiv to TRACE_CNTL( "limit_ms", 5L, 50L, 500L )
+  TRACE_CNTL("reset");
+  fhicl::ParameterSet pset;
+  if (argc == 2 && strcmp(argv[1], "test") == 0) {
+    std::string pstr(mf_test_config);
+    fhicl::make_ParameterSet(pstr, pset);
+    // ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
+  } else if (argc == 2 && strcmp(argv[1], "TRACE") == 0) {
+    std::string pstr(mf_TRACE_config);
+    fhicl::make_ParameterSet(pstr, pset);
+    // ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
+  } else if (argc == 2 && strcmp(argv[1], "friendly") == 0) {
+    std::string pstr(mf_friendly_config);
+    fhicl::make_ParameterSet(pstr, pset);
+    // ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
+  } else if (argc == 2) {
+    // i.e ./MessageFacility.cfg
+    setenv("FHICL_FILE_PATH", ".", 0);
+    cet::filepath_maker fpm;
+    fhicl::make_ParameterSet(argv[1], fpm, pset);
+  }
+#if defined(__cplusplus) && (__cplusplus == 201300L)
+  mf::StartMessageFacility(mf::MessageFacilityService::MultiThread, pset);
+  mf::SetApplicationName(std::string("myAppName"));
 #else
-	mf::StartMessageFacility( pset );
-	//mf::setEnabledState("not used");
-	mf::SetApplicationName(std::string("myAppName"));
+  mf::StartMessageFacility(pset);
+  // mf::setEnabledState("not used");
+  mf::SetApplicationName(std::string("myAppName"));
 #endif
 
-	// else total mf default
+  // else total mf default
 
-	TRACE( 1, "\nHello\n" );
-	TLOG_ERROR("mf_test_category") << "hello - this is an mf::LogError(\"mf_test_category\")\n";
-	mf::LogAbsolute("abs_category/id") << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
-	mf::LogAbsolute("abs_category/id",__FILE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
-	mf::LogAbsolute("abs_category/id",__FILE__,__LINE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
+  TRACE(1, "\nHello\n");
+  TLOG_ERROR("mf_test_category") << "hello - this is an mf::LogError(\"mf_test_category\")\n";
+  mf::LogAbsolute("abs_category/id") << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
+  mf::LogAbsolute("abs_category/id", __FILE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
+  mf::LogAbsolute("abs_category/id", __FILE__, __LINE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 
-	TRACE( 1,"start 1000 LOG_DEBUG" );
-	for (auto ii=0; ii<1000; ++ii)
-		TLOG_DEBUG("mf_test_category") << "this is a LOG_DEBUG " << ii;
+  TRACE(1, "start 1000 LOG_DEBUG");
+  for (auto ii = 0; ii < 1000; ++ii) TLOG_DEBUG("mf_test_category") << "this is a LOG_DEBUG " << ii;
 
-	TRACE( 1, "end LOG_DEBUG, start 1000 TRACE" );
+  TRACE(1, "end LOG_DEBUG, start 1000 TRACE");
 
-	for (auto ii=0; ii<1000; ++ii)
-		TRACEN_( TRACE_NAME, 1, "this is a TRACE_ " << ii );
-	TRACE( 1, "end TRACE" );
+  for (auto ii = 0; ii < 1000; ++ii) TRACEN_(TRACE_NAME, 1, "this is a TRACE_ " << ii);
+  TRACE(1, "end TRACE");
 
-	for (auto ii=0; ii<2; ++ii)
-		::mf::LogTrace{"simply",__FILE__,__LINE__} << "this is a test";
-	return (0);
-}   // main
+  for (auto ii = 0; ii < 2; ++ii) ::mf::LogTrace{"simply", __FILE__, __LINE__} << "this is a test";
+  return (0);
+}  // main

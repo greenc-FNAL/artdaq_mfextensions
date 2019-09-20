@@ -518,7 +518,6 @@ void msgViewerDlg::scrollToBottom() {
   msgFilters_[display].txtDisplay->verticalScrollBar()->setValue(
       msgFilters_[display].txtDisplay->verticalScrollBar()->maximum());
   msgFilters_[display].txtDisplay->horizontalScrollBar()->setValue(0);
-
 }
 
 void msgViewerDlg::updateDisplays() {
