@@ -22,17 +22,18 @@ class ELANSI : public ELdestination {
    * \brief Configuration parameters for ELANSI
    */
   struct Config {
-	  /// ELdestination common config parameters
+    /// ELdestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
-	/// "bell_on_error" (Default: true): Whether to ring the system bell on error messages
-    fhicl::Atom<bool> bellOnError = fhicl::Atom<bool>{fhicl::Name{"bell_on_error"},
-                                  fhicl::Comment{"Whether to ring the system bell on error messages"}, true};
-	/// "blink_error_messages" (Default: false): Whether to print error messages with blinking text
+    /// "bell_on_error" (Default: true): Whether to ring the system bell on error messages
+    fhicl::Atom<bool> bellOnError = fhicl::Atom<bool>{
+        fhicl::Name{"bell_on_error"}, fhicl::Comment{"Whether to ring the system bell on error messages"}, true};
+    /// "blink_error_messages" (Default: false): Whether to print error messages with blinking text
     fhicl::Atom<bool> blinkOnError =
         fhicl::Atom<bool>{fhicl::Name{"blink_error_messages"},
-                                   fhicl::Comment{"Whether to print error messages with blinking text"}, false};
-	/// "error_ansi_color" (Default: "\033[1m\033[91m"): ANSI Color string for Error Messages
-    fhicl::Atom<std::string> errorColor=fhicl::Atom<std::string>{fhicl::Name{"error_ansi_color"}, fhicl::Comment{"ANSI Color string for Error Messages"}, "\033[1m\033[91m"};
+                          fhicl::Comment{"Whether to print error messages with blinking text"}, false};
+    /// "error_ansi_color" (Default: "\033[1m\033[91m"): ANSI Color string for Error Messages
+    fhicl::Atom<std::string> errorColor = fhicl::Atom<std::string>{
+        fhicl::Name{"error_ansi_color"}, fhicl::Comment{"ANSI Color string for Error Messages"}, "\033[1m\033[91m"};
     /// "warning_ansi_color" (Default: "\033[1m\033[93m"): ANSI Color string for Warning Messages
     fhicl::Atom<std::string> warningColor = fhicl::Atom<std::string>{
         fhicl::Name{"warning_ansi_color"}, fhicl::Comment{"ANSI Color string for Warning Messages"}, "\033[1m\033[93m"};
@@ -41,8 +42,7 @@ class ELANSI : public ELdestination {
         fhicl::Name{"info_ansi_color"}, fhicl::Comment{"ANSI Color string for Info Messages"}, "\033[92m"};
     /// "debug_ansi_color" (Default: "\033[39m"): ANSI Color string for ErrDebugor Messages
     fhicl::Atom<std::string> debugColor = fhicl::Atom<std::string>{
-        fhicl::Name{"debug_ansi_color"},
-                                        fhicl::Comment{"ANSI Color string for Debug Messages"}, "\033[39m"};
+        fhicl::Name{"debug_ansi_color"}, fhicl::Comment{"ANSI Color string for Debug Messages"}, "\033[39m"};
   };
   /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
