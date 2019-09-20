@@ -13,7 +13,6 @@
 #include <iostream>
 #include <memory>
 
-
 namespace mfplugins {
 using namespace mf::service;
 using mf::ELseverityLevel;
@@ -23,17 +22,16 @@ using mf::ErrorObj;
 /// Parser-Friendly Message Facility destination plugin
 /// </summary>
 class ELFriendly : public ELostreamOutput {
-public:
+ public:
   /**
    * \brief Configuration Parameters for ELFriendly
    */
   struct Config {
-	  /// Configuration parameters for ELostreamOutput
+    /// Configuration parameters for ELostreamOutput
     fhicl::TableFragment<ELostreamOutput::Config> elOstrConfig;
-	/// "field_delimiter" (Default: "  "): String to print between each message field
+    /// "field_delimiter" (Default: "  "): String to print between each message field
     fhicl::Atom<std::string> delimiter = fhicl::Atom<std::string>{
-        fhicl::Name{"field_delimiter"},
-                                       fhicl::Comment{"String to print between each message field"}, "  "};
+        fhicl::Name{"field_delimiter"}, fhicl::Comment{"String to print between each message field"}, "  "};
   };
   /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
@@ -83,10 +81,10 @@ ELFriendly::ELFriendly(Parameters const& pset)
 // Message prefix filler ( overriddes ELdestination::fillPrefix )
 //======================================================================
 void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
-// if (msg.is_verbatim()) return;
+  // if (msg.is_verbatim()) return;
 
-// Output the prologue:
-//
+  // Output the prologue:
+  //
 
   auto const& xid = msg.xid();
 
