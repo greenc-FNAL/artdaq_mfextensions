@@ -89,6 +89,8 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg {
 
   void tabCloseRequested(int tabIndex);
 
+  void scrollToBottom();
+
   //---------------------------------------------------------------------------
 
  private:

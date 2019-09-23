@@ -39,7 +39,7 @@ void mfviewer::UDPReceiver::setupMessageListener_() {
   si_me_request.sin_family = AF_INET;
   si_me_request.sin_port = htons(message_port_);
   si_me_request.sin_addr.s_addr = htonl(INADDR_ANY);
-  if (bind(message_socket_, (struct sockaddr *)&si_me_request, sizeof(si_me_request)) == -1) {
+  if (bind(message_socket_, (struct sockaddr*)&si_me_request, sizeof(si_me_request)) == -1) {
     TLOG(TLVL_ERROR) << "Cannot bind message socket to port " << message_port_ << ", err=" << strerror(errno);
     exit(1);
   }
@@ -140,52 +140,50 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input) {
 
     auto prevIt = it;
     try {
-      if (++it != tokens.end()) {
+      if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
         seqNum = std::stoi(*it);
       }
     } catch (const std::invalid_argument& e) {
       it = prevIt;
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       hostname = *it;
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       hostaddr = *it;
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       sev = mf::ELseverityLevel(*it);
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       category = *it;
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       application = *it;
     }
     prevIt = it;
     try {
-      if (++it != tokens.end()) {
+      if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
         pid = std::stol(*it);
       }
     } catch (const std::invalid_argument& e) {
       it = prevIt;
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       eventID = *it;
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       module = *it;
     }
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20201  // Sender and receiver version must match!
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       file = *it;
     }
-    if (++it != tokens.end()) {
+    if (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       line = *it;
     }
-#endif
     std::ostringstream oss;
     bool first = true;
-    while (++it != tokens.end()) {
+    while (it != tokens.end() && ++it != tokens.end() /* Advances it */) {
       if (!first) {
         oss << "|";
       } else {
@@ -195,14 +193,6 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input) {
     }
     TLOG(TLVL_TRACE) << "Message content: " << oss.str();
     message = oss.str();
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // Sender and receiver version must match!
-    if (boost::regex_search(message, res, file_line_regex_)) {
-      file = std::string(res[1].first, res[1].second);
-      line = std::string(res[2].first, res[2].second);
-      std::string messagetmp = std::string(res[3].first, res[3].second);
-      message = messagetmp;
-    }
-#endif
   }
 
   qt_mf_msg msg(hostname, category, application, pid, tv);

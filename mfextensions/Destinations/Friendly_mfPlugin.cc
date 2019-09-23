@@ -13,10 +13,6 @@
 #include <iostream>
 #include <memory>
 
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // format changed to format_ for s67
-#define format_ format
-#endif
-
 namespace mfplugins {
 using namespace mf::service;
 using mf::ELseverityLevel;
@@ -26,17 +22,16 @@ using mf::ErrorObj;
 /// Parser-Friendly Message Facility destination plugin
 /// </summary>
 class ELFriendly : public ELostreamOutput {
-public:
+ public:
   /**
    * \brief Configuration Parameters for ELFriendly
    */
   struct Config {
-	  /// Configuration parameters for ELostreamOutput
+    /// Configuration parameters for ELostreamOutput
     fhicl::TableFragment<ELostreamOutput::Config> elOstrConfig;
-	/// "field_delimiter" (Default: "  "): String to print between each message field
+    /// "field_delimiter" (Default: "  "): String to print between each message field
     fhicl::Atom<std::string> delimiter = fhicl::Atom<std::string>{
-        fhicl::Name{"field_delimiter"},
-                                       fhicl::Comment{"String to print between each message field"}, "  "};
+        fhicl::Name{"field_delimiter"}, fhicl::Comment{"String to print between each message field"}, "  "};
   };
   /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;
@@ -86,13 +81,10 @@ ELFriendly::ELFriendly(Parameters const& pset)
 // Message prefix filler ( overriddes ELdestination::fillPrefix )
 //======================================================================
 void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
-// if (msg.is_verbatim()) return;
+  // if (msg.is_verbatim()) return;
 
-// Output the prologue:
-//
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // format changed to format_ for s67
-  format_.preambleMode = true;
-#endif
+  // Output the prologue:
+  //
 
   auto const& xid = msg.xid();
 
@@ -180,9 +172,6 @@ void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg) {
 void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg) {
   if (!format_.want(TEXT)) return;
 
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // format changed to format_ for s67
-  format_.preambleMode = false;
-#endif
   auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
   auto it = msg.items().cbegin();
 

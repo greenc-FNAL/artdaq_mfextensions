@@ -18,14 +18,14 @@ using mf::service::ELdestination;
 /// Message Facility Destination which automatically opens files and sorts messages into them based on given criteria
 /// </summary>
 class ELMultiFileOutput : public ELdestination {
-	public:
+ public:
   /**
    * \brief Configuration parameters for ELMultiFileOutput
    */
   struct Config {
-	  /// ELdestination common config parameters
+    /// ELdestination common config parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
-	/// "base_directory" (Default: "/tmp"): Directory where log files will be created
+    /// "base_directory" (Default: "/tmp"): Directory where log files will be created
     fhicl::Atom<std::string> baseDir = fhicl::Atom<std::string>{
         fhicl::Name{"base_directory"}, fhicl::Comment{"Directory where log files will be created"}, "/tmp"};
     /// "append" (Default: true): Append to existing log files
@@ -43,8 +43,7 @@ class ELMultiFileOutput : public ELdestination {
         fhicl::Name{"use_category"}, fhicl::Comment{"Use the category field when generating log file names"}, false};
     /// "use_module" (Default: false): Use the module field when generating log file names
     fhicl::Atom<bool> useModule = fhicl::Atom<bool>{
-        fhicl::Name{"use_module"},
-                                fhicl::Comment{"Use the module field when generating log file names"}, false};
+        fhicl::Name{"use_module"}, fhicl::Comment{"Use the module field when generating log file names"}, false};
   };
   /// Used for ParameterSet validation
   using Parameters = fhicl::WrappedTable<Config>;

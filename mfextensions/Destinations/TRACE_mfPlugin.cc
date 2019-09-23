@@ -30,17 +30,16 @@ using mf::service::ELdestination;
 /// </summary>
 class ELTRACE : public ELdestination {
  public:
-
-	 /**
-	  * \brief Configuration Parameters for ELTRACE
-	  */
+  /**
+   * \brief Configuration Parameters for ELTRACE
+   */
   struct Config {
-	  /// ELDestination common parameters
+    /// ELDestination common parameters
     fhicl::TableFragment<ELdestination::Config> elDestConfig;
-	/// "lvls" (Default: 0): TRACE level mask for Slow output
+    /// "lvls" (Default: 0): TRACE level mask for Slow output
     fhicl::Atom<size_t> lvls =
         fhicl::Atom<size_t>{fhicl::Name{"lvls"}, fhicl::Comment{"TRACE level mask for Slow output"}, 0};
-	/// "lvlm" (Default: 0): TRACE level mask for Memory output
+    /// "lvlm" (Default: 0): TRACE level mask for Memory output
     fhicl::Atom<size_t> lvlm =
         fhicl::Atom<size_t>{fhicl::Name{"lvlm"}, fhicl::Comment{"TRACE level mask for Memory output"}, 0};
   };
