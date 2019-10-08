@@ -17,41 +17,42 @@ namespace mfviewer {
 ///   Read messagefacility log archive and reemit as
 ///   messagefacility messages
 /// </summary>
-class LogReader : public MVReceiver {
-  Q_OBJECT
- public:
-  /// <summary>
-  /// LogReader Constructor
-  /// </summary>
-  /// <param name="pset">ParameterSet used to configure the LogReader</param>
-  explicit LogReader(fhicl::ParameterSet pset);
+class LogReader : public MVReceiver
+{
+	Q_OBJECT
+public:
+	/// <summary>
+	/// LogReader Constructor
+	/// </summary>
+	/// <param name="pset">ParameterSet used to configure the LogReader</param>
+	explicit LogReader(fhicl::ParameterSet pset);
 
-  /// <summary>
-  /// LogReader Destructor
-  /// </summary>
-  virtual ~LogReader();
+	/// <summary>
+	/// LogReader Destructor
+	/// </summary>
+	virtual ~LogReader();
 
-  /// <summary>
-  /// Receiver loop method. Reads messages from file and emits newMessage signal
-  /// </summary>
-  void run();
+	/// <summary>
+	/// Receiver loop method. Reads messages from file and emits newMessage signal
+	/// </summary>
+	void run();
 
-  /// <summary>
-  /// Read the next message from the input stream
-  /// </summary>
-  /// <returns>qt_mf_msg from log file</returns>
-  qt_mf_msg read_next();  // read next log
+	/// <summary>
+	/// Read the next message from the input stream
+	/// </summary>
+	/// <returns>qt_mf_msg from log file</returns>
+	qt_mf_msg read_next();  // read next log
 
- private:
-  std::ifstream log_;
-  size_t pos_;
+private:
+	std::ifstream log_;
+	size_t pos_;
 
-  std::string filename_;
-  int counter_;
+	std::string filename_;
+	int counter_;
 
-  boost::regex metadata_1;
-  // boost::regex  metadata_2;
-  boost::smatch what_;
+	boost::regex metadata_1;
+	// boost::regex  metadata_2;
+	boost::smatch what_;
 };
 }  // namespace mfviewer
 
