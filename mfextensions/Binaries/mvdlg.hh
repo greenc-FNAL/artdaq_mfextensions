@@ -97,7 +97,7 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg {
   // Display all messages stored in the buffer
   void displayMsg(int display);
 
-  void UpdateTextAreaDisplay(QString text, QTextEdit* widget);
+  void UpdateTextAreaDisplay(QStringList texts, QPlainTextEdit* widget);
 
   void updateDisplays();
 
@@ -179,14 +179,14 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg {
     QStringList hostFilter;
     QStringList appFilter;
     QStringList catFilter;
-    QTextEdit* txtDisplay;
+    QPlainTextEdit* txtDisplay;
 
     // severity threshold
     sev_code_t sevThresh;
   };
   std::vector<MsgFilterDisplay> msgFilters_;
 
-  mutable std::mutex updating_mutex_;
+  mutable std::recursive_mutex updating_mutex_;
 };
 
 enum list_mask_t { LIST_APP = 0x01, LIST_CAT = 0x02, LIST_HOST = 0x04 };

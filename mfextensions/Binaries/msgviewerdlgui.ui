@@ -75,7 +75,7 @@
         background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:0.07, stop:0 rgba(220, 220, 200, 255), stop:1 rgba(255, 255, 230, 255))
         }
 
-        #mainFrame QTextEdit {
+        #mainFrame QPlainTextEdit {
         border: 1px solid #aaa;
         background-color: #fff
         }
@@ -521,7 +521,7 @@
           <bool>true</bool>
          </property>
          <property name="checked">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
         </widget>
         <widget class="QCommandLinkButton" name="btnDebug">
@@ -634,7 +634,7 @@
           <bool>true</bool>
          </property>
          <property name="checked">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
         </widget>
        </widget>
@@ -1381,7 +1381,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QTextEdit" name="txtMessages">
+            <widget class="QPlainTextEdit" name="txtMessages">
              <property name="enabled">
               <bool>true</bool>
              </property>
