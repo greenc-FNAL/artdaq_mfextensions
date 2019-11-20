@@ -18,10 +18,11 @@ extern "C" {
 /**
  * \brief Structure to track progress of upload in cURL send function
  */
-struct upload_status {
-  size_t pos;           ///< Current position within payload
-  size_t size;          ///< Size of payload
-  const char* payload;  ///< payload string
+struct upload_status
+{
+	size_t pos;           ///< Current position within payload
+	size_t size;          ///< Size of payload
+	const char* payload;  ///< payload string
 };
 
 /**
