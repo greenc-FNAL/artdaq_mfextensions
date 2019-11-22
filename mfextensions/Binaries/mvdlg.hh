@@ -24,7 +24,8 @@ class ParameterSet;
 /// <summary>
 /// Message Viewer Dialog Window
 /// </summary>
-class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg {
+class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
+{
   Q_OBJECT
 
  public:
@@ -172,7 +173,8 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg {
   // Receiver Plugin Manager
   mfviewer::ReceiverManager receivers_;
 
-  struct MsgFilterDisplay {
+	struct MsgFilterDisplay
+	{
     int nDisplayMsgs;
     int nDisplayedDeletedMsgs;
     msg_iters_t msgs;
@@ -189,6 +191,11 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg {
   mutable std::recursive_mutex updating_mutex_;
 };
 
-enum list_mask_t { LIST_APP = 0x01, LIST_CAT = 0x02, LIST_HOST = 0x04 };
+enum list_mask_t
+{
+	LIST_APP = 0x01,
+	LIST_CAT = 0x02,
+	LIST_HOST = 0x04
+};
 
 #endif
