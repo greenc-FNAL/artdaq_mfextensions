@@ -360,7 +360,7 @@ void msgViewerDlg::onNewMsg(qt_mf_msg const& mfmsg)
 
 void msgViewerDlg::removeMsg(msgs_t::iterator it)
 {
-	std::unique_lock<std::mutex> lk(updating_mutex_);
+	std::lock_guard<std::recursive_mutex> lk(updating_mutex_);
 	QString const& app = it->app();
 	QString const& cat = it->cat();
 	QString const& host = it->host();
@@ -408,7 +408,6 @@ void msgViewerDlg::removeMsg(msgs_t::iterator it)
 			{
 				if (++msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs) && maxDeletedMsgs > 0)
 				{
-					lk.unlock();
 					displayMsg(d);
 				}
 			}
@@ -426,7 +425,7 @@ void msgViewerDlg::removeMsg(msgs_t::iterator it)
 
 unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 {
-	std::unique_lock<std::mutex> lk(updating_mutex_);
+	std::lock_guard<std::recursive_mutex> lk(updating_mutex_);
 	QString const& app = it->app();
 	QString const& cat = it->cat();
 	QString const& host = it->host();
@@ -447,7 +446,7 @@ unsigned int msgViewerDlg::update_index(msgs_t::iterator it)
 void msgViewerDlg::displayMsg(msgs_t::const_iterator it, int display)
 {
 	if (it->sev() < msgFilters_[display].sevThresh) return;
-	std::unique_lock<std::mutex> lk(updating_mutex_);
+	std::lock_guard<std::recursive_mutex> lk(updating_mutex_);
 
 	msgFilters_[display].nDisplayMsgs++;
 	if (display == tabWidget->currentIndex())
@@ -456,12 +455,14 @@ void msgViewerDlg::displayMsg(msgs_t::const_iterator it, int display)
 	}
 
 	auto txt = it->text(shortMode_);
-	UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
+	QStringList txts;
+	txts.push_back(txt);
+	UpdateTextAreaDisplay(txts, msgFilters_[display].txtDisplay);
 }
 
 void msgViewerDlg::displayMsg(int display)
 {
-	std::unique_lock<std::mutex> lk(updating_mutex_);
+	std::lock_guard<std::recursive_mutex> lk(updating_mutex_);
 	int n = 0;
 	msgFilters_[display].txtDisplay->clear();
 	msgFilters_[display].nDisplayMsgs = 0;
@@ -476,14 +477,14 @@ void msgViewerDlg::displayMsg(int display)
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(2000);  // 2 seconds
 
-	QString txt = "";
+	QStringList txts;
 	int i = 0, prog = 0;
 
 	for (; it != msgFilters_[display].msgs.end(); ++it, ++i)
 	{
 		if (it->get()->sev() >= msgFilters_[display].sevThresh)
 		{
-			txt += it->get()->text(shortMode_);
+			txts.push_back(it->get()->text(shortMode_));
 			++msgFilters_[display].nDisplayMsgs;
 		}
 
@@ -492,12 +493,6 @@ void msgViewerDlg::displayMsg(int display)
 			i = 0;
 			++prog;
 			progress.setValue(prog);
-
-			if (txt.length())
-			{
-				UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
-				txt.clear();
-			}
 		}
 
 		if (progress.wasCanceled()) break;
@@ -508,11 +503,11 @@ void msgViewerDlg::displayMsg(int display)
 		lcdDisplayedMsgs->display(msgFilters_[display].nDisplayMsgs);
 	}
 
-	UpdateTextAreaDisplay(txt, msgFilters_[display].txtDisplay);
+	UpdateTextAreaDisplay(txts, msgFilters_[display].txtDisplay);
 }
 
-// https://stackoverflow.com/questions/21955923/prevent-a-qtextedit-widget-from-scrolling-when-there-is-a-selection
-void msgViewerDlg::UpdateTextAreaDisplay(QString text, QTextEdit* widget)
+// https://stackoverflow.com/questions/13559990/how-to-append-text-to-qplaintextedit-without-adding-newline-and-keep-scroll-at
+void msgViewerDlg::UpdateTextAreaDisplay(QStringList texts, QPlainTextEdit* widget)
 {
 	const QTextCursor old_cursor = widget->textCursor();
 	const int old_scrollbar_value = widget->verticalScrollBar()->value();
@@ -524,8 +519,18 @@ void msgViewerDlg::UpdateTextAreaDisplay(QString text, QTextEdit* widget)
 		pause();
 	}
 
-	// Insert the text at the position of the cursor (which is the end of the document).
-	widget->append(text);
+	QTextCursor new_cursor = QTextCursor(widget->document());
+
+	new_cursor.beginEditBlock();
+	new_cursor.movePosition(QTextCursor::End);
+
+	for (int i = 0; i < texts.size(); i++)
+	{
+		new_cursor.insertBlock();
+		new_cursor.insertHtml(texts.at(i));
+		if (!shortMode_) new_cursor.insertBlock();
+	}
+	new_cursor.endEditBlock();
 
 	if (old_cursor.hasSelection() || paused)
 	{
@@ -744,7 +749,7 @@ void msgViewerDlg::setFilter()
 	auto newTabTitle = QString("Filter ") + QString::number(++nFilters);
 	QWidget* newTab = new QWidget();
 
-	QTextEdit* txtDisplay = new QTextEdit(newTab);
+	QPlainTextEdit* txtDisplay = new QPlainTextEdit(newTab);
 	QTextDocument* doc = new QTextDocument(txtDisplay);
 	txtDisplay->setDocument(doc);
 
@@ -794,7 +799,7 @@ void msgViewerDlg::clear()
 	int ret =
 	    QMessageBox::question(this, tr("Message Viewer"), tr("Are you sure you want to clear all received messages?"),
 	                          QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-	std::unique_lock<std::mutex> lk(updating_mutex_);
+	std::lock_guard<std::recursive_mutex> lk(updating_mutex_);
 	switch (ret)
 	{
 		case QMessageBox::Yes:
