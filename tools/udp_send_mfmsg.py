@@ -8,6 +8,7 @@
  # rev="$Revision: 1.23 $$Date: 2012/01/23 15:32:40 $";
 import sys
 import socket
+from random import randrange
 USAGE = 'send host:port [count]'
 
 # first byte is cmd
@@ -24,20 +25,28 @@ def main(argv):
     count = 1
     if len(argv) == 3: count = int(argv[2])
     for ii  in range(0, count):
-    buf='MF: 01-Jan-1970 01:01:01'
+        sev = randrange(0,15)
+        buf='MF: 01-Jan-1970 01:01:01'
         buf+="|%d" % ii
-    buf+="|" + node
-    buf+="|" + node
-    buf+="|WARNING"
-    buf+="|Test Message"
-    buf+="|UDP Send MFMSG"
-    buf+="|udp_send_mfmsg.py"
-    buf+="|1"
+        buf+="|" + node
+        buf+="|" + node
+        if sev == 0:
+            buf+="|ERROR"
+        elif sev < 3:
+            buf+="|WARNING"
+        elif sev < 7:
+            buf+="|INFO"
+        else:
+            buf+="|DEBUG"
+        buf+="|Test Message"
+        buf+="|UDP Send MFMSG"
+        buf+="|udp_send_mfmsg.py"
+        buf+="|1"
         buf+="|Run 0, Subrun 0, Event %d" % ii
-    buf+="|UDP Test program"
-    buf+="|This is the ARTDAQ UDP test string.\n\t It contains exactly 111 characters, making for a total size of 113 bytes."
-    s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-    s.sendto( buf, (node,int(port)) )
+        buf+="|UDP Test program"
+        buf+="|This is the ARTDAQ UDP test string.\n\t It contains exactly 111 characters, making for a total size of 113 bytes."
+        s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
+        s.sendto( buf, (node,int(port)) )
     pass
 
 
