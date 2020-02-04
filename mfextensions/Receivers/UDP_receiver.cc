@@ -2,14 +2,13 @@
 
 #include "mfextensions/Receivers/UDP_receiver.hh"
 #include <sys/poll.h>
-#include <boost/tokenizer.hpp>
 #include <sstream>
 #include "messagefacility/Utilities/ELseverityLevel.h"
 #include "mfextensions/Receivers/ReceiverMacros.hh"
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
 
 mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset)
-    : MVReceiver(pset), message_port_(pset.get<int>("port", 5140)), message_addr_(pset.get<std::string>("message_address", "227.128.12.27")), multicast_enable_(pset.get<bool>("multicast_enable", false)), multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", "0.0.0.0")), message_socket_(-1), timestamp_regex_("(\\d{2}-[^-]*-\\d{4}\\s\\d{2}:\\d{2}:\\d{2})"), file_line_regex_("^\\s*([^:]*\\.[^:]{1,3}):(\\d+)(.*)")
+    : MVReceiver(pset), message_port_(pset.get<int>("port", 5140)), message_addr_(pset.get<std::string>("message_address", "227.128.12.27")), multicast_enable_(pset.get<bool>("multicast_enable", false)), multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", "0.0.0.0")), message_socket_(-1)
 {
 	TLOG(TLVL_TRACE) << "UDPReceiver Constructor";
 }
@@ -120,6 +119,30 @@ void mfviewer::UDPReceiver::run()
 	TLOG(TLVL_INFO) << "UDPReceiver shutting down!";
 }
 
+std::list<std::string> mfviewer::UDPReceiver::tokenize_(std::string const& input)
+{
+	size_t pos = 0;
+	std::list<std::string> output;
+
+	while (pos != std::string::npos && pos < input.size())
+	{
+		auto newpos = input.find('|', pos);
+		if (newpos != std::string::npos)
+		{
+			output.emplace_back(input, pos, newpos - pos);
+			//TLOG(TLVL_TRACE) << "tokenize_: " << output.back();
+			pos = newpos + 1;
+		}
+		else
+		{
+			output.emplace_back(input, pos);
+			//TLOG(TLVL_TRACE) << "tokenize_: " << output.back();
+			pos = newpos;
+		}
+	}
+	return output;
+}
+
 qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 {
 	std::string hostname, category, application, message, hostaddr, file, line, module, eventID;
@@ -130,24 +153,38 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 
 	TLOG(TLVL_TRACE) << "Recieved MF/Syslog message with contents: " << input;
 
-	boost::char_separator<char> sep("|", "", boost::keep_empty_tokens);
-	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
-	tokenizer tokens(input, sep);
-	tokenizer::iterator it = tokens.begin();
-
-	// There may be syslog garbage in the first token before the timestamp...
-	boost::smatch res;
-	while (it != tokens.end() && !boost::regex_search(*it, res, timestamp_regex_))
-	{
-		++it;
-	}
+	auto tokens = tokenize_(input);
+	auto it = tokens.begin();
 
 	if (it != tokens.end())
 	{
+		bool timestamp_found = false;
 		struct tm tm;
 		time_t t;
-		std::string value(res[1].first, res[1].second);
-		strptime(value.c_str(), "%d-%b-%Y %H:%M:%S", &tm);
+		while (it != tokens.end() && !timestamp_found)
+		{
+			std::string thisString = *it;
+			while (thisString.size() > 0 && !timestamp_found)
+			{
+				auto pos = thisString.find_first_of("0123456789");
+				if (pos != std::string::npos)
+				{
+					thisString = thisString.erase(0, pos);
+					//TLOG(TLVL_TRACE) << "thisString: " << thisString;
+
+					if (strptime(thisString.c_str(), "%d-%b-%Y %H:%M:%S", &tm) != NULL)
+					{
+						timestamp_found = true;
+						break;
+					}
+
+					if (thisString.size() > 0)
+						thisString = thisString.erase(0, 1);
+				}
+			}
+			++it;
+		}
+
 		tm.tm_isdst = -1;
 		t = mktime(&tm);
 		tv.tv_sec = t;
