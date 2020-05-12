@@ -416,12 +416,13 @@ void msgViewerDlg::trim_msg_pool()
 			while (msgFilters_[d].msgs.size() > maxMsgs)
 			{
 				msgFilters_[d].msgs.erase(msgFilters_[d].msgs.begin());
-				msgFilters_[d].nDisplayedDeletedMsgs++;
 			}
 		}
 
 		if ((int)d == tabWidget->currentIndex())
 		{
+			if (msg->sev() >= msgFilters_[d].sevThresh)
+				msgFilters_[d].nDisplayedDeletedMsgs++;
 			if (maxDeletedMsgs > 0 && msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs))
 			{
 				displayMsgs(d);
