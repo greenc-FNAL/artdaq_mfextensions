@@ -8,7 +8,12 @@
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
 
 mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset)
-    : MVReceiver(pset), message_port_(pset.get<int>("port", 5140)), message_addr_(pset.get<std::string>("message_address", "227.128.12.27")), multicast_enable_(pset.get<bool>("multicast_enable", false)), multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", "0.0.0.0")), message_socket_(-1)
+    : MVReceiver(pset)
+    , message_port_(pset.get<int>("port", 5140))
+    , message_addr_(pset.get<std::string>("message_address", "227.128.12.27"))
+    , multicast_enable_(pset.get<bool>("multicast_enable", false))
+    , multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", "0.0.0.0"))
+    , message_socket_(-1)
 {
 	TLOG(TLVL_TRACE) << "UDPReceiver Constructor";
 }
@@ -143,7 +148,7 @@ std::list<std::string> mfviewer::UDPReceiver::tokenize_(std::string const& input
 	return output;
 }
 
-qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
+msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string input)
 {
 	std::string hostname, category, application, message, hostaddr, file, line, module, eventID;
 	mf::ELseverityLevel sev;
@@ -268,15 +273,15 @@ qt_mf_msg mfviewer::UDPReceiver::read_msg(std::string input)
 		message = oss.str();
 	}
 
-	qt_mf_msg msg(hostname, category, application, pid, tv);
-	msg.setSeverity(sev);
-	msg.setMessage("UDPMessage", seqNum, message);
-	msg.setHostAddr(hostaddr);
-	msg.setFileName(file);
-	msg.setLineNumber(line);
-	msg.setModule(module);
-	msg.setEventID(eventID);
-	msg.updateText();
+	auto msg = std::make_shared<qt_mf_msg>(hostname, category, application, pid, tv);
+	msg->setSeverity(sev);
+	msg->setMessage("UDPMessage", seqNum, message);
+	msg->setHostAddr(hostaddr);
+	msg->setFileName(file);
+	msg->setLineNumber(line);
+	msg->setModule(module);
+	msg->setEventID(eventID);
+	msg->updateText();
 
 	return msg;
 }

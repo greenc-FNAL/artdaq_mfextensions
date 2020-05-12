@@ -34,7 +34,7 @@ public:
 	/// </summary>
 	/// <param name="input">String to parse</param>
 	/// <returns>qt_mf_msg object containing message data</returns>
-	qt_mf_msg read_msg(std::string input);
+	msg_ptr_t read_msg(std::string input);
 
 	/// <summary>
 	/// Run simple validation tests on message

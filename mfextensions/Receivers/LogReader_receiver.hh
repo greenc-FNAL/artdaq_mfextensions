@@ -41,7 +41,7 @@ public:
 	/// Read the next message from the input stream
 	/// </summary>
 	/// <returns>qt_mf_msg from log file</returns>
-	qt_mf_msg read_next();  // read next log
+	msg_ptr_t read_next();  // read next log
 
 private:
 	std::ifstream log_;
