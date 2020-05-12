@@ -415,14 +415,14 @@ void msgViewerDlg::trim_msg_pool()
 			std::lock_guard<std::mutex> lk(filter_mutex_);
 			while (msgFilters_[d].msgs.size() > maxMsgs)
 			{
+				if ((*msgFilters_[d].msgs.begin())->sev() >= msgFilters_[d].sevThresh)
+					msgFilters_[d].nDisplayedDeletedMsgs++;
 				msgFilters_[d].msgs.erase(msgFilters_[d].msgs.begin());
 			}
 		}
 
 		if ((int)d == tabWidget->currentIndex())
 		{
-			if (msg->sev() >= msgFilters_[d].sevThresh)
-				msgFilters_[d].nDisplayedDeletedMsgs++;
 			if (maxDeletedMsgs > 0 && msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs))
 			{
 				displayMsgs(d);
