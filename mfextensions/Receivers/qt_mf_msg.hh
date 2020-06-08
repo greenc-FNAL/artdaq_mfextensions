@@ -44,7 +44,7 @@ public:
 	/// <param name="application">Application of the message</param>
 	/// <param name="pid">PID of the message</param>
 	/// <param name="time">Timestamp of the message</param>
-	qt_mf_msg(std::string hostname, std::string category, std::string application, pid_t pid, timeval time);
+	qt_mf_msg(const std::string& hostname, const std::string& category, const std::string& application, pid_t pid, timeval time);
 
 	/// Default message constructor
 	qt_mf_msg() {}
@@ -112,7 +112,7 @@ public:
 	/// <param name="prefix">Message prefix</param>
 	/// <param name="iteration">Message iteration (run/event no)</param>
 	/// <param name="msg">Message text</param>
-	void setMessage(std::string prefix, int iteration, std::string msg);
+	void setMessage(const std::string& prefix, int iteration, const std::string& msg);
 	/// <summary>
 	/// Set the hostaddr field
 	/// </summary>

@@ -37,7 +37,7 @@ int main(int ac, char* av[])
 
 	std::vector<std::string> vcat_def;
 
-	vcat_def.push_back("");
+	vcat_def.emplace_back("");
 
 	try
 	{
@@ -65,7 +65,7 @@ int main(int ac, char* av[])
 		po::store(po::command_line_parser(ac, av).options(desc).positional(p).run(), vm);
 		po::notify(vm);
 
-		if (vm.count("help"))
+		if (vm.count("help") != 0u)
 		{
 			std::cout << "Usage: msglogger [options] <message text>\n";
 			std::cout << cmdopt;
@@ -86,7 +86,7 @@ int main(int ac, char* av[])
 	std::vector<std::string>::iterator it;
 
 	// must have message text
-	if (messages.size() == 0)
+	if (messages.empty())
 	{
 		std::cout << "Message text is missing!\n";
 		std::cout << "Use \"msglogger --help\" for help messages\n";
@@ -145,14 +145,15 @@ int main(int ac, char* av[])
 	mf::SetApplicationName(application);
 
 	// logging message...
-	if (severity == "ERROR")
+	if (severity == "ERROR") {
 		mf::LogError(cat) << message;
-	else if (severity == "WARNING")
+	} else if (severity == "WARNING") {
 		mf::LogWarning(cat) << message;
-	else if (severity == "INFO")
+	} else if (severity == "INFO") {
 		mf::LogInfo(cat) << message;
-	else if (severity == "DEBUG")
+	} else if (severity == "DEBUG") {
 		mf::LogDebug(cat) << message;
+}
 
 	return 0;
 }

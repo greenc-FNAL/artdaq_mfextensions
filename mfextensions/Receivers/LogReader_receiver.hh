@@ -25,7 +25,7 @@ public:
 	/// LogReader Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure the LogReader</param>
-	explicit LogReader(fhicl::ParameterSet pset);
+	explicit LogReader(const fhicl::ParameterSet& pset);
 
 	/// <summary>
 	/// LogReader Destructor

@@ -88,26 +88,26 @@ public:
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
+	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
+	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "Suffix" portion of the message (Unused)
    */
-	virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
+	void fillSuffix(std::ostringstream& /*unused*/, const ErrorObj& /*msg*/) override {}
 
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param o Stringstream object containing message data
    * \param e MessageFacility object containing header information
    */
-	virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
+	void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 private:
 	void reconnect_();
@@ -167,7 +167,7 @@ ELUDP::ELUDP(Parameters const& pset)
 		struct ifaddrs* ifa = nullptr;
 		void* tmpAddrPtr = nullptr;
 
-		if (getifaddrs(&ifAddrStruct))
+		if (getifaddrs(&ifAddrStruct) != 0)
 		{
 			// failed to get addr struct
 			hostaddr_ = "127.0.0.1";
@@ -196,11 +196,16 @@ ELUDP::ELUDP(Parameters const& pset)
 				}
 
 				// find first non-local address
-				if (!hostaddr_.empty() && hostaddr_.compare("127.0.0.1") && hostaddr_.compare("::1")) break;
+				if (!hostaddr_.empty() && (hostaddr_ != "127.0.0.1") && (hostaddr_ != "::1"))
+				{
+					break;
+				}
 			}
 
-			if (hostaddr_.empty())  // failed to find anything
+			if (hostaddr_.empty())
+			{  // failed to find anything
 				hostaddr_ = "127.0.0.1";
+			}
 		}
 	}
 
@@ -344,7 +349,7 @@ void ELUDP::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
 	}
 
 	// remove leading "\n" if present
-	const std::string& usrMsg = !tmposs.str().compare(0, 1, "\n") ? tmposs.str().erase(0, 1) : tmposs.str();
+	const std::string& usrMsg = tmposs.str().compare(0, 1, "\n") == 0 ? tmposs.str().erase(0, 1) : tmposs.str();
 
 	oss << usrMsg;
 }
@@ -352,9 +357,12 @@ void ELUDP::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
 //======================================================================
 // Message router ( overriddes ELdestination::routePayload )
 //======================================================================
-void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj&)
+void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj& /*msg*/)
 {
-	if (message_socket_ == -1) reconnect_();
+	if (message_socket_ == -1)
+	{
+		reconnect_();
+	}
 	if (error_count_ < error_max_ || error_max_ == 0)
 	{
 		char str[INET_ADDRSTRLEN];
@@ -399,7 +407,7 @@ void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj&)
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELUDP>(pset);
 }

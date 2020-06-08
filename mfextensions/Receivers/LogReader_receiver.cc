@@ -2,8 +2,8 @@
 #include <iostream>
 #include "mfextensions/Receivers/ReceiverMacros.hh"
 
-mfviewer::LogReader::LogReader(fhicl::ParameterSet pset)
-    : MVReceiver(pset), log_(), pos_(0), filename_(pset.get<std::string>("filename")), counter_(0), metadata_1("\\%MSG-([wide])\\s([^:]*):\\s\\s([^\\s]*)\\s*(\\d\\d-[^-]*-\\d{4}\\s\\d+:\\d+:\\d+)\\s.[DS]T\\s\\s(\\w+)")
+mfviewer::LogReader::LogReader(const fhicl::ParameterSet& pset)
+    : MVReceiver(pset),  pos_(0), filename_(pset.get<std::string>("filename")), counter_(0), metadata_1(R"(\%MSG-([wide])\s([^:]*):\s\s([^\s]*)\s*(\d\d-[^-]*-\d{4}\s\d+:\d+:\d+)\s.[DS]T\s\s(\w+))")
 //, metadata_2
 //  ( "([^\\s]*)\\s([^\\s]*)\\s([^\\s]*)\\s(([^\\s]*)\\s)?([^:]*):(\\d*)" )
 {
@@ -58,7 +58,7 @@ void mfviewer::LogReader::run()
 	std::cout << "LogReader_receiver shutting down!" << std::endl;
 }
 
-#include <time.h>
+#include <ctime>
 #include <iostream>
 
 qt_mf_msg mfviewer::LogReader::read_next()

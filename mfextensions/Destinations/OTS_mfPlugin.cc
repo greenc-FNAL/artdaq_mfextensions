@@ -67,26 +67,26 @@ public:
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
+	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
+	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "Suffix" portion of the message (Unused)
    */
-	virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
+	void fillSuffix(std::ostringstream& /*unused*/, const ErrorObj& /*msg*/) override {}
 
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param o Stringstream object containing message data
    * \param e MessageFacility object containing header information
    */
-	virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
+	void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 private:
 	// Other stuff
@@ -130,7 +130,7 @@ ELOTS::ELOTS(Parameters const& pset)
 		struct ifaddrs* ifa = nullptr;
 		void* tmpAddrPtr = nullptr;
 
-		if (getifaddrs(&ifAddrStruct))
+		if (getifaddrs(&ifAddrStruct) != 0)
 		{
 			// failed to get addr struct
 			hostaddr_ = "127.0.0.1";
@@ -159,11 +159,16 @@ ELOTS::ELOTS(Parameters const& pset)
 				}
 
 				// find first non-local address
-				if (!hostaddr_.empty() && hostaddr_.compare("127.0.0.1") && hostaddr_.compare("::1")) break;
+				if (!hostaddr_.empty() && (hostaddr_ != "127.0.0.1") && (hostaddr_ != "::1"))
+				{
+					break;
+				}
 			}
 
-			if (hostaddr_.empty())  // failed to find anything
+			if (hostaddr_.empty())
+			{  // failed to find anything
 				hostaddr_ = "127.0.0.1";
+			}
 		}
 	}
 
@@ -193,8 +198,8 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 {
 	const auto& xid = msg.xid();
 
-	auto id = xid.id();
-	auto module = xid.module();
+	const auto& id = xid.id();
+	const auto& module = xid.module();
 	auto app = app_;
 	char* cp = &format_string_[0];
 	char sev;
@@ -202,7 +207,7 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 	std::string ossstr;
 	// ossstr.reserve(100);
 
-	for (; *cp; ++cp)
+	for (; *cp != 0; ++cp)
 	{
 		if (*cp != '%')
 		{
@@ -227,16 +232,22 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 				oss << module;
 				break;  // module name # Early
 			case 'f':   // filename
-				if (filename_delimit_.size() == 0)
+				if (filename_delimit_.empty())
+				{
 					oss << msg.filename();
+				}
 				else if (filename_delimit_.size() == 1)
-					oss << (strrchr(&msg.filename()[0], filename_delimit_[0])
+				{
+					oss << (strrchr(&msg.filename()[0], filename_delimit_[0]) != nullptr
 					            ? strrchr(&msg.filename()[0], filename_delimit_[0]) + 1
 					            : msg.filename());
+				}
 				else
-					oss << (strstr(&msg.filename()[0], &filename_delimit_[0])
+				{
+					oss << (strstr(&msg.filename()[0], &filename_delimit_[0]) != nullptr
 					            ? strstr(&msg.filename()[0], &filename_delimit_[0]) + filename_delimit_.size()
 					            : msg.filename());
+				}
 				break;
 			case 'h':
 				oss << hostname_;
@@ -246,12 +257,20 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 				break;  // severity
 			case 'm':   // message
 				// ossstr.clear();						 // incase message is repeated
-				for (auto const& val : msg.items()) ossstr += val;  // Print the contents.
-				if (ossstr.size())
-				{                                                             // allow/check for "no message"
-					if (ossstr.compare(0, 1, "\n") == 0) ossstr.erase(0, 1);  // remove leading "\n" if present
+				for (auto const& val : msg.items())
+				{
+					ossstr += val;  // Print the contents.
+				}
+				if (!ossstr.empty())
+				{  // allow/check for "no message"
+					if (ossstr.compare(0, 1, "\n") == 0)
+					{
+						ossstr.erase(0, 1);  // remove leading "\n" if present
+					}
 					if (ossstr.compare(ossstr.size() - 1, 1, "\n") == 0)
+					{
 						ossstr.erase(ossstr.size() - 1, 1);  // remove trailing "\n" if present
+					}
 					oss << ossstr;
 				}
 				msg_printed = true;
@@ -285,10 +304,18 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 	}
 	if (!msg_printed)
 	{
-		for (auto const& val : msg.items()) ossstr += val;        // Print the contents.
-		if (ossstr.compare(0, 1, "\n") == 0) ossstr.erase(0, 1);  // remove leading "\n" if present
+		for (auto const& val : msg.items())
+		{
+			ossstr += val;  // Print the contents.
+		}
+		if (ossstr.compare(0, 1, "\n") == 0)
+		{
+			ossstr.erase(0, 1);  // remove leading "\n" if present
+		}
 		if (ossstr.compare(ossstr.size() - 1, 1, "\n") == 0)
+		{
 			ossstr.erase(ossstr.size() - 1, 1);  // remove trailing "\n" if present
+		}
 		oss << ossstr;
 	}
 }
@@ -299,13 +326,13 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 void ELOTS::fillUsrMsg(std::ostringstream& oss __attribute__((__unused__)),
                        const ErrorObj& msg __attribute__((__unused__)))
 {
-	return;  // UsrMsg filled above
+	// UsrMsg filled above
 }
 
 //======================================================================
 // Message router ( overriddes ELdestination::routePayload )
 //======================================================================
-void ELOTS::routePayload(const std::ostringstream& oss, const ErrorObj&) { std::cout << oss.str() << std::endl; }
+void ELOTS::routePayload(const std::ostringstream& oss, const ErrorObj& /*msg*/) { std::cout << oss.str() << std::endl; }
 }  // end namespace mfplugins
 //======================================================================
 //
@@ -317,7 +344,7 @@ void ELOTS::routePayload(const std::ostringstream& oss, const ErrorObj&) { std::
 #define EXTERN_C_FUNC_DECLARE_START extern "C" {
 #endif
 
-EXTERN_C_FUNC_DECLARE_START auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+EXTERN_C_FUNC_DECLARE_START auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELOTS>(pset);
 }

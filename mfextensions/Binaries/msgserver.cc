@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 		po::store(po::command_line_parser(argc, argv).options(desc).run(), vm);
 		po::notify(vm);
 
-		if (vm.count("help"))
+		if (vm.count("help") != 0u)
 		{
 			std::cout << "Usage: msglogger [options] <message text>\n";
 			std::cout << cmdopt;
@@ -73,7 +73,8 @@ int main(int argc, char* argv[])
 
 	while (true)
 	{
-		if (cmdline) std::cout << "> ";
+		if (cmdline) { std::cout << "> ";
+}
 		getline(std::cin, cmd);
 
 		if (cmd.empty())

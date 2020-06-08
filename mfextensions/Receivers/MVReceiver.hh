@@ -23,7 +23,7 @@ public:
 	/// Construct a MVReceiver using the given ParameterSet
 	/// </summary>
 	/// <param name="pset">ParameterSet used to construct MVReceiver</param>
-	explicit MVReceiver(fhicl::ParameterSet pset);
+	explicit MVReceiver(fhicl::ParameterSet const& pset);
 
 	/// <summary>
 	/// MVReceiver destructor
