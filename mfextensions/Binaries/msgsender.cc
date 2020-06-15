@@ -145,15 +145,22 @@ int main(int ac, char* av[])
 	mf::SetApplicationName(application);
 
 	// logging message...
-	if (severity == "ERROR") {
+	if (severity == "ERROR")
+	{
 		mf::LogError(cat) << message;
-	} else if (severity == "WARNING") {
+	}
+	else if (severity == "WARNING")
+	{
 		mf::LogWarning(cat) << message;
-	} else if (severity == "INFO") {
+	}
+	else if (severity == "INFO")
+	{
 		mf::LogInfo(cat) << message;
-	} else if (severity == "DEBUG") {
+	}
+	else if (severity == "DEBUG")
+	{
 		mf::LogDebug(cat) << message;
-}
+	}
 
 	return 0;
 }

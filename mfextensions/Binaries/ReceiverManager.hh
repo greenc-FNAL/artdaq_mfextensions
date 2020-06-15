@@ -19,7 +19,7 @@ public:
 	/// ReceiverManager Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ReceiverManager</param>
-	explicit ReceiverManager(fhicl::ParameterSet pset);
+	explicit ReceiverManager(fhicl::ParameterSet const& pset);
 
 	/// <summary>
 	/// ReceiverManager Destructor

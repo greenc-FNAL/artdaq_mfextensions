@@ -30,12 +30,12 @@ g++ -g -Wall -I$MESSAGEFACILITY_INC -I$CETLIB_INC -I$CETLIB_EXCEPT_INC -I$FHICLC
 ./mf_cout_vs_TRACE_printf test
 #endif
 
+#include <cstdlib>  // setenv
+#include <string>
 #include "TRACE/tracemf.h"  // TRACE
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/make_ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#include <cstdlib>  // setenv
-#include <string>
 //#include "TRACE/trace.h"				// TRACE
 
 const char *mf_test_config =
@@ -164,16 +164,22 @@ int main(int argc, char *argv[])
 	mf::LogAbsolute("abs_category/id", __FILE__, __LINE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 
 	TRACE(1, "start 1000 LOG_DEBUG");
-	for (auto ii = 0; ii < 1000; ++ii) { TLOG_DEBUG("mf_test_category") << "this is a LOG_DEBUG " << ii;
-}
+	for (auto ii = 0; ii < 1000; ++ii)
+	{
+		TLOG_DEBUG("mf_test_category") << "this is a LOG_DEBUG " << ii;
+	}
 
 	TRACE(1, "end LOG_DEBUG, start 1000 TRACE");
 
-	for (auto ii = 0; ii < 1000; ++ii) { TRACEN_(TRACE_NAME, 1, "this is a TRACE_ " << ii);
-}
+	for (auto ii = 0; ii < 1000; ++ii)
+	{
+		TRACEN_(TRACE_NAME, 1, "this is a TRACE_ " << ii);
+	}
 	TRACE(1, "end TRACE");
 
-	for (auto ii = 0; ii < 2; ++ii) { ::mf::LogTrace{"simply", __FILE__, __LINE__} << "this is a test";
-}
+	for (auto ii = 0; ii < 2; ++ii)
+	{
+		::mf::LogTrace{"simply", __FILE__, __LINE__} << "this is a test";
+	}
 	return (0);
 }  // main

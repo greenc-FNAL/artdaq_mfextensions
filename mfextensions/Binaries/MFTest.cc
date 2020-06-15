@@ -6,13 +6,13 @@
 #define MF_DEBUG
 #endif
 
-#include "fhiclcpp/ParameterSet.h"
-#include "fhiclcpp/make_ParameterSet.h"
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include "fhiclcpp/ParameterSet.h"
+#include "fhiclcpp/make_ParameterSet.h"
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 

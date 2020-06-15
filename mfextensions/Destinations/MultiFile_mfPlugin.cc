@@ -130,7 +130,7 @@ void ELMultiFileOutput::routePayload(const std::ostringstream& oss, const ErrorO
 
 void ELMultiFileOutput::flush()
 {
-	for (auto & output : outputs_)
+	for (auto& output : outputs_)
 	{
 		output.second->flush();
 	}

@@ -3,7 +3,7 @@
 #include "mfextensions/Receivers/ReceiverMacros.hh"
 
 mfviewer::LogReader::LogReader(const fhicl::ParameterSet& pset)
-    : MVReceiver(pset),  pos_(0), filename_(pset.get<std::string>("filename")), counter_(0), metadata_1(R"(\%MSG-([wide])\s([^:]*):\s\s([^\s]*)\s*(\d\d-[^-]*-\d{4}\s\d+:\d+:\d+)\s.[DS]T\s\s(\w+))")
+    : MVReceiver(pset), pos_(0), filename_(pset.get<std::string>("filename")), counter_(0), metadata_1(R"(\%MSG-([wide])\s([^:]*):\s\s([^\s]*)\s*(\d\d-[^-]*-\d{4}\s\d+:\d+:\d+)\s.[DS]T\s\s(\w+))")
 //, metadata_2
 //  ( "([^\\s]*)\\s([^\\s]*)\\s([^\\s]*)\\s(([^\\s]*)\\s)?([^:]*):(\\d*)" )
 {

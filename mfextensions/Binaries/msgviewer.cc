@@ -1,5 +1,5 @@
-#include <QtWidgets/QApplication>
 #include <QtWidgets/qdesktopwidget.h>
+#include <QtWidgets/QApplication>
 #include <cstdio>
 #include <iostream>
 

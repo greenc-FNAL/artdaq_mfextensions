@@ -295,7 +295,7 @@ void ELUDP::reconnect_()
 		TLOG(TLVL_ERROR) << "Unable to enable multicast loopback on message socket, err=" << strerror(errno);
 		exit(1);
 	}
-	if (setsockopt(message_socket_, SOL_SOCKET, SO_BROADCAST, (void*)&yes, sizeof(int)) == -1)
+	if (setsockopt(message_socket_, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes)) == -1)
 	{
 		TLOG(TLVL_ERROR) << "Cannot set message socket to broadcast, err=" << strerror(errno);
 		exit(1);

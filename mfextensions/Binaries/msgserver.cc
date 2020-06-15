@@ -73,8 +73,10 @@ int main(int argc, char* argv[])
 
 	while (true)
 	{
-		if (cmdline) { std::cout << "> ";
-}
+		if (cmdline)
+		{
+			std::cout << "> ";
+		}
 		getline(std::cin, cmd);
 
 		if (cmd.empty())
