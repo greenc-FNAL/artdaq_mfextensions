@@ -10,7 +10,6 @@
 #include <fstream>
 
 namespace mfplugins {
-using mf::ELseverityLevel;
 using mf::ErrorObj;
 using mf::service::ELdestination;
 
@@ -55,7 +54,7 @@ public:
 	/// ELMultiFileOutput Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELMultiFileOutput</param>
-	ELMultiFileOutput(Parameters const& pset);
+	explicit ELMultiFileOutput(Parameters const& pset);
 
 	/// <summary>
 	/// Default virtual Destructor
@@ -75,6 +74,11 @@ public:
 	void flush() override;
 
 private:
+	ELMultiFileOutput(ELMultiFileOutput const&) = delete;
+	ELMultiFileOutput(ELMultiFileOutput&&) = delete;
+	ELMultiFileOutput& operator=(ELMultiFileOutput const&) = delete;
+	ELMultiFileOutput& operator=(ELMultiFileOutput&&) = delete;
+
 	std::string baseDir_;
 	bool append_;
 	std::unordered_map<std::string, std::unique_ptr<cet::ostream_handle>> outputs_;

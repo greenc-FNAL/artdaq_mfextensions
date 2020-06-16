@@ -15,7 +15,6 @@
 
 namespace mfplugins {
 using namespace mf::service;
-using mf::ELseverityLevel;
 using mf::ErrorObj;
 
 /// <summary>
@@ -43,7 +42,7 @@ public:
 	/// ELFriendly Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELFriendly</param>
-	ELFriendly(Parameters const& pset);
+	explicit ELFriendly(Parameters const& pset);
 
 	/**
    * \brief Fill the "Prefix" portion of the message

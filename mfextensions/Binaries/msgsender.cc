@@ -15,7 +15,6 @@
 #include <boost/program_options.hpp>
 
 using namespace boost;
-namespace BFS = boost::filesystem;
 namespace po = boost::program_options;
 
 #include <algorithm>

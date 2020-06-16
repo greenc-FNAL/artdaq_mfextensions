@@ -33,7 +33,6 @@
 #endif
 
 namespace mfplugins {
-using mf::ELseverityLevel;
 using mf::ErrorObj;
 using mf::service::ELdestination;
 
@@ -129,7 +128,7 @@ private:
 	int next_error_report_;
 	int seqNum_;
 
-	long pid_;
+	int64_t pid_;
 	std::string hostname_;
 	std::string hostaddr_;
 	std::string app_;
@@ -144,7 +143,7 @@ private:
 //======================================================================
 
 ELUDP::ELUDP(Parameters const& pset)
-    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max()), host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address()), message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<long>(getpid()))
+    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max()), host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address()), message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<int64_t>(getpid()))
 {
 	// hostname
 	char hostname_c[1024];
@@ -157,7 +156,7 @@ ELUDP::ELUDP(Parameters const& pset)
 	if (host != nullptr)
 	{
 		// ip address from hostname if the entry exists in /etc/hosts
-		char* ip = inet_ntoa(*(struct in_addr*)host->h_addr);
+		char* ip = inet_ntoa(*reinterpret_cast<struct in_addr*>(host->h_addr)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 		hostaddr_ = ip;
 	}
 	else
@@ -180,7 +179,7 @@ ELUDP::ELUDP(Parameters const& pset)
 				if (ifa->ifa_addr->sa_family == AF_INET)
 				{
 					// a valid IPv4 addres
-					tmpAddrPtr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr)->sin_addr); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 					char addressBuffer[INET_ADDRSTRLEN];
 					inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;
@@ -189,7 +188,7 @@ ELUDP::ELUDP(Parameters const& pset)
 				else if (ifa->ifa_addr->sa_family == AF_INET6)
 				{
 					// a valid IPv6 address
-					tmpAddrPtr = &((struct sockaddr_in6*)ifa->ifa_addr)->sin6_addr;
+					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in6*>(ifa->ifa_addr)->sin6_addr);  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 					char addressBuffer[INET6_ADDRSTRLEN];
 					inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;
@@ -369,7 +368,7 @@ void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj& /*msg*/)
 		inet_ntop(AF_INET, &(message_addr_.sin_addr), str, INET_ADDRSTRLEN);
 
 		auto string = "UDPMFMESSAGE" + std::to_string(pid_) + "|" + oss.str();
-		auto sts = sendto(message_socket_, string.c_str(), string.size(), 0, (struct sockaddr*)&message_addr_,
+		auto sts = sendto(message_socket_, string.c_str(), string.size(), 0, reinterpret_cast<struct sockaddr*>(&message_addr_),  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 		                  sizeof(message_addr_));
 
 		if (sts < 0)

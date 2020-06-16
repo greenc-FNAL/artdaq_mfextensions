@@ -144,7 +144,7 @@ void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 	auto message = oss.str();
 
 	auto level = xid.severity().getLevel();
-	auto lvlNum = 0;
+	int lvlNum;
 
 	switch (level)
 	{
@@ -161,8 +161,10 @@ void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 		case mf::ELseverityLevel::ELsev_warning:
 			lvlNum = 1;
 			break;
+		default:
+			lvlNum = 0;
 	}
-	TRACE(lvlNum, message);  // this is the TRACE -- direct the message to memory and/or stdout
+	TRACE(lvlNum, message);  // NOLINT this is the TRACE -- direct the message to memory and/or stdout
 }
 }  // end namespace mfplugins
 

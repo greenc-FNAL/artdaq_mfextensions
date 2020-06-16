@@ -10,7 +10,17 @@ mfviewer::LogReader::LogReader(const fhicl::ParameterSet& pset)
 	std::cout << "LogReader_receiver Constructor" << std::endl;
 }
 
-mfviewer::LogReader::~LogReader() { log_.close(); }
+mfviewer::LogReader::~LogReader()
+{
+	try
+	{
+		log_.close();
+	}
+	catch (...)
+	{
+		// IGNORED
+	}
+}
 
 void mfviewer::LogReader::run()
 {

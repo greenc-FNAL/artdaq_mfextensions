@@ -23,21 +23,21 @@ int main(int argc, char** argv)
 	{
 		for (int i = 1; i < argc; ++i)
 		{
-			if ((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0))
+			if ((strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0))  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			{
 				print_usage();
 				return 0;
 			}
 
-			if (((strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--configuration") == 0)) && i < argc - 1)
+			if (((strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--configuration") == 0)) && i < argc - 1)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			{
-				conf = std::string(argv[i + 1]);
+				conf = std::string(argv[i + 1]); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 				++i;
 			}
 
 			else
 			{
-				std::cout << "unknown option: " << argv[i] << "\n";
+				std::cout << "unknown option: " << argv[i] << "\n";  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 				print_usage();
 				return -1;
 			}

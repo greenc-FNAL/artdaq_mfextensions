@@ -23,7 +23,7 @@ public:
 	/// <param name="name">Regular expression to match messages</param>
 	/// <param name="limit">Number of messages before throttling is enabled</param>
 	/// <param name="timespan">Time limit for throttling</param>
-	throttle(std::string const& name, int limit, long timespan);
+	throttle(std::string const& name, int limit, int64_t timespan);
 
 	/// <summary>
 	/// Determine whether the name has reached the throttling limit
@@ -44,8 +44,8 @@ private:
 	regex_t expr_;
 	smatch_t what_;
 	int limit_;
-	long timespan_;
-	long last_window_start_;
+	int64_t timespan_;
+	int64_t last_window_start_;
 	int count_;
 	bool in_use_;
 };

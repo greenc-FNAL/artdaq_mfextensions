@@ -47,6 +47,12 @@ signals:
 	/// </summary>
 	/// <param name="msg">Received message</param>
 	void NewMessage(qt_mf_msg const& msg);
+
+private:
+	MVReceiver(MVReceiver const&) = delete;
+	MVReceiver(MVReceiver&&) = delete;
+	MVReceiver& operator=(MVReceiver const&) = delete;
+	MVReceiver& operator=(MVReceiver&&) = delete;
 };
 }  // namespace mfviewer
 

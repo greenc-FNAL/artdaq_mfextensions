@@ -51,6 +51,11 @@ private slots:
 	void onNewMessage(qt_mf_msg const& mfmsg);
 
 private:
+	ReceiverManager(ReceiverManager const&) = delete;
+	ReceiverManager(ReceiverManager&&) = delete;
+	ReceiverManager& operator=(ReceiverManager const&) = delete;
+	ReceiverManager& operator=(ReceiverManager&&) = delete;
+
 	std::vector<std::unique_ptr<mfviewer::MVReceiver>> receivers_;
 };
 }  // namespace mfviewer

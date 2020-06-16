@@ -58,7 +58,7 @@ int TCP_listen_fd(int port, int rcvbuf)
 	sin.sin_addr.s_addr = INADDR_ANY;
 
 	// printf( "bind..." );fflush(stdout);
-	sts = bind(listener_fd, (struct sockaddr *)&sin, sizeof(sin));
+	sts = bind(listener_fd, reinterpret_cast<struct sockaddr *>(&sin), sizeof(sin));
 	if (sts == -1)
 	{
 		TLOG(TLVL_ERROR) << "Could not bind socket! Exiting with code 3!";

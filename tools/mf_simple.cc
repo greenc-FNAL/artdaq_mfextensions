@@ -121,19 +121,19 @@ int main(int argc, char *argv[])
 	setenv("TRACE_LIMIT_MS", "5,50,500", 0);  // equiv to TRACE_CNTL( "limit_ms", 5L, 50L, 500L )
 	TRACE_CNTL("reset");
 	fhicl::ParameterSet pset;
-	if (argc == 2 && strcmp(argv[1], "test") == 0)
+	if (argc == 2 && strcmp(argv[1], "test") == 0) // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
 		std::string pstr(mf_test_config);
 		fhicl::make_ParameterSet(pstr, pset);
 		// ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
 	}
-	else if (argc == 2 && strcmp(argv[1], "TRACE") == 0)
+	else if (argc == 2 && strcmp(argv[1], "TRACE") == 0)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
 		std::string pstr(mf_TRACE_config);
 		fhicl::make_ParameterSet(pstr, pset);
 		// ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
 	}
-	else if (argc == 2 && strcmp(argv[1], "friendly") == 0)
+	else if (argc == 2 && strcmp(argv[1], "friendly") == 0)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
 		std::string pstr(mf_friendly_config);
 		fhicl::make_ParameterSet(pstr, pset);
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 		// i.e ./MessageFacility.cfg
 		setenv("FHICL_FILE_PATH", ".", 0);
 		cet::filepath_maker fpm;
-		fhicl::make_ParameterSet(argv[1], fpm, pset);
+		fhicl::make_ParameterSet(argv[1], fpm, pset);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	}
 #if defined(__cplusplus) && (__cplusplus == 201300L)
 	mf::StartMessageFacility(mf::MessageFacilityService::MultiThread, pset);
@@ -157,25 +157,25 @@ int main(int argc, char *argv[])
 
 	// else total mf default
 
-	TRACE(1, "\nHello\n");
+	TRACE(1, "\nHello\n"); // NOLINT
 	TLOG_ERROR("mf_test_category") << "hello - this is an mf::LogError(\"mf_test_category\")\n";
 	mf::LogAbsolute("abs_category/id") << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 	mf::LogAbsolute("abs_category/id", __FILE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 	mf::LogAbsolute("abs_category/id", __FILE__, __LINE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 
-	TRACE(1, "start 1000 LOG_DEBUG");
+	TRACE(1, "start 1000 LOG_DEBUG"); // NOLINT
 	for (auto ii = 0; ii < 1000; ++ii)
 	{
 		TLOG_DEBUG("mf_test_category") << "this is a LOG_DEBUG " << ii;
 	}
 
-	TRACE(1, "end LOG_DEBUG, start 1000 TRACE");
+	TRACE(1, "end LOG_DEBUG, start 1000 TRACE"); // NOLINT
 
 	for (auto ii = 0; ii < 1000; ++ii)
 	{
-		TRACEN_(TRACE_NAME, 1, "this is a TRACE_ " << ii);
+		TRACEN_(TRACE_NAME, 1, "this is a TRACE_ " << ii); // NOLINT
 	}
-	TRACE(1, "end TRACE");
+	TRACE(1, "end TRACE"); // NOLINT
 
 	for (auto ii = 0; ii < 2; ++ii)
 	{
