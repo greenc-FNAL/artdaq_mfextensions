@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 
-#include <ErrorHandler/ma_types.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
 
 #include <boost/any.hpp>
 #include <boost/function.hpp>
@@ -64,7 +64,7 @@ public:
   // a user function is allowed to take multiple arguments
   // other than the condition name that it applies on
   virtual bool
-    parse_arguments( anys_t const & args ) { return true; }
+    parse_arguments( anys_t const & /*args*/ ) { return true; }
 
   // whether the funciton triggers a grouped alarm or
   // individual alarms with respect to the condition's 

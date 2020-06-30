@@ -2,7 +2,7 @@
 #define ERROR_HANDLER_MA_COND_TEST_EXPR_H
 
 
-#include <ErrorHandler/ma_cond_test_andexpr.h>
+#include "ErrorHandler/MessageAnalyzer/ma_cond_test_andexpr.h"
 
 
 namespace novadaq {

@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 
-#include <ErrorHandler/ma_types.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
 
 #include <fhiclcpp/ParameterSet.h>
 

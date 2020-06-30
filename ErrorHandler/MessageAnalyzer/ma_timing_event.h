@@ -1,7 +1,7 @@
 #ifndef ERROR_HANDLER_MA_TIMING_EVENT_H
 #define ERROR_HANDLER_MA_TIMING_EVENT_H
 
-#include <ErrorHandler/ma_types.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
 #include <boost/thread/mutex.hpp>
 #include <queue>
 

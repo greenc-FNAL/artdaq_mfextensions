@@ -1,6 +1,6 @@
 
-#include <ErrorHandler/ma_cell.h>
-#include <ErrorHandler/ma_condition.h>
+#include "ErrorHandler/MessageAnalyzer/ma_cell.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
 
 #include <time.h>
 
@@ -30,7 +30,7 @@ bool ma_cell::hit( msg_t const & msg
   what_ = w;
 
   // push new message
-  time_t latest = msg.timestamp().tv_sec;
+  time_t latest = msg.time().tv_sec;
   msgs.push_back(msg);
 
   if( on && cond.persistent() )
@@ -40,7 +40,7 @@ bool ma_cell::hit( msg_t const & msg
   }
 
   // pop expired messages ( >timespan )
-  while(latest - msgs.front().timestamp().tv_sec > cond.timespan())
+  while (latest - msgs.front().time().tv_sec > cond.timespan())
     msgs.pop_front();
 
   // pop excessive messages ( >count )
@@ -61,7 +61,7 @@ bool ma_cell::hit( msg_t const & msg
     // t0 = events.front();
     // schedule(t0 + ts + 1);
 
-    time_t t0 = msgs.front().timestamp().tv_sec;
+    time_t t0 = msgs.front().time().tv_sec;
     t_event = t0 + cond.timespan() + 1;
     cond.timing_events().event_queue().push(ma_timing_event(t_event, cond, s_idx, t_idx));
   }
@@ -76,7 +76,7 @@ bool ma_cell::hit( msg_t const & msg
     // t0 = events.front();
     // schedule(t0 + ts + 1);
 
-    time_t t0 = msgs.front().timestamp().tv_sec;
+    time_t t0 = msgs.front().time().tv_sec;
     t_event = t0 + cond.timespan() + 1;
     cond.timing_events().event_queue().push(ma_timing_event(t_event, cond, s_idx, t_idx));
   }

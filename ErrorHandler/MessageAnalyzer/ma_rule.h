@@ -2,12 +2,12 @@
 #define ERROR_HANDLER_MA_RULE_H
 
 // from novadaq
-#include <ErrorHandler/ma_utils.h>
-#include <ErrorHandler/ma_condition.h>
-#include <ErrorHandler/ma_domain_expr.h>
-#include <ErrorHandler/ma_boolean_expr.h>
-#include <ErrorHandler/ma_richmsg.h>
-#include <ErrorHandler/ma_action.h>
+#include "ErrorHandler/MessageAnalyzer/ma_utils.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
+#include "ErrorHandler/MessageAnalyzer/ma_domain_expr.h"
+#include "ErrorHandler/MessageAnalyzer/ma_boolean_expr.h"
+#include "ErrorHandler/MessageAnalyzer/ma_richmsg.h"
+#include "ErrorHandler/MessageAnalyzer/ma_action.h"
 
 // from ups
 #include <boost/shared_ptr.hpp>

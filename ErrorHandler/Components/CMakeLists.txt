@@ -11,6 +11,8 @@ cet_make(LIBRARY_NAME Components
   ${MESSAGEFACILITY_LIBS}
 Qt5::Widgets
 Qt5::Core
+mfextensions_Receivers_LogReader_receiver
+MessageAnalyzer
 )
 
 install_headers()

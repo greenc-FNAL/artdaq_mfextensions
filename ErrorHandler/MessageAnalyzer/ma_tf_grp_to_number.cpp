@@ -1,6 +1,6 @@
 
-#include <ErrorHandler/ma_tf_grp_to_number.h>
-#include <ErrorHandler/ma_condition.h>
+#include "ErrorHandler/MessageAnalyzer/ma_tf_grp_to_number.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
 
 #include <boost/lexical_cast.hpp>
 

@@ -1,8 +1,8 @@
 
-#include <ErrorHandler/ma_domain_ops.h>
-#include <ErrorHandler/ma_domain_cond.h>
-#include <ErrorHandler/ma_domain_expr.h>
-#include <ErrorHandler/ma_rule.h>
+#include "ErrorHandler/MessageAnalyzer/ma_domain_ops.h"
+#include "ErrorHandler/MessageAnalyzer/ma_domain_cond.h"
+#include "ErrorHandler/MessageAnalyzer/ma_domain_expr.h"
+#include "ErrorHandler/MessageAnalyzer/ma_rule.h"
 
 
 using namespace novadaq::errorhandler;

@@ -1,5 +1,5 @@
 
-#include <ErrorHandler/ma_participants.h>
+#include "ErrorHandler/MessageAnalyzer/ma_participants.h"
 
 #include <stdexcept>
 #include <sstream>

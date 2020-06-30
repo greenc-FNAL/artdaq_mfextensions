@@ -1,12 +1,12 @@
 #ifndef ERROR_HANDLER_MA_RULE_ENGINE_H
 #define ERROR_HANDLER_MA_RULE_ENGINE_H
 
-#include <ErrorHandler/ma_types.h>
-#include <ErrorHandler/ma_condition.h>
-#include <ErrorHandler/ma_rule.h>
-#include <ErrorHandler/ma_participants.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
+#include "ErrorHandler/MessageAnalyzer/ma_rule.h"
+#include "ErrorHandler/MessageAnalyzer/ma_participants.h"
 
-#include <ErrorHandler/ma_timing_event.h>
+#include "ErrorHandler/MessageAnalyzer/ma_timing_event.h"
 #include <boost/thread.hpp>
 
 namespace fhicl 

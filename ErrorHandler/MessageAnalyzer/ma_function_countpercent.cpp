@@ -1,7 +1,7 @@
 
-#include <ErrorHandler/ma_function_countpercent.h>
-#include <ErrorHandler/ma_condition.h>
-#include <ErrorHandler/ma_participants.h>
+#include "ErrorHandler/MessageAnalyzer/ma_function_countpercent.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
+#include "ErrorHandler/MessageAnalyzer/ma_participants.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -41,7 +41,7 @@ boost::any
   int count = cond.get_alarm_count( dom, count_type );
   int total = ma_participants::instance().get_group_participant_count( group );
 
-  LOG_DEBUG("") << "count = " << count << ", participants = " << total;
+  TLOG(TLVL_DEBUG) << "count = " << count << ", participants = " << total;
 
   return boost::any( (double)count/total );
 }

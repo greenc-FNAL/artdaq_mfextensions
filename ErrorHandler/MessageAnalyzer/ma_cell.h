@@ -1,7 +1,7 @@
 #ifndef ERROR_HANDLER_MA_FREQUENCY_H
 #define ERROR_HANDLER_MA_FREQUENCY_H
 
-#include <ErrorHandler/ma_utils.h>
+#include "ErrorHandler/MessageAnalyzer/ma_utils.h"
 
 #include <boost/multi_array.hpp>
 #include <boost/regex.hpp>
@@ -50,7 +50,7 @@ public:
   // get latest message
   string_t 
     get_latest_message() const
-    { assert( !msgs.empty() ); return msgs.back().message(); }
+    { assert( !msgs.empty() ); return msgs.back().text(false).toStdString(); }
 
   // get group
   string_t

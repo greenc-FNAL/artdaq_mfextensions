@@ -1,7 +1,7 @@
 #ifndef ERRORHANDLER_MA_RICHMSG_H
 #define ERRORHANDLER_MA_RICHMSG_H
 
-#include <ErrorHandler/ma_types.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
 
 #include <vector>
 

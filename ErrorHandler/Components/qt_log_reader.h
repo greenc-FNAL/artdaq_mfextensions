@@ -2,8 +2,7 @@
 #define ERRORHANDLER_QT_LOG_READER_H
 
 
-#include <messagefacility/MessageLogger/MessageFacilityMsg.h>
-#include <Extensions/interface/LogReader.h>
+#include "mfextensions/Receivers/LogReader_receiver.hh"
 #include <QtCore/QThread>
 
 namespace novadaq {
@@ -19,10 +18,10 @@ protected:
 signals:
   void updateProgress(int);
   void readCompleted();
-  void newMessage(mf::MessageFacilityMsg const &);
+  void newMessage(qt_mf_msg const &);
 
 public:
-  qt_log_reader() : pause(false), idx(0), reader() { }
+  qt_log_reader() : pause(false), idx(0), reader(nullptr) { }
 
   bool open( QString const & filename );
 
@@ -33,7 +32,7 @@ private:
   bool pause;
   int  idx;
 
-  mf::LogReader reader;
+  std::unique_ptr<mfviewer::LogReader> reader;
   
 };
 

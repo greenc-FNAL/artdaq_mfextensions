@@ -34,7 +34,7 @@ public:
 
   // parse aruments
   virtual bool 
-    parse_arguments( anys_t const & args ) { return true; }
+    parse_arguments( anys_t const & /*args*/ ) { return true; }
 
 };
 

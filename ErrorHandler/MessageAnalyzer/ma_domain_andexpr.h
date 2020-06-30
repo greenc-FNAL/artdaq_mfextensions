@@ -2,8 +2,8 @@
 #define ERROR_HANDLER_MA_DOMAIN_ANDEXPR_H
 
 // from novadaq
-#include <ErrorHandler/ma_types.h>
-#include <ErrorHandler/ma_domain_cond.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
+#include "ErrorHandler/MessageAnalyzer/ma_domain_cond.h"
 
 // from ups
 

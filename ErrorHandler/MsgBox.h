@@ -2,8 +2,8 @@
 #define _NOVA_MSG_BOX_H
 
 #include "ui_MsgBox.h"
-#include <ErrorHandler/ma_utils.h>
-#include <ErrorHandler/NodeInfo.h>
+#include "ErrorHandler/MessageAnalyzer/ma_utils.h"
+#include "ErrorHandler/Components/NodeInfo.h"
 
 #include <list>
 

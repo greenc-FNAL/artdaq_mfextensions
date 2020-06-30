@@ -2,11 +2,11 @@
 #define ERROR_HANDLER_MA_CONDITION_H
 
 // from novadaq
-#include <ErrorHandler/ma_types.h>
-#include <ErrorHandler/ma_utils.h>
-#include <ErrorHandler/ma_hitmap.h>
-#include <ErrorHandler/ma_cond_test_expr.h>
-#include <ErrorHandler/ma_timing_event.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
+#include "ErrorHandler/MessageAnalyzer/ma_utils.h"
+#include "ErrorHandler/MessageAnalyzer/ma_hitmap.h"
+#include "ErrorHandler/MessageAnalyzer/ma_cond_test_expr.h"
+#include "ErrorHandler/MessageAnalyzer/ma_timing_event.h"
 
 // from ups
 #include <boost/regex.hpp>

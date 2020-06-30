@@ -1,6 +1,6 @@
 
-#include <ErrorHandler/ma_rule.h>
-#include <ErrorHandler/ma_parse.h>
+#include "ErrorHandler/MessageAnalyzer/ma_rule.h"
+#include "ErrorHandler/MessageAnalyzer/ma_parse.h"
 
 #include <iostream>
 
@@ -52,7 +52,7 @@ void
   alarm_msg.init(this, alarm_message);
 
   // actions
-  std::vector<string_t> keys = act_pset.get_pset_keys();
+  std::vector<string_t> keys = act_pset.get_pset_names();
   for(size_t i=0; i<keys.size(); ++i)
   {
     ParameterSet param = act_pset.get<ParameterSet>(keys[i]);
@@ -73,7 +73,7 @@ cond_idx_t
   // cond_map must not be empty
   assert (cond_map != NULL);
 
-  LOG_DEBUG("") << "insert_cond_ptr: name = " << name << "  "
+  TLOG(TLVL_DEBUG) << "insert_cond_ptr: name = " << name << "  "
                 << "primitive = " << primitive;
 
   // the condition has already been added
@@ -118,7 +118,7 @@ void ma_rule::evaluate_domain( )
   domains.clear();
   domain_expr.evaluate(domains);
 
-  LOG_DEBUG("") << description_
+  TLOG(TLVL_DEBUG) << description_
                 << ": domain evaluated, size = " << domains.size();
 }
 
@@ -139,7 +139,7 @@ bool ma_rule::recursive_evaluate ( ma_domain & value
   if (primitive_cond[n])
     conditions[n]->get_cond_range(domain[n], src, target);
 
-  LOG_DEBUG("") << "depth: " << n << "  "
+  TLOG(TLVL_DEBUG) << "depth: " << n << "  "
                 << "primitive_cond[n]: " << primitive_cond[n];
 
   for(int s = src.first; s<=src.second; ++s)
@@ -149,7 +149,7 @@ bool ma_rule::recursive_evaluate ( ma_domain & value
       value[n].first = s;
       value[n].second = t;
 
-      LOG_DEBUG("") << "depth: " << n << "  "
+      TLOG(TLVL_DEBUG) << "depth: " << n << "  "
                     << "src: "   << s << "  "
                     << "tgt: "   << t;
 
@@ -177,7 +177,7 @@ bool ma_rule::evaluate( )
   // if disabled, always returns false
   if( !enabled ) return false;
 
-  LOG_DEBUG("") << description_ << ": evaluate boolean expr...";
+  TLOG(TLVL_DEBUG) << description_ << ": evaluate boolean expr...";
 
   // loop through domain alternatives
   for ( ma_domains::const_iterator ait = domains.begin()
@@ -205,12 +205,12 @@ bool ma_rule::boolean_evaluate( ma_domain & value
                               , ma_domain & alarm
                               , ma_domain const & domain )
 {
-  LOG_DEBUG("") << "now evaluate boolean_expr with given value";
+  TLOG(TLVL_DEBUG) << "now evaluate boolean_expr with given value";
 
   // evaluate as true with given set of values
   if (boolean_expr.evaluate(value, alarm, domain))
   {
-    LOG_DEBUG("") << "alarm (" << alarm[0].first << ", "
+    TLOG(TLVL_DEBUG) << "alarm (" << alarm[0].first << ", "
                                << alarm[0].second << ")";
 
     std::map<ma_domain, timeval>::iterator it = alarms.find(alarm);
@@ -255,7 +255,7 @@ bool ma_rule::boolean_evaluate( ma_domain & value
 
     // otherwise, the alarm has already been triggered, or hasn't passed
     // the holdoff time
-    LOG_DEBUG("") << "this alarm has already been triggered";
+    TLOG(TLVL_DEBUG) << "this alarm has already been triggered";
   }
 
   // reset alarm

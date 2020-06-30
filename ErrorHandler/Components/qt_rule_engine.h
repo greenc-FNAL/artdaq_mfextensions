@@ -2,7 +2,7 @@
 #define ERROR_HANDLER_QT_RULE_ENGINE_H
 
 
-#include <ErrorHandler/ma_rule_engine.h>
+#include "ErrorHandler/MessageAnalyzer/ma_rule_engine.h"
 
 #include <QtCore/QObject>
 #include <QtCore/QVector>
@@ -119,7 +119,7 @@ public:
 public slots:
 
   // receiving a new message
-  void feed( mf::MessageFacilityMsg const & msg ) { engine.feed(msg); }
+  void feed( msg_t const & msg ) { engine.feed(msg); }
 
 signals:
 

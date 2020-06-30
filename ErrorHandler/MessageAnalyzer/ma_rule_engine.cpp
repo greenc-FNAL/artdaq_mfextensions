@@ -1,5 +1,5 @@
 
-#include <ErrorHandler/ma_rule_engine.h>
+#include "ErrorHandler/MessageAnalyzer/ma_rule_engine.h"
 
 #include <cetlib/filepath_maker.h>
 #include <fhiclcpp/make_ParameterSet.h>
@@ -30,11 +30,11 @@ void ma_rule_engine::init_engine( )
   // Error Handling Supervisor -- EHS
   EHS = pset.get<bool>("EHS", false);
 
-  ParameterSet conds = pset.get<ParameterSet>("conditions");
-  ParameterSet rules = pset.get<ParameterSet>("rules");
+  ParameterSet conds = pset.get<ParameterSet>("conditions", fhicl::ParameterSet());
+  ParameterSet rules = pset.get<ParameterSet>("rules", fhicl::ParameterSet());
 
-  cnames = conds.get_pset_keys();
-  rnames = rules.get_pset_keys();
+  cnames = conds.get_pset_names();
+  rnames = rules.get_pset_names();
 
   // go through all conditions
   for( size_t i=0; i<cnames.size(); ++i )

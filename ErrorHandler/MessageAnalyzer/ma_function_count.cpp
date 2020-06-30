@@ -1,7 +1,7 @@
 
-#include <ErrorHandler/ma_function_count.h>
-#include <ErrorHandler/ma_condition.h>
-#include <ErrorHandler/ma_participants.h>
+#include "ErrorHandler/MessageAnalyzer/ma_function_count.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
+#include "ErrorHandler/MessageAnalyzer/ma_participants.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -43,7 +43,7 @@ boost::any
   // get triggering count from hitmap of the condition with give domain
   int count = cond.get_alarm_count( dom, count_type );
 
-  LOG_DEBUG("") << "count = " << count;
+  TLOG(TLVL_DEBUG) << "count = " << count;
 
   return boost::any(count);
 }

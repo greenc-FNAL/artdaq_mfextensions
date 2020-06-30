@@ -1,6 +1,6 @@
 
-#include <ErrorHandler/ma_hitmap.h>
-#include <ErrorHandler/ma_condition.h>
+#include "ErrorHandler/MessageAnalyzer/ma_hitmap.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
 
 using namespace novadaq::errorhandler;
 
@@ -213,7 +213,7 @@ bool
 { 
   bool r = hitmap[v.first][v.second].is_on();
 
-  LOG_DEBUG("") << "hitmap::get_status @ " 
+  TLOG(TLVL_DEBUG) << "hitmap::get_status @ " 
                 << v.first << ", " << v.second << " = " << r;
   return r; 
 }

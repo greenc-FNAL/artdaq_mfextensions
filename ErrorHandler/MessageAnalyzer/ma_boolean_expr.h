@@ -1,7 +1,7 @@
 #ifndef ERROR_HANDLER_MA_BOOLEAN_EXPR_H
 #define ERROR_HANDLER_MA_BOOLEAN_EXPR_H
 
-#include <ErrorHandler/ma_boolean_andexpr.h>
+#include "ErrorHandler/MessageAnalyzer/ma_boolean_andexpr.h"
 
 namespace novadaq {
 namespace errorhandler {

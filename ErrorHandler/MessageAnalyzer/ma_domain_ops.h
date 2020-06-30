@@ -1,7 +1,7 @@
 #ifndef ERROR_HANDLER_MA_DOMAIN_OPS_H
 #define ERROR_HANDLER_MA_DOMAIN_OPS_H
 
-#include <ErrorHandler/ma_types.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
 
 namespace novadaq {
 namespace errorhandler {

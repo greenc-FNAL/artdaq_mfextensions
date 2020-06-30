@@ -1,8 +1,8 @@
 #ifndef ERRORHANDER_MA_ACTION_MAIL_H
 #define ERRORHANDER_MA_ACTION_MAIL_H
 
-#include <ErrorHandler/ma_action.h>
-#include <ErrorHandler/ma_richmsg.h>
+#include "ErrorHandler/MessageAnalyzer/ma_action.h"
+#include "ErrorHandler/MessageAnalyzer/ma_richmsg.h"
 
 namespace novadaq {
 namespace errorhandler {

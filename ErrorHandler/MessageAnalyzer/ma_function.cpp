@@ -1,5 +1,5 @@
 
-#include <ErrorHandler/ma_function.h>
+#include "ErrorHandler/MessageAnalyzer/ma_function.h"
 
 
 using namespace novadaq::errorhandler;

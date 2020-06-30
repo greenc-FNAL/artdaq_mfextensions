@@ -1,4 +1,4 @@
-#include <ErrorHandler/ma_test_function.h>
+#include "ErrorHandler/MessageAnalyzer/ma_test_function.h"
 
 using namespace novadaq::errorhandler;
 

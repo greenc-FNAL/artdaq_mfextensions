@@ -1,5 +1,5 @@
-#include <ErrorHandler/ma_cond_test_primary.h>
-#include <ErrorHandler/ma_cond_test_expr.h>
+#include "ErrorHandler/MessageAnalyzer/ma_cond_test_primary.h"
+#include "ErrorHandler/MessageAnalyzer/ma_cond_test_expr.h"
 
 
 using namespace novadaq::errorhandler;

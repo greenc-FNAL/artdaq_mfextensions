@@ -11,6 +11,9 @@ cet_make(LIBRARY_NAME MessageAnalyzer
   ${MESSAGEFACILITY_LIBS}
 Qt5::Widgets
 Qt5::Core
+${Boost_REGEX_LIBRARY}
+${Boost_THREAD_LIBRARY}
+pthread
 )
 
 install_headers()

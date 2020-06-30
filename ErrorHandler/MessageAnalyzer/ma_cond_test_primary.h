@@ -1,8 +1,8 @@
 #ifndef ERROR_HANDLER_MA_COND_TEST_PRIMARY_H
 #define ERROR_HANDLER_MA_COND_TEST_PRIMARY_H
 
-#include <ErrorHandler/ma_types.h>
-#include <ErrorHandler/ma_test_function.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
+#include "ErrorHandler/MessageAnalyzer/ma_test_function.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>

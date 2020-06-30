@@ -1,9 +1,9 @@
 #ifndef ERROR_HANDLER_MA_BOOLEAN_COND_H
 #define ERROR_HANDLER_MA_BOOLEAN_COND_H
 
-#include <ErrorHandler/ma_types.h>
-#include <ErrorHandler/ma_condition.h>
-#include <ErrorHandler/ma_function.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
+#include "ErrorHandler/MessageAnalyzer/ma_function.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/any.hpp>

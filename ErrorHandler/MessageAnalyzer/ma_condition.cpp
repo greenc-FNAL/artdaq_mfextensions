@@ -1,5 +1,5 @@
-#include <ErrorHandler/ma_condition.h>
-#include <ErrorHandler/ma_parse.h>
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
+#include "ErrorHandler/MessageAnalyzer/ma_parse.h"
 
 using namespace novadaq::errorhandler;
 
@@ -19,8 +19,8 @@ ma_condition::ma_condition( string_t  const & desc
                           , ma_timing_events & events
                           )
 : description_  ( desc )
-, severity_     ( mf::QtDDSReceiver::getSeverityCode(sev) )
-, srcs_str      ( )
+    , severity_(get_sev_from_string(sev))
+    , srcs_str      ( )
 , e_srcs        ( )
 , any_src       ( false )
 , cats_str      ( )
@@ -142,7 +142,7 @@ bool
   // register to hitmap
   unsigned int result = hitmap.capture(msg, src_, tgt_, what_);
 
-  LOG_DEBUG("") << "cond::match() result = " << result << " src = " << src_;
+  TLOG(TLVL_DEBUG) << "cond::match() result = " << result << " src = " << src_;
 
   // update reaction_start list
   if (result & STATUS_CHANGE)  status.push_back(this);
@@ -170,10 +170,10 @@ bool ma_condition::event( size_t src, size_t tgt, time_t t, conds_t & status )
 
 void ma_condition::extract_fields (msg_t const & msg)
 {
-  sev_ = mf::QtDDSReceiver::getSeverityCode(msg.severity());
+  sev_ = msg.sev();
          get_source_from_msg(src_, msg);
-  cat_ = msg.category();
-  bdy_ = msg.message();
+  cat_ = msg.cat().toStdString();
+  bdy_ = msg.text(false).toStdString();
 }
 
 void ma_condition::update_fields ( )
@@ -239,18 +239,3 @@ bool ma_condition::match_test ( )
 {
   return test_expr.evaluate( this );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

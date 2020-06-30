@@ -2,7 +2,7 @@ add_subdirectory(MessageAnalyzer)
 add_subdirectory(Components)
 
 
-cet_make_exec(MsgAnalyzer SOURCE MsgAnalyzer.cc MsgAnalyzerDlg.cpp
+cet_make_exec(MsgAnalyzer SOURCE MsgAnalyzer.cc MsgAnalyzerDlg.cpp MsgBox.cpp
 LIBRARIES
 MessageAnalyzer
 Components

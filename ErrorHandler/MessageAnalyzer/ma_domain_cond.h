@@ -2,8 +2,8 @@
 #define ERROR_HANDLER_MA_DOMAIN_COND_H
 
 // from novadaq
-#include <ErrorHandler/ma_types.h>
-#include <ErrorHandler/ma_condition.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
 
 // from ups
 #include <boost/shared_ptr.hpp>

@@ -1,7 +1,7 @@
 #ifndef ERROR_HANDLER_MA_FUNCTION_COUNT_H
 #define ERROR_HANDLER_MA_FUNCTION_COUNT_H
 
-#include <ErrorHandler/ma_function.h>
+#include "ErrorHandler/MessageAnalyzer/ma_function.h"
 
 namespace novadaq {
 namespace errorhandler {

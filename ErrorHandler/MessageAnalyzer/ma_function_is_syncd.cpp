@@ -1,6 +1,6 @@
 
-#include <ErrorHandler/ma_function_is_syncd.h>
-#include <ErrorHandler/ma_condition.h>
+#include "ErrorHandler/MessageAnalyzer/ma_function_is_syncd.h"
+#include "ErrorHandler/MessageAnalyzer/ma_condition.h"
 
 #include <boost/lexical_cast.hpp>
 

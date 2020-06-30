@@ -1,9 +1,9 @@
 #ifndef _NOVA_ERROR_HANDLER_NODE_INFO_H_
 #define _NOVA_ERROR_HANDLER_NODE_INFO_H_
 
-#include <ErrorHandler/ma_utils.h>
+#include "ErrorHandler/MessageAnalyzer/ma_utils.h"
 
-#include <QtGui/QListWidget>
+#include <QtWidgets/QListWidget>
 
 #include <map>
 #include <list>
@@ -46,7 +46,6 @@ private:
   QString get_caption  ( std::string const & key ) const;
   void    get_icon_geometry ( int & icon_w, int & icon_h ) const;
   void    get_node_geometry ( int & node_w, int & node_h ) const;
-  QString get_html_str_from_msg ( msg_t const & msg ) const;
   void    update_icon  ( sev_code_t sev );
 
 private:

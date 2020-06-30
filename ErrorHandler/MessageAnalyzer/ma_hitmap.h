@@ -1,10 +1,10 @@
 #ifndef ERROR_HANDLER_MA_HITMAP_H
 #define ERROR_HANDLER_MA_HITMAP_H
 
-#include <ErrorHandler/ma_types.h>
-#include <ErrorHandler/ma_utils.h>
-#include <ErrorHandler/ma_domain_ops.h>
-#include <ErrorHandler/ma_cell.h>
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
+#include "ErrorHandler/MessageAnalyzer/ma_utils.h"
+#include "ErrorHandler/MessageAnalyzer/ma_domain_ops.h"
+#include "ErrorHandler/MessageAnalyzer/ma_cell.h"
 
 #include <string>
 #include <vector>

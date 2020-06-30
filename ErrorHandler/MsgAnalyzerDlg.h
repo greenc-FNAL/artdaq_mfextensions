@@ -3,15 +3,14 @@
 
 #include "ui_MsgAnalyzerDlg.h"
 
-#include <ErrorHandler/ma_utils.h>
-#include <ErrorHandler/NodeInfo.h>
-#include <ErrorHandler/qt_rule_engine.h>
-#include <ErrorHandler/qt_log_reader.h>
-#include <ErrorHandler/ma_rcclient.h>
+#include "ErrorHandler/MessageAnalyzer/ma_utils.h"
+#include "ErrorHandler/Components/NodeInfo.h"
+#include "ErrorHandler/Components/qt_rule_engine.h"
+#include "ErrorHandler/Components/qt_log_reader.h"
 
 #include <QtCore/QMutex>
 #include <QtCore/QSignalMapper>
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 
 #include <boost/regex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -45,8 +44,8 @@ private slots:
 
   void onLoad();
 
-  void onNewMsg(mf::MessageFacilityMsg const & mfmsg);
-  void onNewSysMsg(mf::QtDDSReceiver::SysMsgCode, QString const & msg);
+  void onNewMsg(msg_t const & mfmsg);
+  void onNewSysMsg(sev_code_t, QString const & msg);
 
   void onNewAlarm( QString const & rule_name
                  , QString const & msg );
@@ -106,12 +105,8 @@ private:
 
   // data member
   fhicl::ParameterSet    pset;
-  mf::QtDDSReceiver      qtdds;
   qt_rule_engine         engine;
   qt_log_reader          reader;
-
-  novadaq::rcclient::ma_rcclient 
-                         rcclient;
 
   map_t                  map;
   int                    nmsgs;

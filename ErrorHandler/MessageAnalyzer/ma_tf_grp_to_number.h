@@ -2,7 +2,7 @@
 #define ERROR_HANDLER_MA_TEST_FUNCTION_GRP_TO_NUMBER_H
 
 
-#include <ErrorHandler/ma_test_function.h>
+#include "ErrorHandler/MessageAnalyzer/ma_test_function.h"
 
 namespace novadaq {
 namespace errorhandler {

@@ -3,8 +3,8 @@
 #define BOOST_TEST_MODULE ma_domain_test
 #include <boost/test/unit_test.hpp>
 
-#include <ErrorHandler/ma_domain_ops.h>
-#include <ErrorHandler/ma_domain_cond.h>
+#include "ErrorHandler/MessageAnalyzer/ma_domain_ops.h"
+#include "ErrorHandler/MessageAnalyzer/ma_domain_cond.h"
 
 using namespace novadaq::errorhandler;
 

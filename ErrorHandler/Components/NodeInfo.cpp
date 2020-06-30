@@ -1,4 +1,4 @@
-#include <ErrorHandler/NodeInfo.h>
+#include "ErrorHandler/Components/NodeInfo.h"
 #include <sstream>
 
 #include <QtGui/QPainter>
@@ -11,7 +11,7 @@ NodeInfo::NodeInfo ( node_type_t type
                    , bool aow
                    , bool aoe )
 : msgs_ptr    (new msgs_t)
-, highest_sev (mf::QtDDSReceiver::DEBUG)
+, highest_sev (SDEBUG)
 , item_ptr    ()
 , node_type   (type)
 , key_str (key)
@@ -46,7 +46,7 @@ NodeInfo::NodeInfo ( node_type_t type
 
 node_status NodeInfo::push_msg ( msg_t const & msg )
 {
-  sev_code_t sev = mf::QtDDSReceiver::getSeverityCode(msg.severity());
+  sev_code_t sev = msg.sev();
 
   node_status status = NORMAL;
 
@@ -59,9 +59,9 @@ node_status NodeInfo::push_msg ( msg_t const & msg )
     // update icon
     if (sev > highest_sev) 
     {
-      if( sev==mf::QtDDSReceiver::WARNING && alarm_warning)   
+      if( sev==SWARNING && alarm_warning)   
         status = FIRST_WARNING;
-      else if( sev==mf::QtDDSReceiver::ERROR && alarm_error) 
+      else if( sev==SERROR && alarm_error) 
         status = FIRST_ERROR;
 
       update_icon(sev);
@@ -76,7 +76,7 @@ node_status NodeInfo::push_msg ( msg_t const & msg )
 
 void NodeInfo::reset()
 {
-  highest_sev = mf::QtDDSReceiver::DEBUG;
+  highest_sev = SDEBUG;
   update_icon(highest_sev);
 }
 
@@ -87,40 +87,11 @@ QString NodeInfo::msgs_to_string() const
   msgs_t::const_iterator it = msgs_ptr->begin();
   while (it!=msgs_ptr->end())
   {
-    txt += get_html_str_from_msg(*it);
+    txt += (*it).text(false);
     ++it;
   }
     
   return txt;
-}
-
-QString NodeInfo::get_html_str_from_msg(mf::MessageFacilityMsg const & msg) const
-{
-  mf::QtDDSReceiver::SeverityCode sevid = 
-                 mf::QtDDSReceiver::getSeverityCode(msg.severity());
-
-  std::ostringstream ss;
-
-  ss << "<font ";
-
-  if     (sevid==mf::QtDDSReceiver::ERROR)    ss << "color='#FF0000'>";
-  else if(sevid==mf::QtDDSReceiver::WARNING)  ss << "color='#E08000'>";
-  else if(sevid==mf::QtDDSReceiver::INFO)     ss << "color='#008000'>";
-  else                                        ss << "color='#505050'>";
-
-  ss << "<b>" << msg.severity() << " / " << msg.category() << "</b><br>";
-  ss << msg.timestr()  << "<br>";
-  ss << msg.hostname() << " (" << msg.hostaddr() << ")" << "<br>";
-  ss << msg.process()  << " (" << msg.pid()      << ")" << "<br>";
-  ss << msg.file()     << " (" << msg.line() << ")" << "<br>";
-  ss << msg.application() << " / "
-     << msg.module()      << " / "
-     << msg.context()     << "<br>";
-  ss << msg.message()     << "<br>";
-  ss << "</font><br>";
-
-  return QString(ss.str().c_str());
-
 }
 
 void NodeInfo::update_icon ( sev_code_t sev )
@@ -135,16 +106,16 @@ void NodeInfo::update_icon ( sev_code_t sev )
 
   switch(sev)
   {
-  case mf::QtDDSReceiver::ERROR:   
+  case SERROR:   
     background = QColor(255,  0,  0, 255); break;
 
-  case mf::QtDDSReceiver::WARNING: 
+  case SWARNING: 
     background = QColor(224,128,  0, 255); break;
 
-  case mf::QtDDSReceiver::INFO:    
+  case SINFO:    
     background = QColor(  0,128,  0, 255); break;
 
-  case mf::QtDDSReceiver::DEBUG:   
+  case SDEBUG:   
     background = QColor( 80, 80, 80, 255); break;
 
   default:                         
@@ -187,15 +158,15 @@ void NodeInfo::get_icon_geometry ( int & icon_w
 { 
   switch(node_type)
   {
-  case BufferNode:
+  case External:
     icon_w = BUFFERNODE_ICON_WIDTH;
     icon_h = BUFFERNODE_ICON_HEIGHT;
     break;
-  case DCM:
+  case UserCode:
     icon_w = DCM_ICON_WIDTH;
     icon_h = DCM_ICON_HEIGHT;
     break;
-  case MainComponent:
+  case Framework:
   default:
     icon_w = MAINCOMPONENT_ICON_WIDTH;
     icon_h = MAINCOMPONENT_ICON_HEIGHT;
@@ -207,15 +178,15 @@ void NodeInfo::get_node_geometry ( int & node_w
 { 
   switch(node_type)
   {
-  case BufferNode:
+	  case External:
     node_w = BUFFERNODE_NODE_WIDTH;
     node_h = BUFFERNODE_NODE_HEIGHT;
     break;
-  case DCM:
+	  case UserCode:
     node_w = DCM_NODE_WIDTH;
     node_h = DCM_NODE_HEIGHT;
     break;
-  case MainComponent:
+	  case Framework:
   default:
     node_w = MAINCOMPONENT_NODE_WIDTH;
     node_h = MAINCOMPONENT_NODE_HEIGHT;
@@ -225,8 +196,8 @@ void NodeInfo::get_node_geometry ( int & node_w
 
 QString NodeInfo::get_caption ( std::string const & key ) const
 {
-  if (node_type==BufferNode)  return key.substr(18).c_str();
-  if (node_type==DCM)         return key.substr(4 ).c_str();
+  //if (node_type==BufferNode)  return key.substr(18).c_str();
+  //if (node_type==DCM)         return key.substr(4 ).c_str();
 
   return key.c_str();
 }
