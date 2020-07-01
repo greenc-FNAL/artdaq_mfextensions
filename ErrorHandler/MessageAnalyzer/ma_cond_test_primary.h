@@ -32,7 +32,7 @@ public:
   bool evaluate( ma_condition const * cond ) const;
 
   void insert_expr      ( ma_cond_test_expr const & expr );
-  void insert_func      ( string_t     const & name
+  void insert_func      ( std::string     const & name
                         , anys_t       const & args );
   void insert_compare_op( compare_op_t cop, any_t const & v );
 
@@ -45,7 +45,7 @@ private:
   compare_op_t  op;
   bool          rhv_b;
   double        rhv_d;
-  string_t      rhv_s;
+  std::string      rhv_s;
 
   // shared_ptr to a test expression
   boost::shared_ptr<ma_cond_test_expr> expr;

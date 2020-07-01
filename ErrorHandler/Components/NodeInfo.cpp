@@ -44,7 +44,7 @@ NodeInfo::NodeInfo ( node_type_t type
   //item_ptr->setData(Qt::UserRole, QVariant::fromValue<msgs_ptr_t>(msgs_ptr)); 
 }
 
-node_status NodeInfo::push_msg ( msg_t const & msg )
+node_status NodeInfo::push_msg ( qt_mf_msg const & msg )
 {
   sev_code_t sev = msg.sev();
 

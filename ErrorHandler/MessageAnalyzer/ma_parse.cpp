@@ -65,7 +65,6 @@ using novadaq::errorhandler::ma_cond_test_primary;
 using novadaq::errorhandler::cond_idx_t;
 using novadaq::errorhandler::cond_arg_t;
 using novadaq::errorhandler::compare_op_t;
-using novadaq::errorhandler::string_t;
 using novadaq::errorhandler::SOURCE;
 using novadaq::errorhandler::TARGET;
 using novadaq::errorhandler::NONE;
@@ -123,7 +122,7 @@ static void
 
 static void
   insert_cond_arg( ma_domain_cond & cond
-                 , string_t const & name
+                 , std::string const & name
                  , char arg
                  , ma_rule * rule )
 {
@@ -138,7 +137,7 @@ static void
 }
 
 static void
-  insert_str_cond( ma_domain_cond & cond, string_t const & str )
+  insert_str_cond( ma_domain_cond & cond, std::string const & str )
 {
   cond.insert_str_cond( str );
 }
@@ -157,11 +156,11 @@ template< class FwdIter, class Skip >
   // data member
   qi::rule<FwdIter, ma_domain_expr(),    Skip> domain_expr;
   qi::rule<FwdIter, ma_domain_andexpr(), Skip> domain_andexpr;
-  qi::rule<FwdIter, ma_domain_cond(), locals<string_t>, Skip> domain_cond;
+  qi::rule<FwdIter, ma_domain_cond(), locals<std::string>, Skip> domain_cond;
 
-  qi::rule<FwdIter, string_t(), Skip> key;
-  qi::rule<FwdIter, string_t(), Skip> keywords;
-  qi::rule<FwdIter, string_t(), Skip> str;
+  qi::rule<FwdIter, std::string(), Skip> key;
+  qi::rule<FwdIter, std::string(), Skip> keywords;
+  qi::rule<FwdIter, std::string(), Skip> str;
 
 };
 
@@ -244,7 +243,7 @@ static void
 
 static void 
   insert_primitive_cond( ma_boolean_cond & cond
-                       , string_t const & name
+                       , std::string const & name
                        , ma_rule * rule )
 {
   // 1. first insert the condition ptr to the corresponding rule
@@ -257,8 +256,8 @@ static void
 
 static void
   insert_ext_func( ma_boolean_cond & cond
-                 , string_t const  & function
-                 , string_t const  & name
+                 , std::string const  & function
+                 , std::string const  & name
                  , char              cond_arg
                  , std::vector<boost::any> const & func_args
                  , ma_rule * rule )
@@ -291,7 +290,7 @@ static void
 static void
   insert_compare_op_string( ma_boolean_cond & cond
                           , compare_op_t op
-                          , string_t rhv )
+                          , std::string rhv )
 {
   cond.insert_compare_op_string( op, rhv );
 }
@@ -313,12 +312,12 @@ template< class FwdIter, class Skip >
   qi::rule<FwdIter, ma_boolean_expr(),    Skip> boolean_expr;
   qi::rule<FwdIter, ma_boolean_andexpr(), Skip> boolean_andexpr;
   qi::rule<FwdIter, ma_boolean_cond()
-                  , locals<string_t, char, compare_op_t, string_t, anys>
+                  , locals<std::string, char, compare_op_t, std::string, anys>
                   , Skip>                       boolean_cond;
 
-  qi::rule<FwdIter, string_t(),           Skip> key;
-  qi::rule<FwdIter, string_t(),           Skip> str;
-  qi::rule<FwdIter, string_t(),           Skip> keywords;
+  qi::rule<FwdIter, std::string(),           Skip> key;
+  qi::rule<FwdIter, std::string(),           Skip> str;
+  qi::rule<FwdIter, std::string(),           Skip> keywords;
   qi::rule<FwdIter, compare_op_t(),       Skip> compare_op;
 
   qi::rule<FwdIter, any(),                Skip> arg;
@@ -421,10 +420,10 @@ static void
 // ------------------------------------------------------------------
 
 bool
-  novadaq::errorhandler::parse_condition_expr ( string_t const & s 
+  novadaq::errorhandler::parse_condition_expr ( std::string const & s 
                                               , ma_rule * rule )
 {
-  typedef string_t::const_iterator iter_t;
+  typedef std::string::const_iterator iter_t;
   typedef ascii::space_type        ws_t;
 
   boolean_expr_parser<iter_t, ws_t> boolean_p(rule);
@@ -475,7 +474,7 @@ static void
 
 static void
   insert_test_func( ma_cond_test_primary          & primary
-                  , string_t                const & function
+                  , std::string                const & function
                   , std::vector<boost::any> const & func_args )
 {
   primary.insert_func( function, func_args );
@@ -511,12 +510,12 @@ template< class FwdIter, class Skip >
   qi::rule<FwdIter, ma_cond_test_expr(),    Skip> test_expr;
   qi::rule<FwdIter, ma_cond_test_andexpr(), Skip> test_andexpr;
   qi::rule<FwdIter, ma_cond_test_primary()
-                  , locals<string_t, anys_t, compare_op_t>
+                  , locals<std::string, anys_t, compare_op_t>
                                           , Skip> test_primary;
 
-  qi::rule<FwdIter, string_t(),           Skip> key;
-  qi::rule<FwdIter, string_t(),           Skip> str;
-  qi::rule<FwdIter, string_t(),           Skip> keywords;
+  qi::rule<FwdIter, std::string(),           Skip> key;
+  qi::rule<FwdIter, std::string(),           Skip> str;
+  qi::rule<FwdIter, std::string(),           Skip> keywords;
   qi::rule<FwdIter, compare_op_t(),       Skip> compare_op;
 
   qi::rule<FwdIter, any(),                Skip> value;
@@ -596,10 +595,10 @@ template< class FwdIter, class Skip >
 // ------------------------------------------------------------------
 
 bool
-  novadaq::errorhandler::parse_condition_test ( string_t const & s 
+  novadaq::errorhandler::parse_condition_test ( std::string const & s 
                                               , ma_cond_test_expr & expr )
 {
-  typedef string_t::const_iterator iter_t;
+  typedef std::string::const_iterator iter_t;
   typedef ascii::space_type        ws_t;
 
   if( s.empty() ) return true;

@@ -29,12 +29,12 @@ class ma_condition
 public:
   
   // c'tor
-  ma_condition( string_t  const & desc
-              , string_t  const & sev
-              , strings_t const & sources
-              , strings_t const & categories
-              , string_t  const & regex
-              , string_t  const & test
+  ma_condition( std::string  const & desc
+              , std::string  const & sev
+              , std::vector<std::string> const & sources
+              , std::vector<std::string> const & categories
+              , std::string  const & regex
+              , std::string  const & test
               , bool              persistent_cond
               , int               trigger_count
               , bool              at_least
@@ -52,7 +52,7 @@ public:
   void init();
 
   // public method that gets called when new message comes in
-  bool match( msg_t const & msg
+  bool match( qt_mf_msg const & msg
             , conds_t & status
             , conds_t & source 
             , conds_t & target );
@@ -61,9 +61,9 @@ public:
   bool event( size_t src, size_t tgt, time_t t, conds_t & status );
 
   // get fields
-  const string_t & description() const { return description_; }
-  const string_t & regex()       const { return regex_str; }
-  const string_t & sources_str() const { return srcs_str; }
+  const std::string & description() const { return description_; }
+  const std::string & regex()       const { return regex_str; }
+  const std::string & sources_str() const { return srcs_str; }
 
   // update fields with lastest match message
   void update_fields();
@@ -73,18 +73,18 @@ public:
 
   // get fields from last message
       sev_code_t   get_msg_severity( ) const { return last_sev_; }
-  const string_t & get_msg_category( ) const { return last_cat_; }
-  const string_t & get_msg_source  ( ) const { return last_src_; }
-  const string_t & get_msg_target  ( ) const { return last_tgt_; }
-  const string_t & get_msg_body    ( ) const { return last_bdy_; }
-        string_t   get_msg_group   ( size_t i ) const
+  const std::string & get_msg_category( ) const { return last_cat_; }
+  const std::string & get_msg_source  ( ) const { return last_src_; }
+  const std::string & get_qt_mf_msgarget  ( ) const { return last_tgt_; }
+  const std::string & get_msg_body    ( ) const { return last_bdy_; }
+        std::string   get_msg_group   ( size_t i ) const
     { if(i>last_what_.size()) throw std::runtime_error("group does not exist");
-      return string_t(last_what_[i].first, last_what_[i].second); }
+      return std::string(last_what_[i].first, last_what_[i].second); }
 
   // return index of the src/tgt string, or -2 if not found
-  int find_source(string_t const & src) { return hitmap.find_source(src); }
-  int find_target(string_t const & tgt) { return hitmap.find_target(tgt); }
-  int find_arg(string_t const & arg, arg_t type)
+  int find_source(std::string const & src) { return hitmap.find_source(src); }
+  int find_target(std::string const & tgt) { return hitmap.find_target(tgt); }
+  int find_arg(std::string const & arg, arg_t type)
     { return (type==SOURCE) ? hitmap.find_source(arg) : hitmap.find_target(arg); }
 
   // get src/tgt list
@@ -96,11 +96,11 @@ public:
       throw std::runtime_error("condition::get_args() unsupported arg type"); }
 
   // get src/tgt string. precond: size()>0, 0<=idx<size() or idx=ANY
-  const string_t & get_source( ma_cond_domain v ) const 
+  const std::string & get_source( ma_cond_domain v ) const 
     { return hitmap.get_source(v); }
-  const string_t & get_target( ma_cond_domain v ) const 
+  const std::string & get_target( ma_cond_domain v ) const 
     { return hitmap.get_target(v); }
-  string_t get_arg( ma_cond_domain v, arg_t type ) const
+  std::string get_arg( ma_cond_domain v, arg_t type ) const
     { if( type==SOURCE ) return hitmap.get_source(v);
       if( type==TARGET ) return hitmap.get_target(v);
       if( type==MESSAGE) return hitmap.get_message(v);
@@ -168,7 +168,7 @@ private:
 
   // extract severity, source, category, and message body
   // from message facility message
-  void extract_fields (msg_t const & msg);
+  void extract_fields (qt_mf_msg const & msg);
 
   bool match_srcs ( );
   bool match_cats ( );
@@ -178,22 +178,22 @@ private:
 private:
 
   // condition description
-  string_t     description_;
+  std::string     description_;
 
   // filtering conditions
   sev_code_t   severity_;
 
-  string_t     srcs_str;
+  std::string     srcs_str;
   vregex_t     e_srcs;
   bool         any_src;
 
-  string_t     cats_str;
+  std::string     cats_str;
   vregex_t     e_cats;
   bool         any_cat;
 
   // match condition
   match_type_t match_type;
-  string_t     regex_str;
+  std::string     regex_str;
   regex_t      e;
 
   // test condition
@@ -214,17 +214,17 @@ private:
 
   // temp variables used in matching
   sev_code_t   sev_;
-  string_t     src_;
-  string_t     tgt_;
-  string_t     cat_;
-  string_t     bdy_;
+  std::string     src_;
+  std::string     tgt_;
+  std::string     cat_;
+  std::string     bdy_;
   boost::smatch what_;
 
   sev_code_t   last_sev_;
-  string_t     last_src_;
-  string_t     last_tgt_;
-  string_t     last_cat_;
-  string_t     last_bdy_;
+  std::string     last_src_;
+  std::string     last_tgt_;
+  std::string     last_cat_;
+  std::string     last_bdy_;
   boost::smatch last_what_;
 
   // notification lists
@@ -242,10 +242,10 @@ private:
 //typedef boost::shared_ptr<ma_condition> cond_sp;
 //typedef std::list<cond_sp>              conds_t;
 //typedef std::vector<cond_sp>            cond_vec_t;
-//typedef std::map<string_t, cond_sp>     cond_map_t;
+//typedef std::map<std::string, cond_sp>     cond_map_t;
 
 typedef std::vector<ma_condition *>       cond_vec_t;
-typedef std::map<string_t, ma_condition>  cond_map_t;
+typedef std::map<std::string, ma_condition>  cond_map_t;
 
 } // end of namespace errorhandler
 } // end of namespace novadaq

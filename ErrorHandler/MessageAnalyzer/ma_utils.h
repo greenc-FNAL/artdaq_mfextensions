@@ -7,16 +7,16 @@
 namespace novadaq {
 namespace errorhandler {
 
-  inline string_t 
-    trim_hostname(string_t const & host);
+  inline std::string 
+    trim_hostname(std::string const & host);
 
   inline node_type_t 
-    get_source_from_msg(string_t & src, msg_t const & msg);
+    get_source_from_msg(std::string & src, qt_mf_msg const & msg);
 
-  inline string_t
+  inline std::string
     get_message_type_str(message_type_t type);
 
-  inline sev_code_t get_sev_from_string(string_t const& sev);
+  inline sev_code_t get_sev_from_string(std::string const& sev);
 
 } // end of namespace errorhandler
 } // end of namespace novadaq
@@ -24,8 +24,8 @@ namespace errorhandler {
 // ------------------------------------------------------------------
 // misc. utilities
 
-novadaq::errorhandler::string_t 
-  novadaq::errorhandler::trim_hostname(string_t const & host)
+std::string 
+  novadaq::errorhandler::trim_hostname(std::string const & host)
 {
   size_t pos = host.find('.');
   if (pos==std::string::npos) return host;
@@ -39,14 +39,14 @@ novadaq::errorhandler::string_t
  * @return node_type_t indicating the type of the source
 */
 novadaq::errorhandler::node_type_t
-novadaq::errorhandler::get_source_from_msg(string_t& src, msg_t const& /*msg*/)
+novadaq::errorhandler::get_source_from_msg(std::string& src, qt_mf_msg const& /*msg*/)
 {
 	src = "artdaq";
 	return Framework;
 }
 
 
-novadaq::errorhandler::string_t 
+std::string 
   novadaq::errorhandler::get_message_type_str(message_type_t type)
 {
   switch(type)
@@ -60,7 +60,7 @@ novadaq::errorhandler::string_t
   }
 }
 
-sev_code_t novadaq::errorhandler::get_sev_from_string(string_t const& sev) {
+sev_code_t novadaq::errorhandler::get_sev_from_string(std::string const& sev) {
 	mf::ELseverityLevel elss(sev);
 
 	int sevid = elss.getLevel();

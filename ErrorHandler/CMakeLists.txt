@@ -12,6 +12,7 @@ Qt5::Widgets
 Qt5::Core
 )
 
+#install_fhicl(SUBDIRS config)
 install_headers()
 install_source()
 

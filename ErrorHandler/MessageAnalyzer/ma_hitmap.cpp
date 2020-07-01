@@ -4,8 +4,8 @@
 
 using namespace novadaq::errorhandler;
 
-const string_t ma_hitmap::global_s = "__S_GLOBAL__";
-const string_t ma_hitmap::global_t = "__T_GLOBAL__";
+const std::string ma_hitmap::global_s = "__S_GLOBAL__";
+const std::string ma_hitmap::global_t = "__T_GLOBAL__";
 
 const size_t ma_hitmap::cap_increment = 20;
 
@@ -32,9 +32,9 @@ void
 }
 
 unsigned int 
-  ma_hitmap::capture( msg_t    const & msg
-                    , string_t const & src
-                    , string_t const & tgt
+  ma_hitmap::capture( qt_mf_msg    const & msg
+                    , std::string const & src
+                    , std::string const & tgt
                     , boost::smatch const & what )
 {
   size_t s_idx = 0;
@@ -126,7 +126,7 @@ bool
 }
 
 int 
-  ma_hitmap::find_source(string_t const & src)
+  ma_hitmap::find_source(std::string const & src)
 {
   idx_t::const_iterator it = src_idx.find(src);
   if (it==src_idx.end())  return D_NIL;
@@ -134,7 +134,7 @@ int
 }
 
 int 
-  ma_hitmap::find_target(string_t const & tgt)
+  ma_hitmap::find_target(std::string const & tgt)
 {
   idx_t::const_iterator it = tgt_idx.find(tgt);
   if (it==tgt_idx.end())  return D_NIL;
@@ -142,7 +142,7 @@ int
 }
 
 // get src/tgt string from idx
-const string_t & 
+const std::string & 
   ma_hitmap::get_source( ma_cond_domain v ) const
 { 
   int idx = v.first;
@@ -159,7 +159,7 @@ const string_t &
   throw std::runtime_error("get_source: idx not found");
 }
 
-const string_t & 
+const std::string & 
   ma_hitmap::get_target( ma_cond_domain v ) const
 { 
   int idx = v.second;
@@ -176,7 +176,7 @@ const string_t &
   throw std::runtime_error("get_source: idx not found");
 }
 
-string_t 
+std::string 
   ma_hitmap::get_message( ma_cond_domain v ) const
 {
   assert( !src_idx.empty() ); 
@@ -191,7 +191,7 @@ string_t
   return hitmap[v.first][v.second].get_latest_message();
 }
  
-string_t 
+std::string 
   ma_hitmap::get_message_group( ma_cond_domain v, size_t g ) const
 {
   assert( !src_idx.empty() ); 

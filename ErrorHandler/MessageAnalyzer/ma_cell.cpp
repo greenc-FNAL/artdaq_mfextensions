@@ -20,7 +20,7 @@ ma_cell::~ma_cell()
 
 }
 
-bool ma_cell::hit( msg_t const & msg
+bool ma_cell::hit( qt_mf_msg const & msg
                  , boost::smatch const & w
                  , ma_condition & cond
                  , size_t s_idx

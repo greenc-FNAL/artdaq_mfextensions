@@ -99,7 +99,7 @@ void ma_domain_cond::evaluate(ma_domains & domains) const
       bool keep = true;
 
       // get the actual src/target string and index
-      string_t const & c1_arg_str = it->first;
+      std::string const & c1_arg_str = it->first;
       size_t           c1_arg_idx = it->second;
 
       // domain[c1_idx] = domain[c1_idx] n (c1_arg_idx, *)

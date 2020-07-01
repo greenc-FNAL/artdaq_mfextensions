@@ -9,7 +9,7 @@ using namespace novadaq::errorhandler;
 // -----------------------------------------------------------------
 // add group
 
-void ma_participants::add_group( string_t const & group )
+void ma_participants::add_group( std::string const & group )
 {
   groups_t::const_iterator it = groups.find(group);
 
@@ -20,7 +20,7 @@ void ma_participants::add_group( string_t const & group )
   groups.insert( std::make_pair(group, apps) );
 }
 
-void ma_participants::add_group( string_t const & group, size_t size )
+void ma_participants::add_group( std::string const & group, size_t size )
 {
   groups_t::const_iterator it = groups.find(group);
 
@@ -44,8 +44,8 @@ void ma_participants::add_group( string_t const & group, size_t size )
 // -----------------------------------------------------------------
 // add participant
 
-void ma_participants::add_participant( string_t const & group
-                                            , string_t const & app )
+void ma_participants::add_participant( std::string const & group
+                                            , std::string const & app )
 {
   groups_t::iterator it = groups.find(group);
 
@@ -56,7 +56,7 @@ void ma_participants::add_participant( string_t const & group
   all_apps.insert(app);
 }
 
-void ma_participants::add_participant( string_t const & app )
+void ma_participants::add_participant( std::string const & app )
 {
   ungrouped_apps.insert(app);
   all_apps.insert(app);
@@ -66,7 +66,7 @@ void ma_participants::add_participant( string_t const & app )
 // get count
 
 size_t ma_participants::
-         get_group_participant_count( string_t const & group ) const
+         get_group_participant_count( std::string const & group ) const
 {
   groups_t::const_iterator it = groups.find(group);
 

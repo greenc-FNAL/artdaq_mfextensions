@@ -18,7 +18,7 @@ ${FHICLCPP}
 #endforeach()
 
 # set(CMAKE_AUTOMOC_MOC_OPTIONS -p${CMAKE_CURRENT_SOURCE_DIR} -I${CMAKE_SOURCE_DIR}/Binaries)
-cet_make_exec(msgserver SOURCE msgserver.cc ReceiverManager.cc
+cet_make_exec(msgserver SOURCE msgserver.cc
 LIBRARIES
 MFExtensions
 MFReceivers
@@ -28,7 +28,7 @@ ${FHICLCPP}
 Qt5::Core
 )
 
-cet_make_exec(msgviewer SOURCE msgviewer.cc mvdlg.cc ReceiverManager.cc
+cet_make_exec(msgviewer SOURCE msgviewer.cc mvdlg.cc
 LIBRARIES
 MFExtensions
 MFReceivers

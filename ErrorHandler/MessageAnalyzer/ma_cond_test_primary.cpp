@@ -27,7 +27,7 @@ void ma_cond_test_primary::insert_expr( ma_cond_test_expr const & e )
   cond_type = EXPR;
 }
 
-void ma_cond_test_primary::insert_func( string_t     const & name
+void ma_cond_test_primary::insert_func( std::string     const & name
                                       , anys_t       const & args )
 {
   func.reset( ma_test_function_factory::create_instance(name) );
@@ -69,7 +69,7 @@ void ma_cond_test_primary::insert_compare_op( compare_op_t cop
   }
   else
   {
-    rhv_s = boost::any_cast<string_t>(v);
+    rhv_s = boost::any_cast<std::string>(v);
     cond_type = FUNCTION_STRING;
   }
 }
@@ -89,7 +89,7 @@ bool ma_cond_test_primary::evaluate( ma_condition const * cond ) const
 
     bool     b;
     double   d;
-    string_t s;
+    std::string s;
 
     switch( cond_type )
     {
@@ -101,7 +101,7 @@ bool ma_cond_test_primary::evaluate( ma_condition const * cond ) const
       return compare( op, b, rhv_b );
 
     case FUNCTION_STRING:
-      s = boost::any_cast<string_t>( v );
+      s = boost::any_cast<std::string>( v );
       return compare( op, s, rhv_s );
 
     case FUNCTION_DOUBLE:

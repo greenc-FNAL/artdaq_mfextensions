@@ -12,12 +12,12 @@
 #include <messagefacility/MessageLogger/MessageLogger.h>
 #include "mfextensions/Receivers/qt_mf_msg.hh"  // sev_code_t
 
-#include <boost/function.hpp>
 #include <boost/multi_array.hpp>
-#include <boost/shared_ptr.hpp>
 
 // system includes
 #include <list>
+#include <memory>
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
@@ -32,15 +32,11 @@ class ma_condition;
 class ma_rule;
 
 // typdefs used in errorhandler
-typedef std::string string_t;
-typedef std::vector<std::string> strings_t;
-
-typedef qt_mf_msg msg_t;
-typedef std::list<msg_t> msgs_t;
-typedef boost::shared_ptr<msgs_t> msgs_sp_t;
+typedef std::list<qt_mf_msg> msgs_t;
+typedef std::shared_ptr<msgs_t> msgs_sp_t;
 
 typedef boost::multi_array_types::index_range range;
-typedef std::map<string_t, size_t> idx_t;
+typedef std::map<std::string, size_t> idx_t;
 
 // domain of a condition
 // <source, target>, -1 means all, -2 means null
@@ -153,10 +149,10 @@ const unsigned int SOURCE_CHANGE = 0x02;
 const unsigned int TARGET_CHANGE = 0x04;
 
 // alarm callback funtion type
-typedef boost::function<void(string_t const &, string_t const &)> alarm_fn_t;
+typedef std::function<void(std::string const &, std::string const &)> alarm_fn_t;
 
 // condition match callback function type
-typedef boost::function<void(string_t const &)> cond_match_fn_t;
+typedef std::function<void(std::string const &)> cond_match_fn_t;
 
 // alert message type
 enum message_type_t

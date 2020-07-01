@@ -27,14 +27,14 @@ public:
                 , cond_match_fn_t cond_match );
 
   // public method, call to run the rule engine
-  void feed( msg_t const & msg );
+  void feed( qt_mf_msg const & msg );
 
   // public accessor for cond map and rule map
   size_t cond_size() const { return cmap.size(); }
   size_t rule_size() const { return rmap.size(); }
 
-  const strings_t & cond_names() const { return cnames; }
-  const strings_t & rule_names() const { return rnames; }
+  const std::vector<std::string> & cond_names() const { return cnames; }
+  const std::vector<std::string> & rule_names() const { return rnames; }
 
   bool is_EHS() const { return EHS; }
 
@@ -44,41 +44,41 @@ public:
     { return pset; }
 
   // get condition fields
-  const string_t &
-    cond_description( string_t const & name ) const
+  const std::string &
+    cond_description( std::string const & name ) const
     { return find_cond_by_name(name).description(); }
 
-  const string_t &
-    cond_sources    ( string_t const & name ) const
+  const std::string &
+    cond_sources    ( std::string const & name ) const
     { return find_cond_by_name(name).sources_str(); }
 
-  const string_t & 
-    cond_regex      ( string_t const & name ) const
+  const std::string & 
+    cond_regex      ( std::string const & name ) const
     { return find_cond_by_name(name).regex(); }
 
   int
-    cond_msg_count  ( string_t const & name ) const
+    cond_msg_count  ( std::string const & name ) const
     { return find_cond_by_name(name).get_msg_count(); }
 
   // get rule fields
-  const string_t &
-    rule_description( string_t const & name ) const
+  const std::string &
+    rule_description( std::string const & name ) const
     { return find_rule_by_name(name).description(); }
 
-  const string_t & 
-    rule_expr ( string_t const & name ) const
+  const std::string & 
+    rule_expr ( std::string const & name ) const
     { return find_rule_by_name(name).cond_expr(); }
 
-  const strings_t &
-    rule_cond_names( string_t const & name ) const
+  const std::vector<std::string> &
+    rule_cond_names( std::string const & name ) const
     { return find_rule_by_name(name).cond_names(); }
 
   int
-    rule_alarm_count ( string_t const & name ) const
+    rule_alarm_count ( std::string const & name ) const
     { return find_rule_by_name(name).get_alarm_count(); }
 
   // set rule enable/disable status
-  void enable_rule( string_t const & name, bool flag )
+  void enable_rule( std::string const & name, bool flag )
     { find_rule_by_name(name).enable(flag); }
 
   // enable/disable EHS
@@ -86,7 +86,7 @@ public:
     { EHS = flag; }
 
   // reset a rule to its ground state (reset alarms and domains)
-  void reset_rule( string_t const & name )
+  void reset_rule( std::string const & name )
     { find_rule_by_name(name).reset(); }
 
   void reset_rules( )
@@ -94,7 +94,7 @@ public:
         it->second.reset(); }
 
   // reset conditions
-  void reset_cond( string_t const & name )
+  void reset_cond( std::string const & name )
     { find_cond_by_name(name).reset(); }
 
   void reset_conds( )
@@ -106,19 +106,19 @@ public:
     { reset_conds(); reset_rules(); }
 
   // participants
-  void add_participant_group( string_t const & group )
+  void add_participant_group( std::string const & group )
     { ma_participants::instance().add_group( group ); }
 
-  void add_participant_group( string_t const & group, size_t size )
+  void add_participant_group( std::string const & group, size_t size )
     { ma_participants::instance().add_group( group, size ); }
 
-  void add_participant( string_t const & group, string_t const & app )
+  void add_participant( std::string const & group, std::string const & app )
     { ma_participants::instance().add_participant( group, app ); }
 
-  void add_participant( string_t const & app )
+  void add_participant( std::string const & app )
     { ma_participants::instance().add_participant( app ); }
 
-  size_t get_group_participant_count( string_t const & group ) const
+  size_t get_group_participant_count( std::string const & group ) const
     { return ma_participants::instance().get_group_participant_count(group); }
 
   size_t get_participant_count( ) const
@@ -143,11 +143,11 @@ private:
   void evaluate_rules( notify_list_t & notify_status );
 
   // find condition/rule with given name
-  const ma_condition & find_cond_by_name( string_t const & name ) const;
-        ma_condition & find_cond_by_name( string_t const & name );
+  const ma_condition & find_cond_by_name( std::string const & name ) const;
+        ma_condition & find_cond_by_name( std::string const & name );
 
-  const ma_rule      & find_rule_by_name( string_t const & name ) const;
-        ma_rule      & find_rule_by_name( string_t const & name );
+  const ma_rule      & find_rule_by_name( std::string const & name ) const;
+        ma_rule      & find_rule_by_name( std::string const & name );
 
 private: 
 
@@ -156,11 +156,11 @@ private:
 
   // map of conditions
   cond_map_t  cmap;
-  strings_t   cnames;
+  std::vector<std::string>   cnames;
 
   // map of rules
   rule_map_t  rmap;
-  strings_t   rnames;
+  std::vector<std::string>   rnames;
 
   // callbacks
   alarm_fn_t      alarm_fn;

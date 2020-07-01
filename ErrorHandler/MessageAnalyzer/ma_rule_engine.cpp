@@ -69,12 +69,12 @@ void ma_rule_engine::init_engine( )
     }
 
     // construct the condition object
-    ma_condition c( cond.get<string_t>("description", string_t())
-                  , cond.get<string_t>("severity")
-                  , cond.get<strings_t>("source")
-                  , cond.get<strings_t>("category", strings_t(1, "*"))
-                  , cond.get<string_t>("regex")
-                  , cond.get<string_t>("test", string_t())
+    ma_condition c( cond.get<std::string>("description", std::string())
+                  , cond.get<std::string>("severity")
+                  , cond.get<std::vector<std::string>>("source")
+                  , cond.get<std::vector<std::string>>("category", std::vector<std::string>(1, "*"))
+                  , cond.get<std::string>("regex")
+                  , cond.get<std::string>("test", std::string())
                   , cond.get<bool>("persistent", true)
                   , occur
                   , at_least
@@ -101,7 +101,7 @@ void ma_rule_engine::init_engine( )
 
     // construct the rule object
     ma_rule r( rnames[i]
-             , rule.get<string_t>("description", string_t()) 
+             , rule.get<std::string>("description", std::string()) 
              , rule.get<bool>("repeat_alarm", false)
              , rule.get<int>("holdoff", 0)
              );
@@ -115,8 +115,8 @@ void ma_rule_engine::init_engine( )
     // notification list which needs the pointer to the ma_rule object. There-
     // fore we push the ma_rule object into the container first, then do the
     // parse
-    it->second.parse( rule.get<string_t>("expression")
-                    , rule.get<string_t>("message")
+    it->second.parse( rule.get<std::string>("expression")
+                    , rule.get<std::string>("message")
                     , rule.get<ParameterSet>("action", nulp)
                     , &cmap );
   }
@@ -164,7 +164,7 @@ void ma_rule_engine::event_worker()
   }
 }
 
-void ma_rule_engine::feed( msg_t const & msg )
+void ma_rule_engine::feed( qt_mf_msg const & msg )
 {
   // reaction starters
   conds_t status;
@@ -242,7 +242,7 @@ void ma_rule_engine::merge_notify_list( notify_list_t & n_list
 }
 
 const ma_condition &
-  ma_rule_engine::find_cond_by_name( string_t const & name ) const
+  ma_rule_engine::find_cond_by_name( std::string const & name ) const
 {
   cond_map_t::const_iterator it = cmap.find(name);
   if( it == cmap.end() )
@@ -251,7 +251,7 @@ const ma_condition &
 }
 
 ma_condition &
-  ma_rule_engine::find_cond_by_name( string_t const & name )
+  ma_rule_engine::find_cond_by_name( std::string const & name )
 {
   cond_map_t::iterator it = cmap.find(name);
   if( it == cmap.end() )
@@ -260,7 +260,7 @@ ma_condition &
 }
 
 const ma_rule &
-  ma_rule_engine::find_rule_by_name( string_t const & name ) const
+  ma_rule_engine::find_rule_by_name( std::string const & name ) const
 {
   rule_map_t::const_iterator it = rmap.find(name);
   if( it == rmap.end() )
@@ -269,7 +269,7 @@ const ma_rule &
 }
 
 ma_rule &
-  ma_rule_engine::find_rule_by_name( string_t const & name )
+  ma_rule_engine::find_rule_by_name( std::string const & name )
 {
   rule_map_t::iterator it = rmap.find(name);
   if( it == rmap.end() )

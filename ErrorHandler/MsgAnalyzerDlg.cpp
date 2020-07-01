@@ -20,15 +20,8 @@ using fhicl::ParameterSet;
 using namespace novadaq::errorhandler;
 
 static ParameterSet
-read_conf(string_t const fname)
+read_conf(std::string const fname)
 {
-	std::unique_ptr<cet::filepath_maker> policy;
-
-	if (fname[0] == '/')
-		policy.reset(new cet::filepath_maker());
-	else
-		policy.reset(new cet::filepath_lookup("FHICL_FILE_PATH"));
-
 	TLOG(TLVL_DEBUG) << "message analyzer configuration file: "
 	                 << fname;
 
@@ -36,7 +29,8 @@ read_conf(string_t const fname)
 	try
 	{
 		// it throws when the file is not parsable
-		fhicl::make_ParameterSet(fname, *policy, pset);
+		cet::filepath_lookup_after1 lookup_policy("FHICL_FILE_PATH");
+		fhicl::make_ParameterSet(fname, lookup_policy, pset);
 	}
 	catch (cet::exception const &ex)
 	{
@@ -50,6 +44,7 @@ MsgAnalyzerDlg::MsgAnalyzerDlg(std::string const &cfgfile, int partition, QDialo
     : QDialog(parent)
     , pset(read_conf(cfgfile))
     , engine(pset)
+    , receiver(pset.get<fhicl::ParameterSet>("receivers", fhicl::ParameterSet()))
     , map()
     , nmsgs(0)
     , rule_size(0)
@@ -70,7 +65,7 @@ MsgAnalyzerDlg::MsgAnalyzerDlg(std::string const &cfgfile, int partition, QDialo
     , e_aoe()
 {
 	setupUi(this);
-	this->setWindowTitle("NOvA Message Analyzer, Partition " + QString::number(partition));
+	this->setWindowTitle("artdaq Message Analyzer, Partition " + QString::number(partition));
 
 	connect(&engine, SIGNAL(alarm(QString const &, QString const &)), this, SLOT(onNewAlarm(QString const &, QString const &)));
 
@@ -79,11 +74,8 @@ MsgAnalyzerDlg::MsgAnalyzerDlg(std::string const &cfgfile, int partition, QDialo
 	connect(btnReset, SIGNAL(clicked()), this, SLOT(reset()));
 	connect(btnExit, SIGNAL(clicked()), this, SLOT(exit()));
 
-	connect(btnOpenLog, SIGNAL(clicked()), this, SLOT(open_log()));
-	connect(btnReadLog, SIGNAL(clicked()), this, SLOT(read_log()));
-
-	connect(&reader, SIGNAL(updateProgress(int)), pbLog, SLOT(setValue(int)));
-	connect(&reader, SIGNAL(readCompleted()), this, SLOT(read_completed()));
+	connect(&receiver, SIGNAL(newMessage(qt_mf_msg const &)), this, SLOT(onNewMsg(qt_mf_msg const &)));
+	connect(&receiver, SIGNAL(newMessage(qt_mf_msg const &)), &engine, SLOT(feed(qt_mf_msg const &)));
 
 	connect(lwMain, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(onNodeClicked(QListWidgetItem *)));
 	connect(lwDCM, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(onNodeClicked(QListWidgetItem *)));
@@ -163,27 +155,12 @@ MsgAnalyzerDlg::MsgAnalyzerDlg(std::string const &cfgfile, int partition, QDialo
 
 	// conclude
 	publishMessage(MSG_SYSTEM, "Rule engine initialization completed.");
-
-	pbLog->setMaximum(100);
-	pbLog->setMinimum(0);
-	pbLog->setValue(0);
-
-	btnReadLog->setEnabled(false);
-
-	QTimer::singleShot(100, this, SLOT(onLoad()));
+	receiver.start();
 }
 
-void MsgAnalyzerDlg::onLoad()
+MsgAnalyzerDlg::~MsgAnalyzerDlg()
 {
-	if (engine.is_EHS())
-	{
-		publishMessage(MSG_SYSTEM, "Looking for active Error Handling Supervisor");
-
-		publishMessage(MSG_SYSTEM, tr("None EHS has been found. "
-		                              "Current instance of the Message Analyzer "
-		                              "will act as an EHS"));		
-
-	}
+	receiver.stop();
 }
 
 void MsgAnalyzerDlg::initNodeStatus()
@@ -191,13 +168,10 @@ void MsgAnalyzerDlg::initNodeStatus()
 	ParameterSet null_pset;
 	ParameterSet node = pset.get<ParameterSet>("node_status", null_pset);
 
-	typedef std::string string_t;
-	typedef std::vector<std::string> strings_t;
+	std::vector<std::string> null_strings;
 
-	strings_t null_strings;
-
-	strings_t aow = node.get<strings_t>("alarm_on_first_warning", null_strings);
-	strings_t aoe = node.get<strings_t>("alarm_on_first_error", null_strings);
+	std::vector<std::string> aow = node.get<std::vector<std::string>>("alarm_on_first_warning", null_strings);
+	std::vector<std::string> aoe = node.get<std::vector<std::string>>("alarm_on_first_error", null_strings);
 
 	for (size_t i = 0; i < aow.size(); ++i)
 	{
@@ -246,7 +220,7 @@ bool MsgAnalyzerDlg::check_node_aoe(std::string const &key)
 	return false;
 }
 
-void MsgAnalyzerDlg::onNewMsg(msg_t const &mfmsg)
+void MsgAnalyzerDlg::onNewMsg(qt_mf_msg const &mfmsg)
 {
 	// basic message filtering according to the host and app
 	std::string key;
@@ -523,7 +497,7 @@ void MsgAnalyzerDlg::reset()
 
 void MsgAnalyzerDlg::exit()
 {
-	int ret = QMessageBox::warning(this, "MsgAnalyzer", "Are you sure you wish to close MsgAnalyzer? This is usually not the correct procedure!", QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel);
+	int ret = QMessageBox::warning(this, "MsgAnalyzer", "Are you sure you wish to close MsgAnalyzer?", QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel);
 
 	if (ret == QMessageBox::Cancel) return;
 
@@ -532,7 +506,7 @@ void MsgAnalyzerDlg::exit()
 
 void MsgAnalyzerDlg::closeEvent(QCloseEvent *event)
 {
-	QSettings settings("NOvA DAQ", "MsgAnalyzer");
+	QSettings settings("artdaq", "MsgAnalyzer");
 	settings.setValue("geometry", saveGeometry());
 	QDialog::closeEvent(event);
 }
@@ -795,55 +769,4 @@ void MsgAnalyzerDlg::onSetParticipants(QVector<QString> const &dcm, QVector<QStr
 	p.add_group("bnevb", bnevb.size());
 
 	publishMessage(MSG_SYSTEM, "Initialized participants with " + QString(dcm.size()) + "dcm(s) and " + QString(bnevb.size()) + "bnevb(s)");
-}
-
-void MsgAnalyzerDlg::open_log()
-{
-	QString filename =
-	    QFileDialog::getOpenFileName(this, tr("Open Archive"), "/home/qlu", tr("Log Files (*.log);;All Files(*.*)"));
-
-	if (filename.isEmpty())
-		return;
-
-	if (reader.open(filename))
-	{
-		// connect from log reader
-		connect(&reader, SIGNAL(newMessage(msg_t const &)), this, SLOT(onNewMsg(msg_t const &)));
-
-		connect(&reader, SIGNAL(newMessage(msg_t const &)), &engine, SLOT(feed(msg_t const &)));
-
-		// init
-		publishMessage(MSG_SYSTEM, "Disconnected from MessageFacility receiver");
-		publishMessage(MSG_SYSTEM, "Message Log Analysis: " + filename);
-
-		labelLogFile->setText(filename);
-
-		pbLog->setValue(0);
-		btnReadLog->setText("Start");
-		btnReadLog->setEnabled(true);
-		btnOpenLog->setEnabled(true);
-	}
-}
-
-void MsgAnalyzerDlg::read_log()
-{
-	if (btnReadLog->text() == "Pause")
-	{
-		reader.pause_exec();
-		btnReadLog->setText("Resume");
-		btnOpenLog->setEnabled(true);
-	}
-	else
-	{
-		reader.start();
-		btnReadLog->setText("Pause");
-		btnOpenLog->setEnabled(false);
-	}
-}
-
-void MsgAnalyzerDlg::read_completed()
-{
-	btnReadLog->setText("Start");
-	btnReadLog->setEnabled(true);
-	btnOpenLog->setEnabled(true);
 }

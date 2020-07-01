@@ -6,7 +6,7 @@
 #include "ErrorHandler/MessageAnalyzer/ma_utils.h"
 #include "ErrorHandler/Components/NodeInfo.h"
 #include "ErrorHandler/Components/qt_rule_engine.h"
-#include "ErrorHandler/Components/qt_log_reader.h"
+#include "mfextensions/Receivers/ReceiverManager.hh"
 
 #include <QtCore/QMutex>
 #include <QtCore/QSignalMapper>
@@ -37,14 +37,14 @@ public:
   MsgAnalyzerDlg( std::string const & cfgfile, int p
                 , QDialog *parent = 0 );
 
+  virtual ~MsgAnalyzerDlg();
+
 protected:
-  virtual void closeEvent(QCloseEvent *event);
+  void closeEvent(QCloseEvent *event) final;
 
 private slots:
 
-  void onLoad();
-
-  void onNewMsg(msg_t const & mfmsg);
+  void onNewMsg(qt_mf_msg const & mfmsg);
   void onNewSysMsg(sev_code_t, QString const & msg);
 
   void onNewAlarm( QString const & rule_name
@@ -63,10 +63,6 @@ private slots:
   void context_menu_reset();
   void context_menu_warning();
   void context_menu_error();
-
-  void open_log();
-  void read_log();
-  void read_completed();
 
   void rule_enable( );
   void rule_disable( );
@@ -106,7 +102,7 @@ private:
   // data member
   fhicl::ParameterSet    pset;
   qt_rule_engine         engine;
-  qt_log_reader          reader;
+  mfviewer::ReceiverManager          receiver;
 
   map_t                  map;
   int                    nmsgs;

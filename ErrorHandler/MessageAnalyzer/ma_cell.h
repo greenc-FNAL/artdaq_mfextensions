@@ -27,7 +27,7 @@ public:
   // otherwise, the status can change to off when it slides out of 
   // the time window
   bool 
-    hit( msg_t const & msg
+    hit( qt_mf_msg const & msg
        , boost::smatch const & w
        , ma_condition & cond
        , size_t s_idx
@@ -48,15 +48,15 @@ public:
     get_messages() const { return msgs; }
 
   // get latest message
-  string_t 
+  std::string 
     get_latest_message() const
     { assert( !msgs.empty() ); return msgs.back().text(false).toStdString(); }
 
   // get group
-  string_t
+  std::string
     get_message_group(size_t i) const
     { if(i>what_.size()) throw std::runtime_error("group does not exist");
-      return string_t(what_[i].first, what_[i].second); }
+      return std::string(what_[i].first, what_[i].second); }
 
 private:
   msgs_t msgs;

@@ -1,4 +1,4 @@
-#include "mfextensions/Binaries/ReceiverManager.hh"
+#include "mfextensions/Receivers/ReceiverManager.hh"
 
 #include <iostream>
 #include "fhiclcpp/ParameterSet.h"

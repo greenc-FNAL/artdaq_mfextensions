@@ -97,19 +97,19 @@ public:
     { engine.reset(); }
 
   // participants
-  void add_participant_group( string_t const & group )
+  void add_participant_group( std::string const & group )
     { engine.add_participant_group( group ); }
 
-  void add_participant_group( string_t const & group, size_t size )
+  void add_participant_group( std::string const & group, size_t size )
     { engine.add_participant_group( group, size ); }
 
-  void add_participant      ( string_t const & group, string_t const & app )
+  void add_participant      ( std::string const & group, std::string const & app )
     { engine.add_participant( group, app ); }
 
-  void add_participant      ( string_t const & app )
+  void add_participant      ( std::string const & app )
     { engine.add_participant( app ); }
 
-  size_t get_group_participant_count( string_t const & group ) const
+  size_t get_group_participant_count( std::string const & group ) const
     { return engine.get_group_participant_count(group); }
 
   size_t get_participant_count( ) const
@@ -119,7 +119,7 @@ public:
 public slots:
 
   // receiving a new message
-  void feed( msg_t const & msg ) { engine.feed(msg); }
+  void feed( qt_mf_msg const & msg ) { engine.feed(msg); }
 
 signals:
 
@@ -131,8 +131,8 @@ signals:
 
 private:
 
-  void new_alarm ( string_t const & rule_name, string_t const & msg );
-  void cond_match( string_t const & cond_name );
+  void new_alarm ( std::string const & rule_name, std::string const & msg );
+  void cond_match( std::string const & cond_name );
 
 private:
 

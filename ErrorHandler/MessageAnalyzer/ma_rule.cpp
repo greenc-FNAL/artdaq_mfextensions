@@ -7,8 +7,8 @@
 using fhicl::ParameterSet;
 using namespace novadaq::errorhandler;
 
-ma_rule::ma_rule( string_t const & rule_name
-                , string_t const & rule_desc
+ma_rule::ma_rule( std::string const & rule_name
+                , std::string const & rule_desc
                 , bool repeat
                 , int  holdoff_time )
 : conditions( )
@@ -36,8 +36,8 @@ ma_rule::ma_rule( string_t const & rule_name
 }
 
 void
-  ma_rule::parse( string_t const & cond_expr
-                , string_t const & alarm_message
+  ma_rule::parse( std::string const & cond_expr
+                , std::string const & alarm_message
                 , ParameterSet const & act_pset
                 , cond_map_t     * cond_map_ptr )
 {
@@ -52,7 +52,7 @@ void
   alarm_msg.init(this, alarm_message);
 
   // actions
-  std::vector<string_t> keys = act_pset.get_pset_names();
+  std::vector<std::string> keys = act_pset.get_pset_names();
   for(size_t i=0; i<keys.size(); ++i)
   {
     ParameterSet param = act_pset.get<ParameterSet>(keys[i]);
@@ -68,7 +68,7 @@ void
 
 
 cond_idx_t 
-  ma_rule::insert_condition_ptr( string_t const & name, bool primitive )
+  ma_rule::insert_condition_ptr( std::string const & name, bool primitive )
 { 
   // cond_map must not be empty
   assert (cond_map != NULL);
@@ -303,7 +303,7 @@ ma_domain const & ma_rule::get_alarm() const
   return itor_last_alarm->first;
 }
 
-string_t ma_rule::get_alarm_message( )
+std::string ma_rule::get_alarm_message( )
 {
   return alarm_msg.message();
 }
@@ -314,7 +314,7 @@ string_t ma_rule::get_alarm_message( )
 //
 // get condition index and pointer given a name
 cond_idx_t
-  ma_rule::get_cond_idx( string_t const & name ) const
+  ma_rule::get_cond_idx( std::string const & name ) const
 {
   idx_t::const_iterator it = conditions_idx.find(name);
   if( it == conditions_idx.end() )
@@ -324,7 +324,7 @@ cond_idx_t
 
 // get pointer to the condition 
 ma_condition *
-  ma_rule::get_cond( string_t const & name ) const
+  ma_rule::get_cond( std::string const & name ) const
 {
   idx_t::const_iterator it = conditions_idx.find(name);
   if( it == conditions_idx.end() )
@@ -334,7 +334,7 @@ ma_condition *
 
 // get index to the condition 
 size_t
-  ma_rule::get_idx( string_t const & name ) const
+  ma_rule::get_idx( std::string const & name ) const
 {
   idx_t::const_iterator it = conditions_idx.find(name);
   if( it == conditions_idx.end() )
@@ -353,7 +353,7 @@ size_t
 // update the "notify_on_source" or "notify_on_target" list
 // for corresponding conditions
 void
-  ma_rule::update_notify_list( string_t const & name, arg_t arg )
+  ma_rule::update_notify_list( std::string const & name, arg_t arg )
 {
   idx_t::const_iterator it = conditions_idx.find(name);
 

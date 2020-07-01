@@ -59,7 +59,7 @@ public:
   void insert_ext_func( cond_idx_t ci
                       , arg_t arg
                       , std::vector<boost::any> const & func_args
-                      , string_t const & function );
+                      , std::string const & function );
 
   void insert_compare_op_bool  ( compare_op_t cop, bool v )
     { op = cop; rhv_b = v; cond_type = FUNCTION_BOOL; }
@@ -67,7 +67,7 @@ public:
   void insert_compare_op_double( compare_op_t cop, double v )
     { op = cop; rhv_d = v; cond_type = FUNCTION_DOUBLE; }
 
-  void insert_compare_op_string( compare_op_t cop, string_t const & v )
+  void insert_compare_op_string( compare_op_t cop, std::string const & v )
     { op = cop; rhv_s = v; cond_type = FUNCTION_STRING; }
     
 
@@ -89,7 +89,7 @@ private:
   compare_op_t   op;
   bool           rhv_b;
   double         rhv_d;
-  string_t       rhv_s;
+  std::string       rhv_s;
   boost::shared_ptr<ma_function> ext_func;
 
   // shared_ptr to an boolean expression

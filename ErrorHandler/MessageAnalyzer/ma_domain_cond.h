@@ -36,7 +36,7 @@ public:
     { conds.push_back(std::make_pair(ci, arg)); cond_size = size; }
 
   // insert string condition ( cond.$s = 'str_cond' )
-  void insert_str_cond( string_t const & str ) 
+  void insert_str_cond( std::string const & str ) 
     { str_cond = str; }
 
   // insert domain_expr ( cond_type = EXPR )

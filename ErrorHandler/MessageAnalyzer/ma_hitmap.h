@@ -22,22 +22,22 @@ public:
 
   void set_parent( ma_condition * parent ) { cond = parent; }
 
-  unsigned int capture( msg_t    const & msg
-                      , string_t const & src
-                      , string_t const & tgt
+  unsigned int capture( qt_mf_msg    const & msg
+                      , std::string const & src
+                      , std::string const & tgt
                       , boost::smatch const & what );
 
   bool event(size_t src, size_t tgt, time_t t);
 
-  const static string_t global_s;
-  const static string_t global_t;
+  const static std::string global_s;
+  const static std::string global_t;
 
   // reset to ground state
   void reset( );
 
   // return index of the src/tgt string, or -2 if not found
-  int find_source(string_t const & src);
-  int find_target(string_t const & tgt);
+  int find_source(std::string const & src);
+  int find_target(std::string const & tgt);
 
   // get src/tgt string list
   const idx_t & get_sources() const { return src_idx; }
@@ -48,11 +48,11 @@ public:
   size_t target_size() const { return tgt_idx.size(); }
 
   // get src/tgt string from idx
-  const string_t & get_source( ma_cond_domain v ) const;
-  const string_t & get_target( ma_cond_domain v ) const;
+  const std::string & get_source( ma_cond_domain v ) const;
+  const std::string & get_target( ma_cond_domain v ) const;
 
-  string_t get_message( ma_cond_domain v ) const;
-  string_t get_message_group( ma_cond_domain v, size_t g ) const;
+  std::string get_message( ma_cond_domain v ) const;
+  std::string get_message_group( ma_cond_domain v, size_t g ) const;
    
 
   // if the cell has been triggered

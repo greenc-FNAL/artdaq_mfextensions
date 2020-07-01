@@ -17,10 +17,8 @@
 namespace novadaq {
 namespace errorhandler {
 
-typedef std::string                      string_t;
-typedef std::vector<std::string>         strings_t;
 typedef std::set<std::string>            string_set_t;
-typedef std::map<string_t, string_set_t> groups_t;
+typedef std::map<std::string, string_set_t> groups_t;
 
 class ma_participants
 {

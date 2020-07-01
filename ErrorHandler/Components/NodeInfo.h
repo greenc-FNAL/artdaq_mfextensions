@@ -28,7 +28,7 @@ public:
            , bool aow
            , bool aoe );
 
-  node_status push_msg ( msg_t const & msg );
+  node_status push_msg ( qt_mf_msg const & msg );
   QString msgs_to_string () const;
 
   std::string key_string() const { return key_str; }

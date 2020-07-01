@@ -1,21 +1,21 @@
-#include <QtWidgets/QApplication>
 #include <QtCore/QSettings>
+#include <QtWidgets/QApplication>
 
 #include "ErrorHandler/MsgAnalyzerDlg.h"
 
-#include <iostream>
-#include <messagefacility/MessageLogger/MessageLogger.h>
 #include <fhiclcpp/make_ParameterSet.h>
+#include <messagefacility/MessageLogger/MessageLogger.h>
+#include <iostream>
 
 using namespace novadaq::errorhandler;
 using namespace std;
 
 void printUsage()
 {
-  std::cout << "MsgAnalyzer usage:\n"
-            << "  -h, --help                \tdisplay help message\n"
-            << "  -c, --configuration [file]\tspecify the path and filename to the message analyzer conf file\n"
-            << "  -l, --log [file]          \tspecify the path and filename to the log (messagefacility) conf file\n";
+	std::cout << "MsgAnalyzer usage:\n"
+	          << "  -h, --help                \tdisplay help message\n"
+	          << "  -c, --configuration [file]\tspecify the path and filename to the message analyzer conf file\n"
+	          << "  -l, --log [file]          \tspecify the path and filename to the log (messagefacility) conf file\n";
 }
 
 int main(int argc, char* argv[])
@@ -28,10 +28,11 @@ int main(int argc, char* argv[])
 	int partition = 0;
 	// The following lines will cause the application not working properly.
 	// There is a hidden error involving pointers in QT in this code.
-	//const char* partenv = getenv("NOVADAQ_PARTITION_NUMBER");
-	//if(partenv) {
-	//  partition = atoi(partenv);
-	//}
+	auto partenv = getenv("ARTDAQ_PARTITION_NUMBER");
+	if (partenv != nullptr)
+	{
+		partition = atoi(partenv);
+	}
 
 	if (argc > 1)
 	{
@@ -72,22 +73,21 @@ int main(int argc, char* argv[])
 		TLOG(TLVL_ERROR) << "Unable to load configuration file " << mf_cfg << ": " << ex.explain_self();
 	}
 
-  mf::StartMessageFacility(pset, "MsgAnalyzer");
+	mf::StartMessageFacility(pset, "MsgAnalyzer");
 
-  mf::SetIteration("context");
-  mf::SetModuleName("module");
+	mf::SetIteration("context");
+	mf::SetModuleName("module");
 
+	// first log
+	TLOG_DEBUG("category") << "DEBUG: MessageFacility service started";
+	TLOG_INFO("category") << "INFO: MessageFacility service started";
 
-  // first log
-  TLOG_DEBUG("category") << "DEBUG: MessageFacility service started";
-  TLOG_INFO("category") << "INFO: MessageFacility service started";
+	// start MA dialog
+	MsgAnalyzerDlg dialog(cfg, partition);
 
-  // start MA dialog
-  MsgAnalyzerDlg dialog(cfg,partition);
+	QSettings settings("artdaq", "MsgAnalyzer");
+	dialog.restoreGeometry(settings.value("geometry").toByteArray());
+	dialog.show();
 
-  QSettings settings("NOvA DAQ", "MsgAnalyzer");
-  dialog.restoreGeometry(settings.value("geometry").toByteArray());
-  dialog.show();
-
-  return app.exec();
+	return app.exec();
 }

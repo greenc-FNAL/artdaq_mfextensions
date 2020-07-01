@@ -46,7 +46,7 @@ public:
 	struct Config
 	{
 		/// Array of strings
-		using strings_t = fhicl::Sequence<std::string>::default_type;
+		using std::vector<std::string> = fhicl::Sequence<std::string>::default_type;
 		/// ELDestination common config parameters
 		fhicl::TableFragment<ELdestination::Config> elDestConfig;
 		/// "host" (Default: "smtp.fnal.gov"): SMTP Server hostname
@@ -57,7 +57,7 @@ public:
 		/// "to_addresses" (Default: {}): The list of email addresses that SMTP mfPlugin should sent to
 		fhicl::Sequence<std::string> to = fhicl::Sequence<std::string>{
 		    fhicl::Name{"to_addresses"}, fhicl::Comment{"The list of email addresses that SMTP mfPlugin should sent to"},
-		    strings_t{}};
+		    std::vector<std::string>{}};
 		/// "from_address" (REQUIRED): Source email address
 		fhicl::Atom<std::string> from =
 		    fhicl::Atom<std::string>{fhicl::Name{"from_address"}, fhicl::Comment{"Source email address"}};

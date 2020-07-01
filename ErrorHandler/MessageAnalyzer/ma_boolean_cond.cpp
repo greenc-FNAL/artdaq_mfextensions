@@ -25,7 +25,7 @@ typedef std::vector<boost::any> anys_t;
 void ma_boolean_cond::insert_ext_func( cond_idx_t ci
                                      , arg_t      arg
                                      , anys_t   const & func_args
-                                     , string_t const & function )
+                                     , std::string const & function )
 { 
   cond_arg.first = ci; 
   cond_arg.second = arg; 
@@ -115,7 +115,7 @@ bool ma_boolean_cond::evaluate( ma_domain & value
     {
       alarm[cond_idx.second] = 
         ma_cond_domain( cond_idx.first->find_source( cond_idx.first->get_msg_source() )
-                      , cond_idx.first->find_target( cond_idx.first->get_msg_target() ) );
+                      , cond_idx.first->find_target( cond_idx.first->get_qt_mf_msgarget() ) );
     }
 
     // evaluate
@@ -123,7 +123,7 @@ bool ma_boolean_cond::evaluate( ma_domain & value
                                      , domain[cond_idx.second] );
     double     d;
     bool       b;
-    string_t   s;
+    std::string   s;
 
     switch( cond_type )
     {
@@ -136,7 +136,7 @@ bool ma_boolean_cond::evaluate( ma_domain & value
       return compare( op, b, rhv_b );
 
     case FUNCTION_STRING:
-      s = boost::any_cast<string_t>(v);
+      s = boost::any_cast<std::string>(v);
       return compare( op, s, rhv_s );
 
     case FUNCTION_DOUBLE:

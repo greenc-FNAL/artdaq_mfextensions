@@ -3,12 +3,12 @@
 
 using namespace novadaq::errorhandler;
 
-ma_condition::ma_condition( string_t  const & desc
-                          , string_t  const & sev
-                          , strings_t const & sources
-                          , strings_t const & categories
-                          , string_t  const & regex
-                          , string_t  const & test 
+ma_condition::ma_condition( std::string  const & desc
+                          , std::string  const & sev
+                          , std::vector<std::string> const & sources
+                          , std::vector<std::string> const & categories
+                          , std::string  const & regex
+                          , std::string  const & test 
                           , bool              persistent_cond
                           , int               occur 
                           , bool              at_least
@@ -57,7 +57,7 @@ ma_condition::ma_condition( string_t  const & desc
 , catched_messages ( 0 )
 {
   // parse sources
-  strings_t::const_iterator it = sources.begin();
+  std::vector<std::string>::const_iterator it = sources.begin();
   while(it!=sources.end())
   {
     if (*it == "*")
@@ -118,7 +118,7 @@ void ma_condition::init( )
 }
 
 bool 
-  ma_condition::match( msg_t const & msg
+  ma_condition::match( qt_mf_msg const & msg
                      , conds_t & status
                      , conds_t & source 
                      , conds_t & target )
@@ -168,7 +168,7 @@ bool ma_condition::event( size_t src, size_t tgt, time_t t, conds_t & status )
   return false;
 }
 
-void ma_condition::extract_fields (msg_t const & msg)
+void ma_condition::extract_fields (qt_mf_msg const & msg)
 {
   sev_ = msg.sev();
          get_source_from_msg(src_, msg);
@@ -226,7 +226,7 @@ bool ma_condition::match_body ( )
       if( t_group > what_.size() )
         throw std::runtime_error("match_body: target group does not exit");
 
-      tgt_ = string_t(what_[t_group].first, what_[t_group].second);
+      tgt_ = std::string(what_[t_group].first, what_[t_group].second);
     }
     
     return true;

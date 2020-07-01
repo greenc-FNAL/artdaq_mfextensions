@@ -248,7 +248,7 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	maxDeletedMsgs = conf.get<size_t>("max_displayed_deleted_messages", 100000);
 }
 
-bool msgViewerDlg::msg_throttled(qt_mf_msg const& mfmsg)
+bool msgViewerDlg::qt_mf_msghrottled(qt_mf_msg const& mfmsg)
 {
 	// suppression list
 
@@ -315,7 +315,7 @@ void msgViewerDlg::onNewMsg(qt_mf_msg const& mfmsg)
 	lcdMsgs->display(nMsgs);
 
 	// test if the message is suppressed or throttled
-	if (msg_throttled(mfmsg))
+	if (qt_mf_msghrottled(mfmsg))
 	{
 		lcdSuppressionCount->display(nSupMsgs);
 		lcdThrottlingCount->display(nThrMsgs);

@@ -15,22 +15,22 @@ int novadaq::errorhandler::and_op (int i, int j)
   return -2;
 }
 
-string_t novadaq::errorhandler::trim_hostname(string_t const & host)
+std::string novadaq::errorhandler::trim_hostname(std::string const & host)
 {
   size_t pos = host.find('.');
   if (pos==std::string::npos) return host;
   else                        return host.substr(0, pos);
 }
 
-node_type_t novadaq::errorhandler::get_source_from_msg(string_t & src, msg_t const & msg)
+node_type_t novadaq::errorhandler::get_source_from_msg(std::string & src, qt_mf_msg const & msg)
 {
-  string_t host = trim_hostname(msg.hostname());
+  std::string host = trim_hostname(msg.hostname());
 
-  if (  (host.find("dcm")!=string_t::npos) )
+  if (  (host.find("dcm")!=std::string::npos) )
   {
     src  = host; return DCM;
   }
-  else if (host.find("novadaq-ctrl-farm")!=string_t::npos)
+  else if (host.find("novadaq-ctrl-farm")!=std::string::npos)
   {
     src  = host; return BufferNode;
   }
