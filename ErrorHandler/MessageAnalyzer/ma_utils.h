@@ -39,9 +39,9 @@ std::string
  * @return node_type_t indicating the type of the source
 */
 novadaq::errorhandler::node_type_t
-novadaq::errorhandler::get_source_from_msg(std::string& src, qt_mf_msg const& /*msg*/)
+novadaq::errorhandler::get_source_from_msg(std::string& src, qt_mf_msg const& msg)
 {
-	src = "artdaq";
+	src = msg.app().toStdString();
 	return Framework;
 }
 
