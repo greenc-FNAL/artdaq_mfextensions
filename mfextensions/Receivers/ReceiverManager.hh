@@ -41,14 +41,14 @@ signals:
 	/// Signal raised on new message
 	/// </summary>
 	/// <param name="msg">Message just received</param>
-	void newMessage(qt_mf_msg const& msg);
+	void newMessage(msg_ptr_t const& msg);
 
 private slots:
 	/// <summary>
 	/// Slot connected to receivers' newMessage signal
 	/// </summary>
 	/// <param name="mfmsg">Message received by receiver</param>
-	void onNewMessage(qt_mf_msg const& mfmsg);
+	void onNewMessage(msg_ptr_t const& mfmsg);
 
 private:
 	ReceiverManager(ReceiverManager const&) = delete;

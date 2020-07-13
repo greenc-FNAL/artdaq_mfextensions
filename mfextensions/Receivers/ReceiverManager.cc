@@ -7,6 +7,7 @@
 mfviewer::ReceiverManager::ReceiverManager(const fhicl::ParameterSet& pset)
 {
 	qRegisterMetaType<qt_mf_msg>("qt_mf_msg");
+	qRegisterMetaType<msg_ptr_t>("msg_ptr_t");
 	std::vector<std::string> names = pset.get_pset_names();
 	for (const auto& name : names)
 	{
@@ -16,7 +17,7 @@ mfviewer::ReceiverManager::ReceiverManager(const fhicl::ParameterSet& pset)
 			auto plugin_pset = pset.get<fhicl::ParameterSet>(name);
 			pluginType = plugin_pset.get<std::string>("receiverType", "unknown");
 			std::unique_ptr<mfviewer::MVReceiver> rcvr = makeMVReceiver(pluginType, plugin_pset);
-			connect(rcvr.get(), SIGNAL(NewMessage(qt_mf_msg const&)), this, SLOT(onNewMessage(qt_mf_msg const&)));
+			connect(rcvr.get(), SIGNAL(NewMessage(msg_ptr_t)), this, SLOT(onNewMessage(msg_ptr_t)));
 			receivers_.push_back(std::move(rcvr));
 		}
 		catch (...)
@@ -56,4 +57,4 @@ void mfviewer::ReceiverManager::start()
 	}
 }
 
-void mfviewer::ReceiverManager::onNewMessage(qt_mf_msg const& mfmsg) { emit newMessage(mfmsg); }
+void mfviewer::ReceiverManager::onNewMessage(msg_ptr_t const& mfmsg) { emit newMessage(mfmsg); }

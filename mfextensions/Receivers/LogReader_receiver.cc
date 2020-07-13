@@ -71,7 +71,7 @@ void mfviewer::LogReader::run()
 #include <ctime>
 #include <iostream>
 
-qt_mf_msg mfviewer::LogReader::read_next()
+msg_ptr_t mfviewer::LogReader::read_next()
 {
 	std::string line;
 
@@ -133,9 +133,9 @@ qt_mf_msg mfviewer::LogReader::read_next()
 	std::string body;
 	getline(log_, line);
 
-	qt_mf_msg msg("", category, application, 0, tv);
-	msg.setSeverityLevel(sev);
-	msg.setEventID(eventID);
+	msg_ptr_t msg = std::make_shared<qt_mf_msg>("", category, application, 0, tv);
+	msg->setSeverityLevel(sev);
+	msg->setEventID(eventID);
 
 	while (!log_.eof() && line.find("%MSG") == std::string::npos)
 	{
@@ -143,8 +143,8 @@ qt_mf_msg mfviewer::LogReader::read_next()
 		getline(log_, line);
 	}
 
-	msg.setMessage(filename_, counter_, body);
-	msg.updateText();
+	msg->setMessage(filename_, counter_, body);
+	msg->updateText();
 
 	return msg;
 }

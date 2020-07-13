@@ -64,7 +64,7 @@ protected:
 
 private slots:
 
-	void onNewMsg(qt_mf_msg const& mfmsg);
+	void onNewMsg(msg_ptr_t const& mfmsg);
 
 	void setFilter();
 
@@ -101,26 +101,25 @@ private:
 	msgViewerDlg& operator=(msgViewerDlg&&) = delete;
 
 	// Display all messages stored in the buffer
-	void displayMsg(int display);
+	void displayMsgs(int display);
 
 	void UpdateTextAreaDisplay(QStringList const& texts, QPlainTextEdit* widget);
 
 	void updateDisplays();
 
-	void removeMsg(msgs_t::iterator it);
+	void trim_msg_pool();
 
 	// test if the message is suppressed or throttled
-	bool qt_mf_msghrottled(qt_mf_msg const& mfmsg);
+	bool msg_throttled(msg_ptr_t const& mfmsg);
 
-	unsigned int update_index(msgs_t::iterator it);
+	void update_index(msg_ptr_t const& msg);
 
 	// Update the list. Returns true if there's a change in the selection
 	// before and after the update. e.g., the selected entry has been deleted
 	// during the process of updateMap(); otherwise it returns a false.
-	template<typename M>
-	bool updateList(QListWidget* lw, M const& map);
+	bool updateList(QListWidget* lw, msgs_map_t const& map);
 
-	void displayMsg(msgs_t::const_iterator it, int display);
+	void displayMsg(msg_ptr_t const& msg, int display);
 
 	void readSettings();
 
@@ -130,7 +129,7 @@ private:
 
 	QStringList toQStringList(QList<QListWidgetItem*> in);
 
-	msg_iters_t list_intersect(msg_iters_t const& l1, msg_iters_t const& l2);
+	msgs_t list_intersect(msgs_t const& l1, msgs_t const& l2);
 
 	//---------------------------------------------------------------------------
 
@@ -164,12 +163,14 @@ private:
 	QString searchStr;
 
 	// msg pool storing the formatted text body
+	mutable std::mutex msg_pool_mutex_;
 	msgs_t msg_pool_;
 
 	// map of a key to a list of msg iters
-	msg_iters_map_t host_msgs_;
-	msg_iters_map_t cat_msgs_;
-	msg_iters_map_t app_msgs_;
+	mutable std::mutex msg_classification_mutex_;
+	msgs_map_t host_msgs_;
+	msgs_map_t cat_msgs_;
+	msgs_map_t app_msgs_;
 
 	// context menu for "suppression" and "throttling" button
 	QMenu* sup_menu;
@@ -178,22 +179,22 @@ private:
 	// Receiver Plugin Manager
 	mfviewer::ReceiverManager receivers_;
 
+	mutable std::mutex filter_mutex_;
 	struct MsgFilterDisplay
 	{
 		int nDisplayMsgs;
 		int nDisplayedDeletedMsgs;
-		msg_iters_t msgs;
+		msgs_t msgs;
 		QStringList hostFilter;
 		QStringList appFilter;
 		QStringList catFilter;
+		QString filterExpression;
 		QPlainTextEdit* txtDisplay;
 
 		// severity threshold
 		sev_code_t sevThresh;
 	};
 	std::vector<MsgFilterDisplay> msgFilters_;
-
-	mutable std::recursive_mutex updating_mutex_;
 };
 
 enum list_mask_t

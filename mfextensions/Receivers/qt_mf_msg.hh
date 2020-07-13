@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <sys/time.h>
 #include "messagefacility/Utilities/ELseverityLevel.h"
@@ -173,58 +174,18 @@ private:
 };
 
 /// <summary>
-/// A std::list of qt_mf_msgs
+/// A std::shared_ptr to a qt_mf_msg
 /// </summary>
-typedef std::list<qt_mf_msg> msgs_t;
+typedef std::shared_ptr<qt_mf_msg> msg_ptr_t;
 
 /// <summary>
-/// Iterator for the msgs_t type
+/// A std::list of msg_ptr_t
 /// </summary>
-class msg_iter_t
-{
-public:
-	/// <summary>
-	/// Construct a msg_iter_t
-	/// </summary>
-	/// <param name="it">Iterator to msgs_t list</param>
-	msg_iter_t(msgs_t::iterator it)
-	{
-		iter_ = it;
-		seq_ = it->seq();
-	}
-
-	/// <summary>
-	/// Equality operator. Equality is based on the message's sequence number
-	/// </summary>
-	/// <param name="other">msg_iter_t to check for equality</param>
-	/// <returns>True if both messages have the same sequence id</returns>
-	bool operator==(msg_iter_t const& other) const { return seq_ == other.seq_; }
-
-	/// <summary>
-	/// Comparison operator, based on message sequence number
-	/// </summary>
-	/// <param name="other">msg_iter_t to compare</param>
-	/// <returns>seq() < other.seq()</returns>
-	bool operator<(msg_iter_t const& other) const { return seq_ < other.seq_; }
-
-	/// <summary>
-	/// Get the wrapper iterator
-	/// </summary>
-	/// <returns>msgs_t::iterator</returns>
-	msgs_t::iterator get() const { return iter_; };
-
-private:
-	msgs_t::iterator iter_;
-	size_t seq_;
-};
+typedef std::list<msg_ptr_t> msgs_t;
 
 /// <summary>
-/// A std::list of msg_iter_ts
+/// A std::map relating a QString and a msgs_t
 /// </summary>
-typedef std::list<msg_iter_t> msg_iters_t;
-/// <summary>
-/// A std::map relating a QString and a msg_iters_t
-/// </summary>
-typedef std::map<QString, msg_iters_t> msg_iters_map_t;
+typedef std::map<QString, msgs_t> msgs_map_t;
 
 #endif

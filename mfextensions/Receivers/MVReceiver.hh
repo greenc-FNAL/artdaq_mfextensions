@@ -46,7 +46,7 @@ signals:
 	/// process it.
 	/// </summary>
 	/// <param name="msg">Received message</param>
-	void NewMessage(qt_mf_msg const& msg);
+	void NewMessage(msg_ptr_t const& msg);
 
 private:
 	MVReceiver(MVReceiver const&) = delete;
