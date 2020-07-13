@@ -15,7 +15,6 @@
 
 namespace mfplugins {
 using namespace mf::service;
-using mf::ELseverityLevel;
 using mf::ErrorObj;
 
 /// <summary>
@@ -43,26 +42,26 @@ public:
 	/// ELFriendly Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELFriendly</param>
-	ELFriendly(Parameters const& pset);
+	explicit ELFriendly(Parameters const& pset);
 
 	/**
    * \brief Fill the "Prefix" portion of the message
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
+	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
+	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 	/**
    * \brief Fill the "Suffix" portion of the message
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillSuffix(std::ostringstream& o, const ErrorObj& e) override;
+	void fillSuffix(std::ostringstream& o, const ErrorObj& msg) override;
 
 private:
 	std::string delimeter_;
@@ -188,34 +187,39 @@ void ELFriendly::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 //=============================================================================
 void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg)
 {
-	if (!format_.want(TEXT)) return;
+	if (!format_.want(TEXT))
+	{
+		return;
+	}
 
 	auto const usrMsgStart = std::next(msg.items().cbegin(), 4);
 	auto it = msg.items().cbegin();
 
 	// Determine if file and line should be included
-	if (true || !msg.is_verbatim())
-	{
-		// The first four items are { " ", "<FILENAME>", ":", "<LINE>" }
-		while (it != usrMsgStart)
-		{
-			if (!it->compare(" ") && !std::next(it)->compare("--"))
-			{
-				// Do not emit if " --:0" is the match
-				std::advance(it, 4);
-			}
-			else
-			{
-				// Emit if <FILENAME> and <LINE> are meaningful
-				emitToken(oss, *it++);
-			}
-		}
 
-		// Check for user-requested line breaks
-		if (format_.want(NO_LINE_BREAKS))
-			emitToken(oss, " ==> ");
+	// The first four items are { " ", "<FILENAME>", ":", "<LINE>" }
+	while (it != usrMsgStart)
+	{
+		if ((*it == " ") && (*std::next(it) == "--"))
+		{
+			// Do not emit if " --:0" is the match
+			std::advance(it, 4);
+		}
 		else
-			emitToken(oss, "", true);
+		{
+			// Emit if <FILENAME> and <LINE> are meaningful
+			emitToken(oss, *it++);
+		}
+	}
+
+	// Check for user-requested line breaks
+	if (format_.want(NO_LINE_BREAKS))
+	{
+		emitToken(oss, " ==> ");
+	}
+	else
+	{
+		emitToken(oss, "", true);
 	}
 
 	// For verbatim (and user-supplied) messages, just print the contents
@@ -227,9 +231,9 @@ void ELFriendly::fillUsrMsg(std::ostringstream& oss, ErrorObj const& msg)
 }
 
 //=============================================================================
-void ELFriendly::fillSuffix(std::ostringstream& oss, ErrorObj const& msg)
+void ELFriendly::fillSuffix(std::ostringstream& oss, ErrorObj const& /*msg*/)
 {
-	if ((true || !msg.is_verbatim()) && !format_.want(NO_LINE_BREAKS))
+	if (!format_.want(NO_LINE_BREAKS))
 	{
 		emitToken(oss, "\n%MSG");
 	}
@@ -249,7 +253,7 @@ void ELFriendly::fillSuffix(std::ostringstream& oss, ErrorObj const& msg)
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELFriendly>(pset);
 }

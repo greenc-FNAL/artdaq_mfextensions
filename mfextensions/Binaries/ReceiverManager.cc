@@ -4,16 +4,16 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "mfextensions/Receivers/makeMVReceiver.hh"
 
-mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
+mfviewer::ReceiverManager::ReceiverManager(const fhicl::ParameterSet& pset)
 {
 	qRegisterMetaType<qt_mf_msg>("qt_mf_msg");
 	std::vector<std::string> names = pset.get_pset_names();
-	for (auto name : names)
+	for (const auto& name : names)
 	{
 		std::string pluginType = "unknown";
 		try
 		{
-			fhicl::ParameterSet plugin_pset = pset.get<fhicl::ParameterSet>(name);
+			auto plugin_pset = pset.get<fhicl::ParameterSet>(name);
 			pluginType = plugin_pset.get<std::string>("receiverType", "unknown");
 			std::unique_ptr<mfviewer::MVReceiver> rcvr = makeMVReceiver(pluginType, plugin_pset);
 			connect(rcvr.get(), SIGNAL(NewMessage(qt_mf_msg const&)), this, SLOT(onNewMessage(qt_mf_msg const&)));
@@ -30,7 +30,10 @@ mfviewer::ReceiverManager::ReceiverManager(fhicl::ParameterSet pset)
 mfviewer::ReceiverManager::~ReceiverManager()
 {
 	stop();
-	for (auto& i : receivers_) i.reset(nullptr);
+	for (auto& i : receivers_)
+	{
+		i.reset(nullptr);
+	}
 }
 
 void mfviewer::ReceiverManager::stop()

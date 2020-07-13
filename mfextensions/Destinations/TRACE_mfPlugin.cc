@@ -60,26 +60,26 @@ public:
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
+	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
+	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "Suffix" portion of the message (Unused)
    */
-	virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
+	void fillSuffix(std::ostringstream& /*unused*/, const ErrorObj& /*msg*/) override {}
 
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param o Stringstream object containing message data
    * \param e MessageFacility object containing header information
    */
-	virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
+	void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
 };
 
 // END DECLARATION
@@ -130,7 +130,7 @@ void ELTRACE::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
 	ELdestination::fillUsrMsg(tmposs, msg);
 
 	// remove leading "\n" if present
-	const std::string& usrMsg = !tmposs.str().compare(0, 1, "\n") ? tmposs.str().erase(0, 1) : tmposs.str();
+	const std::string& usrMsg = tmposs.str().compare(0, 1, "\n") == 0 ? tmposs.str().erase(0, 1) : tmposs.str();
 
 	oss << usrMsg;
 }
@@ -144,7 +144,7 @@ void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 	auto message = oss.str();
 
 	auto level = xid.severity().getLevel();
-	auto lvlNum = 0;
+	int lvlNum;
 
 	switch (level)
 	{
@@ -161,8 +161,10 @@ void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 		case mf::ELseverityLevel::ELsev_warning:
 			lvlNum = 1;
 			break;
+		default:
+			lvlNum = 0;
 	}
-	TRACE(lvlNum, message);  // this is the TRACE -- direct the message to memory and/or stdout
+	TRACE(lvlNum, message);  // NOLINT this is the TRACE -- direct the message to memory and/or stdout
 }
 }  // end namespace mfplugins
 
@@ -177,7 +179,7 @@ void ELTRACE::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELTRACE>(pset);
 }

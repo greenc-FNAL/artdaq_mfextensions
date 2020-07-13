@@ -17,7 +17,7 @@ public:
 	/// UDPReceiver Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet to use to configure the receiver</param>
-	explicit UDPReceiver(fhicl::ParameterSet pset);
+	explicit UDPReceiver(fhicl::ParameterSet const& pset);
 
 	/// <summary>
 	/// Destructor -- Close socket
@@ -34,16 +34,21 @@ public:
 	/// </summary>
 	/// <param name="input">String to parse</param>
 	/// <returns>qt_mf_msg object containing message data</returns>
-	qt_mf_msg read_msg(std::string input);
+	qt_mf_msg read_msg(std::string const& input);
 
 	/// <summary>
 	/// Run simple validation tests on message
 	/// </summary>
 	/// <param name="input">String to validate</param>
 	/// <returns>True if message contains "MF" marker and at least one "|" delimeter</returns>
-	static bool validate_packet(std::string input);
+	static bool validate_packet(std::string const& input);
 
 private:
+	UDPReceiver(UDPReceiver const&) = delete;
+	UDPReceiver(UDPReceiver&&) = delete;
+	UDPReceiver& operator=(UDPReceiver const&) = delete;
+	UDPReceiver& operator=(UDPReceiver&&) = delete;
+
 	void setupMessageListener_();
 
 	int message_port_;

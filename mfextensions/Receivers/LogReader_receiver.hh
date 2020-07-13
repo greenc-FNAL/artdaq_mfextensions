@@ -25,7 +25,7 @@ public:
 	/// LogReader Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure the LogReader</param>
-	explicit LogReader(fhicl::ParameterSet pset);
+	explicit LogReader(const fhicl::ParameterSet& pset);
 
 	/// <summary>
 	/// LogReader Destructor
@@ -44,6 +44,12 @@ public:
 	qt_mf_msg read_next();  // read next log
 
 private:
+	LogReader(LogReader const&) = delete;
+	LogReader(LogReader&&) = delete;
+	LogReader& operator=(LogReader const&) = delete;
+	LogReader& operator=(LogReader&&) = delete;
+
+
 	std::ifstream log_;
 	size_t pos_;
 

@@ -33,7 +33,6 @@
 #endif
 
 namespace mfplugins {
-using mf::ELseverityLevel;
 using mf::ErrorObj;
 using mf::service::ELdestination;
 
@@ -88,26 +87,26 @@ public:
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
+	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
    * \param e MessageFacility object containing header information
    */
-	virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
+	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "Suffix" portion of the message (Unused)
    */
-	virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
+	void fillSuffix(std::ostringstream& /*unused*/, const ErrorObj& /*msg*/) override {}
 
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param o Stringstream object containing message data
    * \param e MessageFacility object containing header information
    */
-	virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
+	void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 private:
 	void reconnect_();
@@ -129,7 +128,7 @@ private:
 	int next_error_report_;
 	int seqNum_;
 
-	long pid_;
+	int64_t pid_;
 	std::string hostname_;
 	std::string hostaddr_;
 	std::string app_;
@@ -144,7 +143,7 @@ private:
 //======================================================================
 
 ELUDP::ELUDP(Parameters const& pset)
-    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max()), host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address()), message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<long>(getpid()))
+    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max()), host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address()), message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<int64_t>(getpid()))
 {
 	// hostname
 	char hostname_c[1024];
@@ -157,7 +156,7 @@ ELUDP::ELUDP(Parameters const& pset)
 	if (host != nullptr)
 	{
 		// ip address from hostname if the entry exists in /etc/hosts
-		char* ip = inet_ntoa(*(struct in_addr*)host->h_addr);
+		char* ip = inet_ntoa(*reinterpret_cast<struct in_addr*>(host->h_addr)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 		hostaddr_ = ip;
 	}
 	else
@@ -167,7 +166,7 @@ ELUDP::ELUDP(Parameters const& pset)
 		struct ifaddrs* ifa = nullptr;
 		void* tmpAddrPtr = nullptr;
 
-		if (getifaddrs(&ifAddrStruct))
+		if (getifaddrs(&ifAddrStruct) != 0)
 		{
 			// failed to get addr struct
 			hostaddr_ = "127.0.0.1";
@@ -180,7 +179,7 @@ ELUDP::ELUDP(Parameters const& pset)
 				if (ifa->ifa_addr->sa_family == AF_INET)
 				{
 					// a valid IPv4 addres
-					tmpAddrPtr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr)->sin_addr); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 					char addressBuffer[INET_ADDRSTRLEN];
 					inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;
@@ -189,18 +188,23 @@ ELUDP::ELUDP(Parameters const& pset)
 				else if (ifa->ifa_addr->sa_family == AF_INET6)
 				{
 					// a valid IPv6 address
-					tmpAddrPtr = &((struct sockaddr_in6*)ifa->ifa_addr)->sin6_addr;
+					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in6*>(ifa->ifa_addr)->sin6_addr);  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 					char addressBuffer[INET6_ADDRSTRLEN];
 					inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;
 				}
 
 				// find first non-local address
-				if (!hostaddr_.empty() && hostaddr_.compare("127.0.0.1") && hostaddr_.compare("::1")) break;
+				if (!hostaddr_.empty() && (hostaddr_ != "127.0.0.1") && (hostaddr_ != "::1"))
+				{
+					break;
+				}
 			}
 
-			if (hostaddr_.empty())  // failed to find anything
+			if (hostaddr_.empty())
+			{  // failed to find anything
 				hostaddr_ = "127.0.0.1";
+			}
 		}
 	}
 
@@ -290,7 +294,7 @@ void ELUDP::reconnect_()
 		TLOG(TLVL_ERROR) << "Unable to enable multicast loopback on message socket, err=" << strerror(errno);
 		exit(1);
 	}
-	if (setsockopt(message_socket_, SOL_SOCKET, SO_BROADCAST, (void*)&yes, sizeof(int)) == -1)
+	if (setsockopt(message_socket_, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes)) == -1)
 	{
 		TLOG(TLVL_ERROR) << "Cannot set message socket to broadcast, err=" << strerror(errno);
 		exit(1);
@@ -344,7 +348,7 @@ void ELUDP::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
 	}
 
 	// remove leading "\n" if present
-	const std::string& usrMsg = !tmposs.str().compare(0, 1, "\n") ? tmposs.str().erase(0, 1) : tmposs.str();
+	const std::string& usrMsg = tmposs.str().compare(0, 1, "\n") == 0 ? tmposs.str().erase(0, 1) : tmposs.str();
 
 	oss << usrMsg;
 }
@@ -352,16 +356,19 @@ void ELUDP::fillUsrMsg(std::ostringstream& oss, const ErrorObj& msg)
 //======================================================================
 // Message router ( overriddes ELdestination::routePayload )
 //======================================================================
-void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj&)
+void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj& /*msg*/)
 {
-	if (message_socket_ == -1) reconnect_();
+	if (message_socket_ == -1)
+	{
+		reconnect_();
+	}
 	if (error_count_ < error_max_ || error_max_ == 0)
 	{
 		char str[INET_ADDRSTRLEN];
 		inet_ntop(AF_INET, &(message_addr_.sin_addr), str, INET_ADDRSTRLEN);
 
 		auto string = "UDPMFMESSAGE" + std::to_string(pid_) + "|" + oss.str();
-		auto sts = sendto(message_socket_, string.c_str(), string.size(), 0, (struct sockaddr*)&message_addr_,
+		auto sts = sendto(message_socket_, string.c_str(), string.size(), 0, reinterpret_cast<struct sockaddr*>(&message_addr_),  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 		                  sizeof(message_addr_));
 
 		if (sts < 0)
@@ -399,7 +406,7 @@ void ELUDP::routePayload(const std::ostringstream& oss, const ErrorObj&)
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELUDP>(pset);
 }

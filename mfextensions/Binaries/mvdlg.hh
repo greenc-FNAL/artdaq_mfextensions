@@ -34,7 +34,7 @@ public:
    * \param conf Configuration filename (fhicl document)
    * \param parent Parent Qt window
    */
-	msgViewerDlg(std::string const& conf, QDialog* parent = 0);
+	msgViewerDlg(std::string const& conf, QDialog* parent = nullptr);
 
 	virtual ~msgViewerDlg();
 
@@ -95,10 +95,15 @@ private slots:
 	//---------------------------------------------------------------------------
 
 private:
+	msgViewerDlg(msgViewerDlg const&) = delete;
+	msgViewerDlg(msgViewerDlg&&) = delete;
+	msgViewerDlg& operator=(msgViewerDlg const&) = delete;
+	msgViewerDlg& operator=(msgViewerDlg&&) = delete;
+
 	// Display all messages stored in the buffer
 	void displayMsg(int display);
 
-	void UpdateTextAreaDisplay(QStringList texts, QPlainTextEdit* widget);
+	void UpdateTextAreaDisplay(QStringList const& texts, QPlainTextEdit* widget);
 
 	void updateDisplays();
 
