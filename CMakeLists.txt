@@ -111,6 +111,9 @@ add_subdirectory(doc)
 # MFExtensions Library
 add_subdirectory(mfextensions)
 
+# ErrorHandler from NOvA
+add_subdirectory(ErrorHandler)
+
 # tools - utility scripts
 add_subdirectory(tools)
 

@@ -24,6 +24,9 @@ def main(argv):
     node,port = argv[1].split(':')
     count = 1
     if len(argv) == 3: count = int(argv[2])
+
+    print('node:port=%s:%d, count=%d'%(node,int(port),count))
+
     for ii  in range(0, count):
         sev = randrange(0,15)
         buf='MF: 01-Jan-1970 01:01:01'
@@ -46,7 +49,7 @@ def main(argv):
         buf+="|UDP Test program"
         buf+="|This is the ARTDAQ UDP test string.\n\t It contains exactly 111 characters, making for a total size of 113 bytes."
         s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-        s.sendto( buf, (node,int(port)) )
+        s.sendto( buf.encode('utf-8'), (node,int(port)) )
     pass
 
 

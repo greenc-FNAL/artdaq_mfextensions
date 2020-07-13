@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 #include "fhiclcpp/make_ParameterSet.h"
-#include "mfextensions/Binaries/ReceiverManager.hh"
+#include "mfextensions/Receivers/ReceiverManager.hh"
 
 namespace po = boost::program_options;
 

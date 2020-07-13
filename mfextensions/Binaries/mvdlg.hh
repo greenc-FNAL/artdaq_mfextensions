@@ -1,7 +1,7 @@
 #ifndef MSGVIEWERDLG_H
 #define MSGVIEWERDLG_H
 
-#include "mfextensions/Binaries/ReceiverManager.hh"
+#include "mfextensions/Receivers/ReceiverManager.hh"
 #include "mfextensions/Extensions/suppress.hh"
 #include "mfextensions/Extensions/throttle.hh"
 #include "mfextensions/Receivers/qt_mf_msg.hh"
@@ -110,7 +110,7 @@ private:
 	void removeMsg(msgs_t::iterator it);
 
 	// test if the message is suppressed or throttled
-	bool msg_throttled(qt_mf_msg const& mfmsg);
+	bool qt_mf_msghrottled(qt_mf_msg const& mfmsg);
 
 	unsigned int update_index(msgs_t::iterator it);
 

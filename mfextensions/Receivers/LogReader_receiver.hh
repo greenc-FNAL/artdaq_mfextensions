@@ -43,6 +43,8 @@ public:
 	/// <returns>qt_mf_msg from log file</returns>
 	qt_mf_msg read_next();  // read next log
 
+	bool iseof() { return log_.eof(); }
+
 private:
 	LogReader(LogReader const&) = delete;
 	LogReader(LogReader&&) = delete;
