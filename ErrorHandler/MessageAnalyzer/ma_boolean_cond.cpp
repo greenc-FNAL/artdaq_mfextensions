@@ -52,11 +52,6 @@ void ma_boolean_cond::reset( )
 
   if( cond_type >= FUNCTION )
   {
-    cond_idx_t cond_idx = cond_arg.first;
-
-    // condition ptr must not be null
-    assert( cond_idx.first != NULL );
-
     // custom function must not be null 
     assert( ext_func.get() != NULL );
 

@@ -13,10 +13,9 @@
 #  make package
 # ======================================================================
 
-# use cmake 2.8 or later
-# cmake_minimum_required (VERSION 2.8)
-# cmake 2.8.11 or later is required for Qt
-cmake_minimum_required(VERSION 2.8.11)
+# use cmake 3.17 or later
+# CMake 3.17 changed the way that AUTOMOC and AUTOUIC work
+cmake_minimum_required(VERSION 3.17.3)
 
 project(artdaq-mfextensions)
 # cetbuildtools contains our cmake modules
@@ -89,7 +88,6 @@ endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC_RELAXED_MODE ON)
 find_package(Qt5Widgets)
 find_package(Qt5Core)
 
