@@ -1,7 +1,7 @@
 
 #include "ErrorHandler/Components/qt_rule_engine.h"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <QtCore/QMetaType>
 
 using namespace novadaq::errorhandler;
@@ -9,9 +9,8 @@ using namespace novadaq::errorhandler;
 qt_rule_engine::qt_rule_engine( fhicl::ParameterSet const & pset
                               , QObject * parent )
 : QObject( parent )
-, engine ( pset
-         , boost::bind(&qt_rule_engine::new_alarm, this, _1, _2) 
-         , boost::bind(&qt_rule_engine::cond_match, this, _1) )
+, engine ( pset, boost::bind(&qt_rule_engine::new_alarm, this, boost::placeholders::_1, boost::placeholders::_2) 
+         , boost::bind(&qt_rule_engine::cond_match, this, boost::placeholders::_1))
 {
 
 }
