@@ -1,7 +1,6 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "messagefacility/Utilities/ErrorObj.h"
 
-#include <boost/bind.hpp>
 #include <boost/program_options.hpp>
 
 #include <iostream>
