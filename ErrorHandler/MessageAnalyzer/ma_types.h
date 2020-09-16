@@ -15,10 +15,10 @@
 #include <boost/multi_array.hpp>
 
 // system includes
-#include <list>
-#include <memory>
 #include <functional>
+#include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 

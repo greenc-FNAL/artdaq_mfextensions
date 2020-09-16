@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 	setenv("TRACE_LIMIT_MS", "5,50,500", 0);  // equiv to TRACE_CNTL( "limit_ms", 5L, 50L, 500L )
 	TRACE_CNTL("reset");
 	fhicl::ParameterSet pset;
-	if (argc == 2 && strcmp(argv[1], "test") == 0) // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+	if (argc == 2 && strcmp(argv[1], "test") == 0)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
 		std::string pstr(mf_test_config);
 		fhicl::make_ParameterSet(pstr, pset);
@@ -157,25 +157,25 @@ int main(int argc, char *argv[])
 
 	// else total mf default
 
-	TRACE(1, "\nHello\n"); // NOLINT
+	TRACE(1, "\nHello\n");  // NOLINT
 	TLOG_ERROR("mf_test_category") << "hello - this is an mf::LogError(\"mf_test_category\")\n";
 	mf::LogAbsolute("abs_category/id") << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 	mf::LogAbsolute("abs_category/id", __FILE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 	mf::LogAbsolute("abs_category/id", __FILE__, __LINE__) << "hello - this is an mf::LogAbsolute(\"abs_category/id\")";
 
-	TRACE(1, "start 1000 LOG_DEBUG"); // NOLINT
+	TRACE(1, "start 1000 LOG_DEBUG");  // NOLINT
 	for (auto ii = 0; ii < 1000; ++ii)
 	{
 		TLOG_DEBUG("mf_test_category") << "this is a LOG_DEBUG " << ii;
 	}
 
-	TRACE(1, "end LOG_DEBUG, start 1000 TRACE"); // NOLINT
+	TRACE(1, "end LOG_DEBUG, start 1000 TRACE");  // NOLINT
 
 	for (auto ii = 0; ii < 1000; ++ii)
 	{
-		TRACEN_(TRACE_NAME, 1, "this is a TRACE_ " << ii); // NOLINT
+		TRACEN_(TRACE_NAME, 1, "this is a TRACE_ " << ii);  // NOLINT
 	}
-	TRACE(1, "end TRACE"); // NOLINT
+	TRACE(1, "end TRACE");  // NOLINT
 
 	for (auto ii = 0; ii < 2; ++ii)
 	{

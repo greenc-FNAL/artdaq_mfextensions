@@ -5,56 +5,46 @@
 
 #include <boost/algorithm/string.hpp>
 
-
 using namespace novadaq::errorhandler;
 
-REG_MA_FUNCTION( count, ma_func_count )
+REG_MA_FUNCTION(count, ma_func_count)
 
-bool
-  ma_func_count::parse_arguments( anys_t const & args )
+bool ma_func_count::parse_arguments(anys_t const& args)
 {
-  // override 1: int count(cond)
-  if( args.empty() ) 
-  {
-    count_type = NONE;
-    return true;
-  }
+	// override 1: int count(cond)
+	if (args.empty())
+	{
+		count_type = NONE;
+		return true;
+	}
 
-  // override 2: double count(cond, 'type')
-  // return the absolute value of count(cond) in the given type
-  //   type = 'SOURCE'
-  //   type = 'TARGET'
-  //   type = 'MESSAGE'
-  std::string type = boost::any_cast<std::string>(args[0]);
-  boost::to_upper(type);
+	// override 2: double count(cond, 'type')
+	// return the absolute value of count(cond) in the given type
+	//   type = 'SOURCE'
+	//   type = 'TARGET'
+	//   type = 'MESSAGE'
+	std::string type = boost::any_cast<std::string>(args[0]);
+	boost::to_upper(type);
 
-  if( type == "SOURCE" )       count_type = SOURCE;
-  else if( type == "TARGET" )  count_type = TARGET;
-  else if( type == "MESSAGE" ) count_type = NONE;
-  else                         return false;
+	if (type == "SOURCE")
+		count_type = SOURCE;
+	else if (type == "TARGET")
+		count_type = TARGET;
+	else if (type == "MESSAGE")
+		count_type = NONE;
+	else
+		return false;
 
-  return true;
+	return true;
 }
 
 boost::any
-  ma_func_count::evaluate( ma_condition const & cond
-                         , ma_cond_domain dom )
+ma_func_count::evaluate(ma_condition const& cond, ma_cond_domain dom)
 {
-  // get triggering count from hitmap of the condition with give domain
-  int count = cond.get_alarm_count( dom, count_type );
+	// get triggering count from hitmap of the condition with give domain
+	int count = cond.get_alarm_count(dom, count_type);
 
-  TLOG(TLVL_DEBUG) << "count = " << count;
+	TLOG(TLVL_DEBUG) << "count = " << count;
 
-  return boost::any(count);
+	return boost::any(count);
 }
-
-
-
-
-
-
-
-
-
-
-

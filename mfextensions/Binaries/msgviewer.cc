@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 
 			if (((strcmp(argv[i], "-c") == 0) || (strcmp(argv[i], "--configuration") == 0)) && i < argc - 1)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			{
-				conf = std::string(argv[i + 1]); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+				conf = std::string(argv[i + 1]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 				++i;
 			}
 

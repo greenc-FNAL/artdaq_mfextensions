@@ -7,29 +7,31 @@
 namespace novadaq {
 namespace errorhandler {
 
-  inline std::string 
-    trim_hostname(std::string const & host);
+inline std::string
+trim_hostname(std::string const& host);
 
-  inline node_type_t 
-    get_source_from_msg(std::string & src, qt_mf_msg const & msg);
+inline node_type_t
+get_source_from_msg(std::string& src, qt_mf_msg const& msg);
 
-  inline std::string
-    get_message_type_str(message_type_t type);
+inline std::string
+get_message_type_str(message_type_t type);
 
-  inline sev_code_t get_sev_from_string(std::string const& sev);
+inline sev_code_t get_sev_from_string(std::string const& sev);
 
-} // end of namespace errorhandler
-} // end of namespace novadaq
+}  // end of namespace errorhandler
+}  // end of namespace novadaq
 
 // ------------------------------------------------------------------
 // misc. utilities
 
-std::string 
-  novadaq::errorhandler::trim_hostname(std::string const & host)
+std::string
+novadaq::errorhandler::trim_hostname(std::string const& host)
 {
-  size_t pos = host.find('.');
-  if (pos==std::string::npos) return host;
-  else                        return host.substr(0, pos);
+	size_t pos = host.find('.');
+	if (pos == std::string::npos)
+		return host;
+	else
+		return host.substr(0, pos);
 }
 
 /**
@@ -45,22 +47,28 @@ novadaq::errorhandler::get_source_from_msg(std::string& src, qt_mf_msg const& ms
 	return Framework;
 }
 
-
-std::string 
-  novadaq::errorhandler::get_message_type_str(message_type_t type)
+std::string
+novadaq::errorhandler::get_message_type_str(message_type_t type)
 {
-  switch(type)
-  {
-  case MSG_SYSTEM:  return "SYSTEM";
-  case MSG_ERROR:   return "ERROR";
-  case MSG_WARNING: return "WARNING";
-  case MSG_INFO:    return "INFO";
-  case MSG_DEBUG:   return "DEBUG";
-  default:          return "UNKNOWN";
-  }
+	switch (type)
+	{
+		case MSG_SYSTEM:
+			return "SYSTEM";
+		case MSG_ERROR:
+			return "ERROR";
+		case MSG_WARNING:
+			return "WARNING";
+		case MSG_INFO:
+			return "INFO";
+		case MSG_DEBUG:
+			return "DEBUG";
+		default:
+			return "UNKNOWN";
+	}
 }
 
-sev_code_t novadaq::errorhandler::get_sev_from_string(std::string const& sev) {
+sev_code_t novadaq::errorhandler::get_sev_from_string(std::string const& sev)
+{
 	mf::ELseverityLevel elss(sev);
 
 	int sevid = elss.getLevel();
@@ -87,12 +95,3 @@ sev_code_t novadaq::errorhandler::get_sev_from_string(std::string const& sev) {
 }
 
 #endif
-
-
-
-
-
-
-
-
-

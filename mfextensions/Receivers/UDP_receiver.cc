@@ -40,7 +40,7 @@ void mfviewer::UDPReceiver::setupMessageListener_()
 	si_me_request.sin_family = AF_INET;
 	si_me_request.sin_port = htons(message_port_);
 	si_me_request.sin_addr.s_addr = htonl(INADDR_ANY);
-	if (bind(message_socket_, reinterpret_cast<struct sockaddr*>(&si_me_request), sizeof(si_me_request)) == -1) // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	if (bind(message_socket_, reinterpret_cast<struct sockaddr*>(&si_me_request), sizeof(si_me_request)) == -1)  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	{
 		TLOG(TLVL_ERROR) << "Cannot bind message socket to port " << message_port_ << ", err=" << strerror(errno);
 		exit(1);
@@ -113,7 +113,7 @@ void mfviewer::UDPReceiver::run()
 		else
 		{
 			TLOG(TLVL_TRACE) << "Recieved message; validating...(packetSize=" << packetSize << ")";
-			std::string message(buffer, buffer + packetSize); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+			std::string message(buffer, buffer + packetSize);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			if (validate_packet(message))
 			{
 				TLOG(TLVL_TRACE) << "Valid UDP Message received! Sending to GUI!";
@@ -183,7 +183,7 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string const& input)
 						break;
 					}
 
-					if (!thisString.empty() )
+					if (!thisString.empty())
 						thisString = thisString.erase(0, 1);
 				}
 			}

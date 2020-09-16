@@ -51,7 +51,6 @@ private:
 	LogReader& operator=(LogReader const&) = delete;
 	LogReader& operator=(LogReader&&) = delete;
 
-
 	std::ifstream log_;
 	size_t pos_;
 

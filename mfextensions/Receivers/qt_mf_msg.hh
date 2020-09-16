@@ -9,9 +9,9 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include <sys/time.h>
 #include "messagefacility/Utilities/ELseverityLevel.h"
@@ -149,7 +149,6 @@ public:
 	void updateText();
 
 private:
-
 	QString text_;
 	QString shortText_;
 	QColor color_;
