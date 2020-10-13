@@ -59,7 +59,7 @@ public:
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param o Stringstream object containing message data
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
 	void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
 

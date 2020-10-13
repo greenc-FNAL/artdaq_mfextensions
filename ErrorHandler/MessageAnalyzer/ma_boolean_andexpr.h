@@ -8,20 +8,17 @@
 namespace novadaq {
 namespace errorhandler {
 
-//-------------------------------------------------------------------
-//
-// boolean and-expression consists of a list of boolean elemental
-// conditions connected with 'AND' operator
-//
-//-------------------------------------------------------------------
-
+/**
+ * @brief boolean and-expression consists of a list of boolean elemental
+ * conditions connected with 'AND' operator
+*/
 class ma_boolean_andexpr
 {
 public:
-	// c'tor
+	/// c'tor
 	ma_boolean_andexpr() {}
 
-	// reset
+	/// reset
 	void reset();
 
 	// evaluateion
@@ -37,7 +34,7 @@ private:
 	boolean_conds_t conds;
 };
 
-typedef std::list<ma_boolean_andexpr> boolean_andexprs_t;
+typedef std::list<ma_boolean_andexpr> boolean_andexprs_t; ///< List of ma_boolean_andexpr
 
 }  // end of namespace errorhandler
 }  // end of namespace novadaq

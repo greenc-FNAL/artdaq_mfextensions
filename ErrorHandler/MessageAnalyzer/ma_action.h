@@ -21,7 +21,7 @@ class ma_rule;
 typedef std::vector<boost::any> anys_t;
 typedef fhicl::ParameterSet pset_t;
 
-// base class - all customized fucntions are inherited from it
+/// base class - all customized fucntions are inherited from it
 class ma_action
 {
 public:

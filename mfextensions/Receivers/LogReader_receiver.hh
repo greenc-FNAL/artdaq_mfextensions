@@ -43,6 +43,10 @@ public:
 	/// <returns>qt_mf_msg from log file</returns>
 	msg_ptr_t read_next();  // read next log
 
+	/**
+	 * @brief Determine if the LogReader has reached the end of file
+	 * @return Whether the reader is at the end of the file
+	*/
 	bool iseof() { return log_.eof(); }
 
 private:

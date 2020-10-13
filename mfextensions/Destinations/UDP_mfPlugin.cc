@@ -85,14 +85,14 @@ public:
 	/**
    * \brief Fill the "Prefix" portion of the message
    * \param o Output stringstream
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
 	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
 	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
