@@ -34,7 +34,7 @@ private:
 	boolean_conds_t conds;
 };
 
-typedef std::list<ma_boolean_andexpr> boolean_andexprs_t; ///< List of ma_boolean_andexpr
+typedef std::list<ma_boolean_andexpr> boolean_andexprs_t;  ///< List of ma_boolean_andexpr
 
 }  // end of namespace errorhandler
 }  // end of namespace novadaq
