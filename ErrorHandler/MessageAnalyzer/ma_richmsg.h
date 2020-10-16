@@ -13,29 +13,26 @@ class ma_rule;
 class ma_richmsg
 {
 public:
+	ma_richmsg();
+	ma_richmsg(std::string const& s, ma_rule const* parent);
 
-  ma_richmsg( );
-  ma_richmsg( std::string const & s, ma_rule const * parent );
+	~ma_richmsg() {}
 
-  ~ma_richmsg( ) { }
+	void init(ma_rule const* parent, std::string const& s);
 
-  void init( ma_rule const * parent, std::string const & s );
-
-  const std::string & plain_message() const;
-        std::string   message() const;
+	const std::string& plain_message() const;
+	std::string message() const;
 
 private:
+	ma_rule const* rule;
+	std::string plain_msg;
+	std::string stripped_msg;
 
-  ma_rule const * rule;
-  std::string plain_msg;
-  std::string stripped_msg;
-
-  std::vector<size_t>     insert_pos;
-  std::vector<cond_arg_t> symbols;
+	std::vector<size_t> insert_pos;
+	std::vector<cond_arg_t> symbols;
 };
 
-} // end of namespace errorhandler
-} // end of namespace novadaq
-
+}  // end of namespace errorhandler
+}  // end of namespace novadaq
 
 #endif

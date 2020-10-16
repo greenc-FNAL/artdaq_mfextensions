@@ -1,7 +1,7 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_05_01a
-defaultqual	e17:s85
+parent artdaq_mfextensions	v1_05_02
+defaultqual	e19:s96
 
 # These optional lines define the installed directories where
 # headers, libraries, and executables will be found
@@ -29,7 +29,7 @@ messagefacility v2_04_03        s82
 messagefacility v2_02_04        s73
 messagefacility v2_02_01        s67
 qt              v5_12_3a
-TRACE           v3_15_09        -       only_for_build
+TRACE           v3_16_00        -       only_for_build
 cetbuildtools	v7_17_01	-	only_for_build
 end_product_list
 

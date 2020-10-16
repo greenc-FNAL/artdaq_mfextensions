@@ -2,9 +2,9 @@
 #define ERROR_HANDLER_MA_DOMAIN_EXPR_H
 
 // from novadaq
-#include "ErrorHandler/MessageAnalyzer/ma_types.h"
 #include "ErrorHandler/MessageAnalyzer/ma_condition.h"
 #include "ErrorHandler/MessageAnalyzer/ma_domain_andexpr.h"
+#include "ErrorHandler/MessageAnalyzer/ma_types.h"
 
 // from ups
 
@@ -20,27 +20,26 @@ namespace errorhandler {
 class ma_domain_expr
 {
 public:
+	ma_domain_expr();
 
-  ma_domain_expr( );
+	void evaluate(ma_domains& domains) const;
 
-  void evaluate(ma_domains & domains) const;
+	bool empty() const { return andexprs.empty(); }
 
-  bool empty() const { return andexprs.empty(); }
-
-  void insert_andexpr(ma_domain_andexpr const & andexpr)
-    { andexprs.push_back(andexpr); }
+	void insert_andexpr(ma_domain_andexpr const& andexpr)
+	{
+		andexprs.push_back(andexpr);
+	}
 
 private:
+	// all conditions in the parent rule
+	//cond_vec_t const &  conditions;
 
-  // all conditions in the parent rule
-  //cond_vec_t const &  conditions;
-
-  // list of and-expressions
-  domain_andexprs_t andexprs;
-
+	// list of and-expressions
+	domain_andexprs_t andexprs;
 };
 
-} // end of namespace errorhandler
-} // end of namespace novadaq
+}  // end of namespace errorhandler
+}  // end of namespace novadaq
 
 #endif

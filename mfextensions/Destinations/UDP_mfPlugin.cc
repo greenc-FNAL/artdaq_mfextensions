@@ -85,14 +85,14 @@ public:
 	/**
    * \brief Fill the "Prefix" portion of the message
    * \param o Output stringstream
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
 	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
 	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
@@ -156,7 +156,7 @@ ELUDP::ELUDP(Parameters const& pset)
 	if (host != nullptr)
 	{
 		// ip address from hostname if the entry exists in /etc/hosts
-		char* ip = inet_ntoa(*reinterpret_cast<struct in_addr*>(host->h_addr)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		char* ip = inet_ntoa(*reinterpret_cast<struct in_addr*>(host->h_addr));  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 		hostaddr_ = ip;
 	}
 	else
@@ -179,7 +179,7 @@ ELUDP::ELUDP(Parameters const& pset)
 				if (ifa->ifa_addr->sa_family == AF_INET)
 				{
 					// a valid IPv4 addres
-					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr)->sin_addr); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr)->sin_addr);  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 					char addressBuffer[INET_ADDRSTRLEN];
 					inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;

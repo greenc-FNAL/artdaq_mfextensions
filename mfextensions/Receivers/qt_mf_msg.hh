@@ -9,9 +9,9 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 #include <sys/time.h>
 #include "messagefacility/Utilities/ELseverityLevel.h"
@@ -51,11 +51,11 @@ public:
 	qt_mf_msg() {}
 	/// Default copy constructor
 	qt_mf_msg(const qt_mf_msg&) = default;
-	qt_mf_msg(qt_mf_msg&&) = default;
-	qt_mf_msg& operator=(qt_mf_msg const&) = default;
-	qt_mf_msg& operator=(qt_mf_msg&&) = default;
+	qt_mf_msg(qt_mf_msg&&) = default;                  ///< Default Move Constructor
+	qt_mf_msg& operator=(qt_mf_msg const&) = default;  ///< Default Copy Assignment Operator
+	qt_mf_msg& operator=(qt_mf_msg&&) = default;       ///< Default Move Assignment Operator
 
-	virtual ~qt_mf_msg() = default;
+	virtual ~qt_mf_msg() = default;  ///< Default Destructor
 
 	// get method
 	/// <summary>
@@ -149,7 +149,6 @@ public:
 	void updateText();
 
 private:
-
 	QString text_;
 	QString shortText_;
 	QColor color_;

@@ -9,25 +9,20 @@ namespace errorhandler {
 
 class ma_action_mail : public ma_action
 {
-
 public:
+	ma_action_mail(ma_rule const* rule, pset_t const& pset);
+	virtual ~ma_action_mail() {}
 
-  ma_action_mail(ma_rule const * rule, pset_t const & pset);
-  virtual ~ma_action_mail() {}
-
-  virtual bool exec();
+	virtual bool exec();
 
 private:
+	std::string script_name;
+	std::string script_para;
 
-  std::string script_name;
-  std::string script_para;
-
-  ma_richmsg param;
-
+	ma_richmsg param;
 };
 
-} // end of namespace errorhandler
-} // end of namespace novadaq
-
+}  // end of namespace errorhandler
+}  // end of namespace novadaq
 
 #endif

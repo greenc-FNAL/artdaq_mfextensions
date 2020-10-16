@@ -76,7 +76,7 @@ inline int ResolveHost(char const* host_in, in_addr& addr)
 			perror("gethostbyname");
 			return (-1);
 		}
-		addr = *reinterpret_cast<struct in_addr*>(hostent_sp->h_addr_list[0]); // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-type-reinterpret-cast)
+		addr = *reinterpret_cast<struct in_addr*>(hostent_sp->h_addr_list[0]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-type-reinterpret-cast)
 	}
 	return 0;
 }
@@ -138,8 +138,8 @@ inline int GetInterfaceForNetwork(char const* host_in, in_addr& addr)
 
 			if (ifa->ifa_addr->sa_family == AF_INET)
 			{
-				auto if_addr = reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-				auto sa = reinterpret_cast<struct sockaddr_in*>(ifa->ifa_netmask);// NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+				auto if_addr = reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr);  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+				auto sa = reinterpret_cast<struct sockaddr_in*>(ifa->ifa_netmask);    // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 
 				TLOG(15) << "IF: " << ifa->ifa_name << " Desired: " << desired_host.s_addr
 				         << " netmask: " << sa->sin_addr.s_addr << " this interface: " << if_addr->sin_addr.s_addr;
@@ -169,7 +169,7 @@ inline int GetInterfaceForNetwork(char const* host_in, in_addr& addr)
 			perror("gethostbyname");
 			return (-1);
 		}
-		addr = *reinterpret_cast<struct in_addr*>(hostent_sp->h_addr_list[0]);// NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		addr = *reinterpret_cast<struct in_addr*>(hostent_sp->h_addr_list[0]);  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	}
 	return sts;
 }
@@ -227,7 +227,7 @@ inline int ResolveHost(char const* host_in, int dflt_port, sockaddr_in& sin)
 			perror("gethostbyname");
 			return (-1);
 		}
-		sin.sin_addr = *reinterpret_cast<struct in_addr*>(hostent_sp->h_addr_list[0]);// NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		sin.sin_addr = *reinterpret_cast<struct in_addr*>(hostent_sp->h_addr_list[0]);  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	}
 	return 0;
 }
@@ -260,7 +260,7 @@ inline int TCPConnect(char const* host_in, int dflt_port, int64_t flags = 0, int
 		return -1;
 	}
 
-	sts = connect(s_fd, reinterpret_cast<struct sockaddr*>(&sin), sizeof(sin));// NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	sts = connect(s_fd, reinterpret_cast<struct sockaddr*>(&sin), sizeof(sin));  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	if (sts == -1)
 	{
 		// perror( "connect error" );

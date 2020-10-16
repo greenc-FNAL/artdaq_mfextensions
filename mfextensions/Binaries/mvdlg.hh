@@ -1,9 +1,9 @@
 #ifndef MSGVIEWERDLG_H
 #define MSGVIEWERDLG_H
 
-#include "mfextensions/Receivers/ReceiverManager.hh"
 #include "mfextensions/Extensions/suppress.hh"
 #include "mfextensions/Extensions/throttle.hh"
+#include "mfextensions/Receivers/ReceiverManager.hh"
 #include "mfextensions/Receivers/qt_mf_msg.hh"
 #include "ui_msgviewerdlgui.h"
 
