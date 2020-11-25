@@ -243,13 +243,13 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 				}
 				else
 				{
-					const char *cp=strstr(&msg.filename()[0], &filename_delimit_[0]);         // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+					const char* cp = strstr(&msg.filename()[0], &filename_delimit_[0]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 					if (cp != nullptr)
 					{
 						// make sure to remove a part that ends with '/'
-						cp += filename_delimit_.size() - 1;          // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+						cp += filename_delimit_.size() - 1;  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 						while (*cp && *cp != '/') ++cp;
-						++cp; // increment past '/'
+						++cp;  // increment past '/'
 						oss << cp;
 					}
 					else
