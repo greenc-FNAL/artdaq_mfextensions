@@ -1,6 +1,6 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent artdaq_mfextensions	v1_05_03
+parent artdaq_mfextensions	v1_05_03a
 defaultqual	e19:s96
 
 # These optional lines define the installed directories where
@@ -17,6 +17,7 @@ bindir      fq_dir      bin
 
 #
 product		version		optional
+messagefacility v2_07_02        s104
 messagefacility v2_06_02        s103
 messagefacility v2_06_01        s102
 messagefacility v2_07_02        s101
@@ -40,6 +41,13 @@ end_product_list
 # -nq- means there is no qualifier
 # a "-" means the dependent product is not required by the parent and will not be setup
 qualifier		messagefacility	qt  TRACE   notes
+c7:s104:debug   c7:debug    	c7  -nq-    -std=c++17
+c7:s104:prof    c7:prof    		c7  -nq-    -std=c++17
+e20:s104:debug  e20:debug   	e20 -nq-    -std=c++17
+e20:s104:prof   e20:prof   		e20 -nq-    -std=c++17
+e19:s104:debug  e19:debug   	e19 -nq-    -std=c++17
+e19:s104:prof   e19:prof   		e19 -nq-    -std=c++17
+
 c7:s103:debug   		c7:debug    	c7  -nq-    -std=c++17
 c7:s103:prof    		c7:prof    	c7  -nq-    -std=c++17
 e19:s103:debug  		e19:debug   	e19 -nq-    -std=c++17
