@@ -115,6 +115,9 @@ add_subdirectory(mfextensions)
 # ErrorHandler from NOvA
 add_subdirectory(ErrorHandler)
 
+# Unit Tests for MFExtensions
+add_subdirectory(test)
+
 # tools - utility scripts
 add_subdirectory(tools)
 
