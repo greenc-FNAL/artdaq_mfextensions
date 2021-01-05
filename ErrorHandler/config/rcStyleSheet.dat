@@ -1,0 +1,117 @@
+QMainWindow {
+  background: #bbbbbb;
+}
+
+QPushButton {
+  color: #333;
+  font: bold 10px;
+  border: 1px solid #555;
+  border-radius: 3px;
+  padding: 2px;
+  background-color: #00aa00;
+  min-width: 80px;
+  min-height: 20px;
+}
+
+QPushButton:disabled {
+  font: bold 8px;
+  background-color: #bbbb00;
+}
+  
+QPushButton:hover {
+  background-color: #00ff00;
+}
+
+QPushButton:pressed {
+  background-color: #00cc00;
+}
+
+QLCDNumber {
+  border: 2px solid #000000;
+  border-radius: 3px;
+  color : black;
+}
+
+QTextEdit {
+  border: 2px solid #000000;
+  background-color: #aaaaaa;
+}
+
+QLineEdit {
+  border: 2px solid #000000;
+  background-color: #aaaaaa;
+}
+
+QTableWidget {
+  background-color: #aaaaaa;
+  font: bold 10px;
+}
+
+QHeaderView {
+  background-color: #aaaaaa;
+  color: black;
+  font: bold 10px;
+}
+
+QTabWidget::pane {
+  background-color: #aaaaaa;
+  border-top: 1px solid #c2c7cb;
+  }
+
+QTabWidget::tab-bar {
+  background-color: #aaaaaa;
+  left: 5px;
+  }
+
+QTabBar::tab {
+  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+     stop: 0 #e1e1e1, stop: 0.4 #dddddd, 
+     stop: 0.5 #d8d8d8, stop: 1.0 #d3d3d3);
+  border: 2px solid #c4c4c3;
+  border-bottom-color: #c2c7cb;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  min-width: 14px;
+  padding: 2px;
+  font: bold 10px;
+  }
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+  background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+    stop: 0 #fafafa, stop: 0.4 #f4f4f4,
+    stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
+}
+
+QTabBar::tab:selected {
+  border-color: #9B9B9B;
+  border-bottom-color: #C2C7CB;
+}
+
+QTabBar::tab:!selected {
+  margin-top: -2px;
+}
+
+QTabBar::tab:first:selected {
+  margin-left: 0;
+}
+
+QTabBar::tab:last:selected {
+  margin-right: 0;
+}
+
+QTabBar::tab:only-one {
+  margin: 0;
+}
+
+QProgressBar {
+  border: 2px solid black;
+  border-radius: 3px;
+  text-align: center;
+  background-color: #aaaaaa;
+}
+
+QProgressBar::chunk {
+  background-color: #1e90ff;
+  width: 15px;
+}
+	

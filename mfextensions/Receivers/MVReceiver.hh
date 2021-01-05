@@ -23,7 +23,7 @@ public:
 	/// Construct a MVReceiver using the given ParameterSet
 	/// </summary>
 	/// <param name="pset">ParameterSet used to construct MVReceiver</param>
-	explicit MVReceiver(fhicl::ParameterSet pset);
+	explicit MVReceiver(fhicl::ParameterSet const& pset);
 
 	/// <summary>
 	/// MVReceiver destructor
@@ -46,7 +46,13 @@ signals:
 	/// process it.
 	/// </summary>
 	/// <param name="msg">Received message</param>
-	void NewMessage(msg_ptr_t const&);
+	void NewMessage(msg_ptr_t const& msg);
+
+private:
+	MVReceiver(MVReceiver const&) = delete;
+	MVReceiver(MVReceiver&&) = delete;
+	MVReceiver& operator=(MVReceiver const&) = delete;
+	MVReceiver& operator=(MVReceiver&&) = delete;
 };
 }  // namespace mfviewer
 

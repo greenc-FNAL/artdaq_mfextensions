@@ -67,7 +67,9 @@ static fhicl::ParameterSet readConf(std::string const& fname)
 	char* mfe_path = getenv("MFEXTENSIONS_DIR");
 	if (mfe_path) env.append(":").append(mfe_path).append("/config");
 
-	putenv((char*)env.c_str());
+	env.append("\0");  // So that putenv gets a valid C string
+
+	putenv(&env[0]);
 
 	// printf("%s\n", env.c_str());
 
@@ -136,9 +138,9 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 	msgFilters_.push_back(allMessages);
 
 	// https://stackoverflow.com/questions/2616483/close-button-only-for-some-tabs-in-qt
-	QTabBar* tabBar = tabWidget->findChild<QTabBar*>();
-	tabBar->setTabButton(0, QTabBar::RightSide, 0);
-	tabBar->setTabButton(0, QTabBar::LeftSide, 0);
+	auto tabBar = tabWidget->findChild<QTabBar*>();
+	tabBar->setTabButton(0, QTabBar::RightSide, nullptr);
+	tabBar->setTabButton(0, QTabBar::LeftSide, nullptr);
 
 	if (simpleRender)
 		btnRMode->setChecked(true);
@@ -149,7 +151,7 @@ msgViewerDlg::msgViewerDlg(std::string const& conf, QDialog* parent)
 
 	changeSeverity(SINFO);
 
-	QTextDocument* doc = new QTextDocument(txtMessages);
+	auto doc = new QTextDocument(txtMessages);
 	txtMessages->setDocument(doc);
 
 	receivers_.start();
@@ -176,11 +178,11 @@ static void str_to_suppress(std::vector<std::string> const& vs, std::vector<supp
 
 	for (size_t i = 0; i < vs.size(); ++i)
 	{
-		s.push_back(suppress(vs[i]));
+		s.emplace_back(vs[i]);
 		act = menu->addAction(QString(vs[i].c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
-		QVariant v = qVariantFromValue((void*)&s[i]);
+		QVariant v = qVariantFromValue(static_cast<void*>(&s[i]));
 		act->setData(v);
 	}
 }
@@ -200,12 +202,12 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const& ps, std::ve
 
 	for (size_t i = 0; i < ps.size(); ++i)
 	{
-		std::string name = ps[i].get<std::string>("name");
-		t.push_back(throttle(name, ps[i].get<int>("limit", -1), ps[i].get<long>("timespan", -1)));
+		auto name = ps[i].get<std::string>("name");
+		t.emplace_back(name, ps[i].get<int>("limit", -1), ps[i].get<int64_t>("timespan", -1));
 		act = menu->addAction(QString(name.c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
-		QVariant v = qVariantFromValue((void*)&t[i]);
+		QVariant v = qVariantFromValue(static_cast<void*>(&t[i]));
 		act->setData(v);
 	}
 }
@@ -216,7 +218,7 @@ void msgViewerDlg::parseConf(fhicl::ParameterSet const& conf)
 	// QAction * act;
 
 	// suppression list
-	fhicl::ParameterSet sup = conf.get<fhicl::ParameterSet>("suppress", nulp);
+	auto sup = conf.get<fhicl::ParameterSet>("suppress", nulp);
 
 	auto sup_host = sup.get<std::vector<std::string>>("hosts", std::vector<std::string>());
 	auto sup_app = sup.get<std::vector<std::string>>("applications", std::vector<std::string>());
@@ -323,7 +325,6 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 		return;
 	}
 
-
 	// push the message to the message pool
 	{
 		std::lock_guard<std::mutex> lk(msg_pool_mutex_);
@@ -338,19 +339,19 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 	for (size_t d = 0; d < msgFilters_.size(); ++d)
 	{
 		bool hostMatch =
-		    msgFilters_[d].hostFilter.contains(msg->host(), Qt::CaseInsensitive) || msgFilters_[d].hostFilter.size() == 0;
+		    msgFilters_[d].hostFilter.contains(msg->host(), Qt::CaseInsensitive) || msgFilters_[d].hostFilter.empty();
 		bool appMatch =
-		    msgFilters_[d].appFilter.contains(msg->app(), Qt::CaseInsensitive) || msgFilters_[d].appFilter.size() == 0;
+		    msgFilters_[d].appFilter.contains(msg->app(), Qt::CaseInsensitive) || msgFilters_[d].appFilter.empty();
 		bool catMatch =
-		    msgFilters_[d].catFilter.contains(msg->cat(), Qt::CaseInsensitive) || msgFilters_[d].catFilter.size() == 0;
+		    msgFilters_[d].catFilter.contains(msg->cat(), Qt::CaseInsensitive) || msgFilters_[d].catFilter.empty();
 
 		// Check to display the message
 		if (hostMatch && appMatch && catMatch)
 		{
-				std::lock_guard<std::mutex> lk(filter_mutex_);
-				msgFilters_[d].msgs.push_back(msg);
+			std::lock_guard<std::mutex> lk(filter_mutex_);
+			msgFilters_[d].msgs.push_back(msg);
 			if ((int)d == tabWidget->currentIndex())
-			displayMsg(msg, d);
+				displayMsg(msg, d);
 		}
 	}
 }
@@ -377,17 +378,17 @@ void msgViewerDlg::trim_msg_pool()
 				if (hostIter != host_msgs_[host].end()) host_msgs_[host].erase(hostIter);
 				if (appIter != app_msgs_[app].end()) app_msgs_[app].erase(appIter);
 
-				if (app_msgs_[app].size() == 0)
+				if (app_msgs_[app].empty())
 				{
 					app_msgs_.erase(app);
 					app_list_update = true;
 				}
-				if (cat_msgs_[cat].size() == 0)
+				if (cat_msgs_[cat].empty())
 				{
 					cat_msgs_.erase(cat);
 					cat_list_update = true;
 				}
-				if (host_msgs_[host].size() == 0)
+				if (host_msgs_[host].empty())
 				{
 					host_msgs_.erase(host);
 					host_list_update = true;
@@ -534,7 +535,7 @@ void msgViewerDlg::displayMsgs(int display)
 }
 
 // https://stackoverflow.com/questions/13559990/how-to-append-text-to-qplaintextedit-without-adding-newline-and-keep-scroll-at
-void msgViewerDlg::UpdateTextAreaDisplay(QStringList texts, QPlainTextEdit* widget)
+void msgViewerDlg::UpdateTextAreaDisplay(QStringList const& texts, QPlainTextEdit* widget)
 {
 	const QTextCursor old_cursor = widget->textCursor();
 	const int old_scrollbar_value = widget->verticalScrollBar()->value();
@@ -625,8 +626,8 @@ bool msgViewerDlg::updateList(QListWidget* lw, msgs_map_t const& map)
 msgs_t msgViewerDlg::list_intersect(msgs_t const& l1, msgs_t const& l2)
 {
 	msgs_t output;
-	msgs_t::const_iterator it1 = l1.begin();
-	msgs_t::const_iterator it2 = l2.begin();
+	auto it1 = l1.begin();
+	auto it2 = l2.begin();
 
 	while (it1 != l1.end() && it2 != l2.end())
 	{
@@ -731,7 +732,8 @@ void msgViewerDlg::setFilter()
 		                   ")";
 	}
 
-	for (size_t d = 0; d < msgFilters_.size(); ++d) {
+	for (size_t d = 0; d < msgFilters_.size(); ++d)
+	{
 		if (msgFilters_[d].filterExpression == filterExpression)
 		{
 			tabWidget->setCurrentIndex(d);
@@ -805,13 +807,13 @@ void msgViewerDlg::setFilter()
 	// Add the tab and populate it
 
 	auto newTabTitle = QString("Filter ") + QString::number(++nFilters);
-	QWidget* newTab = new QWidget();
+	auto newTab = new QWidget();
 
-	QPlainTextEdit* txtDisplay = new QPlainTextEdit(newTab);
-	QTextDocument* doc = new QTextDocument(txtDisplay);
+	auto txtDisplay = new QPlainTextEdit(newTab);
+	auto doc = new QTextDocument(txtDisplay);
 	txtDisplay->setDocument(doc);
 
-	QVBoxLayout* layout = new QVBoxLayout();
+	auto layout = new QVBoxLayout();
 	layout->addWidget(txtDisplay);
 	layout->setContentsMargins(0, 0, 0, 0);
 	newTab->setLayout(layout);
@@ -1044,14 +1046,14 @@ void msgViewerDlg::searchClear()
 void msgViewerDlg::setSuppression(QAction* act)
 {
 	bool status = act->isChecked();
-	suppress* sup = (suppress*)act->data().value<void*>();
+	auto sup = static_cast<suppress*>(act->data().value<void*>());
 	sup->use(status);
 }
 
 void msgViewerDlg::setThrottling(QAction* act)
 {
 	bool status = act->isChecked();
-	throttle* thr = (throttle*)act->data().value<void*>();
+	auto thr = static_cast<throttle*>(act->data().value<void*>());
 	thr->use(status);
 }
 
@@ -1064,26 +1066,26 @@ void msgViewerDlg::tabWidgetCurrentChanged(int newTab)
 	lwApplication->setCurrentRow(-1, QItemSelectionModel::Clear);
 	lwCategory->setCurrentRow(-1, QItemSelectionModel::Clear);
 
-	for (auto host : msgFilters_[newTab].hostFilter)
+	for (auto const& host : msgFilters_[newTab].hostFilter)
 	{
 		auto items = lwHost->findItems(host, Qt::MatchExactly);
-		if (items.size() > 0)
+		if (!items.empty())
 		{
 			items[0]->setSelected(true);
 		}
 	}
-	for (auto app : msgFilters_[newTab].appFilter)
+	for (auto const& app : msgFilters_[newTab].appFilter)
 	{
 		auto items = lwApplication->findItems(app, Qt::MatchExactly);
-		if (items.size() > 0)
+		if (!items.empty())
 		{
 			items[0]->setSelected(true);
 		}
 	}
-	for (auto cat : msgFilters_[newTab].catFilter)
+	for (auto const& cat : msgFilters_[newTab].catFilter)
 	{
 		auto items = lwCategory->findItems(cat, Qt::MatchExactly);
-		if (items.size() > 0)
+		if (!items.empty())
 		{
 			items[0]->setSelected(true);
 		}

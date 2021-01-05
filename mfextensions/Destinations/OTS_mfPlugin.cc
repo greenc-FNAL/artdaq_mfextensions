@@ -25,7 +25,6 @@
 #include <boost/algorithm/string.hpp>
 
 namespace mfplugins {
-using mf::ELseverityLevel;
 using mf::ErrorObj;
 using mf::service::ELdestination;
 
@@ -65,32 +64,32 @@ public:
 	/**
    * \brief Fill the "Prefix" portion of the message
    * \param o Output stringstream
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
-	virtual void fillPrefix(std::ostringstream& o, const ErrorObj& e) override;
+	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "User Message" portion of the message
    * \param o Output stringstream
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
-	virtual void fillUsrMsg(std::ostringstream& o, const ErrorObj& e) override;
+	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
    * \brief Fill the "Suffix" portion of the message (Unused)
    */
-	virtual void fillSuffix(std::ostringstream&, const ErrorObj&) override {}
+	void fillSuffix(std::ostringstream& /*unused*/, const ErrorObj& /*msg*/) override {}
 
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param o Stringstream object containing message data
    * \param e MessageFacility object containing header information
    */
-	virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
+	void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 private:
 	// Other stuff
-	long pid_;
+	int64_t pid_;
 	std::string hostname_;
 	std::string hostaddr_;
 	std::string app_;
@@ -107,7 +106,7 @@ private:
 //======================================================================
 
 ELOTS::ELOTS(Parameters const& pset)
-    : ELdestination(pset().elDestConfig()), pid_(static_cast<long>(getpid())), format_string_(pset().format_string()), filename_delimit_(pset().filename_delimit())
+    : ELdestination(pset().elDestConfig()), pid_(static_cast<int64_t>(getpid())), format_string_(pset().format_string()), filename_delimit_(pset().filename_delimit())
 {
 	// hostname
 	char hostname_c[1024];
@@ -120,7 +119,7 @@ ELOTS::ELOTS(Parameters const& pset)
 	if (host != nullptr)
 	{
 		// ip address from hostname if the entry exists in /etc/hosts
-		char* ip = inet_ntoa(*(struct in_addr*)host->h_addr);
+		char* ip = inet_ntoa(*reinterpret_cast<struct in_addr*>(host->h_addr));  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-bounds-pointer-arithmetic)
 		hostaddr_ = ip;
 	}
 	else
@@ -130,7 +129,7 @@ ELOTS::ELOTS(Parameters const& pset)
 		struct ifaddrs* ifa = nullptr;
 		void* tmpAddrPtr = nullptr;
 
-		if (getifaddrs(&ifAddrStruct))
+		if (getifaddrs(&ifAddrStruct) != 0)
 		{
 			// failed to get addr struct
 			hostaddr_ = "127.0.0.1";
@@ -143,7 +142,7 @@ ELOTS::ELOTS(Parameters const& pset)
 				if (ifa->ifa_addr->sa_family == AF_INET)
 				{
 					// a valid IPv4 addres
-					tmpAddrPtr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in*>(ifa->ifa_addr))->sin_addr;  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 					char addressBuffer[INET_ADDRSTRLEN];
 					inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;
@@ -152,18 +151,23 @@ ELOTS::ELOTS(Parameters const& pset)
 				else if (ifa->ifa_addr->sa_family == AF_INET6)
 				{
 					// a valid IPv6 address
-					tmpAddrPtr = &((struct sockaddr_in6*)ifa->ifa_addr)->sin6_addr;
+					tmpAddrPtr = &(reinterpret_cast<struct sockaddr_in6*>(ifa->ifa_addr))->sin6_addr;  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 					char addressBuffer[INET6_ADDRSTRLEN];
 					inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;
 				}
 
 				// find first non-local address
-				if (!hostaddr_.empty() && hostaddr_.compare("127.0.0.1") && hostaddr_.compare("::1")) break;
+				if (!hostaddr_.empty() && (hostaddr_ != "127.0.0.1") && (hostaddr_ != "::1"))
+				{
+					break;
+				}
 			}
 
-			if (hostaddr_.empty())  // failed to find anything
+			if (hostaddr_.empty())
+			{  // failed to find anything
 				hostaddr_ = "127.0.0.1";
+			}
 		}
 	}
 
@@ -193,24 +197,24 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 {
 	const auto& xid = msg.xid();
 
-	auto id = xid.id();
-	auto module = xid.module();
+	const auto& id = xid.id();
+	const auto& module = xid.module();
 	auto app = app_;
-	char* cp = &format_string_[0];
+	char* cp = &format_string_[0];  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	char sev;
 	bool msg_printed = false;
 	std::string ossstr;
 	// ossstr.reserve(100);
 
-	for (; *cp; ++cp)
+	for (; *cp != 0; ++cp)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
 		if (*cp != '%')
 		{
 			oss << *cp;
 			continue;
 		}
-		if (*++cp == '\0')
-		{  // inc pas '%' and check if end
+		if (*++cp == '\0')  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		{                   // inc pas '%' and check if end
 			// ending '%' gets printed
 			oss << *cp;
 			break;  // done
@@ -227,16 +231,30 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 				oss << module;
 				break;  // module name # Early
 			case 'f':   // filename
-				if (filename_delimit_.size() == 0)
+				if (filename_delimit_.empty())
+				{
 					oss << msg.filename();
+				}
 				else if (filename_delimit_.size() == 1)
-					oss << (strrchr(&msg.filename()[0], filename_delimit_[0])
-					            ? strrchr(&msg.filename()[0], filename_delimit_[0]) + 1
+				{
+					oss << (strrchr(&msg.filename()[0], filename_delimit_[0]) != nullptr  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+					            ? strrchr(&msg.filename()[0], filename_delimit_[0]) + 1   // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 					            : msg.filename());
+				}
 				else
-					oss << (strstr(&msg.filename()[0], &filename_delimit_[0])
-					            ? strstr(&msg.filename()[0], &filename_delimit_[0]) + filename_delimit_.size()
-					            : msg.filename());
+				{
+					const char* cp = strstr(&msg.filename()[0], &filename_delimit_[0]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+					if (cp != nullptr)
+					{
+						// make sure to remove a part that ends with '/'
+						cp += filename_delimit_.size() - 1;  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+						while (*cp && *cp != '/') ++cp;
+						++cp;  // increment past '/'
+						oss << cp;
+					}
+					else
+						oss << msg.filename();
+				}
 				break;
 			case 'h':
 				oss << hostname_;
@@ -246,12 +264,20 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 				break;  // severity
 			case 'm':   // message
 				// ossstr.clear();						 // incase message is repeated
-				for (auto const& val : msg.items()) ossstr += val;  // Print the contents.
-				if (ossstr.size())
-				{                                                             // allow/check for "no message"
-					if (ossstr.compare(0, 1, "\n") == 0) ossstr.erase(0, 1);  // remove leading "\n" if present
+				for (auto const& val : msg.items())
+				{
+					ossstr += val;  // Print the contents.
+				}
+				if (!ossstr.empty())
+				{  // allow/check for "no message"
+					if (ossstr.compare(0, 1, "\n") == 0)
+					{
+						ossstr.erase(0, 1);  // remove leading "\n" if present
+					}
 					if (ossstr.compare(ossstr.size() - 1, 1, "\n") == 0)
+					{
 						ossstr.erase(ossstr.size() - 1, 1);  // remove trailing "\n" if present
+					}
 					oss << ossstr;
 				}
 				msg_printed = true;
@@ -266,7 +292,7 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 				oss << mf::GetIteration();
 				break;  // run/iteration/event no #pre-events
 			case 's':
-				sev = xid.severity().getName()[0] | 0x20;
+				sev = xid.severity().getName()[0] | 0x20;  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 				oss << sev;
 				break;  // severity lower case
 			case 'T':
@@ -285,10 +311,18 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 	}
 	if (!msg_printed)
 	{
-		for (auto const& val : msg.items()) ossstr += val;        // Print the contents.
-		if (ossstr.compare(0, 1, "\n") == 0) ossstr.erase(0, 1);  // remove leading "\n" if present
+		for (auto const& val : msg.items())
+		{
+			ossstr += val;  // Print the contents.
+		}
+		if (ossstr.compare(0, 1, "\n") == 0)
+		{
+			ossstr.erase(0, 1);  // remove leading "\n" if present
+		}
 		if (ossstr.compare(ossstr.size() - 1, 1, "\n") == 0)
+		{
 			ossstr.erase(ossstr.size() - 1, 1);  // remove trailing "\n" if present
+		}
 		oss << ossstr;
 	}
 }
@@ -299,13 +333,13 @@ void ELOTS::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 void ELOTS::fillUsrMsg(std::ostringstream& oss __attribute__((__unused__)),
                        const ErrorObj& msg __attribute__((__unused__)))
 {
-	return;  // UsrMsg filled above
+	// UsrMsg filled above
 }
 
 //======================================================================
 // Message router ( overriddes ELdestination::routePayload )
 //======================================================================
-void ELOTS::routePayload(const std::ostringstream& oss, const ErrorObj&) { std::cout << oss.str() << std::endl; }
+void ELOTS::routePayload(const std::ostringstream& oss, const ErrorObj& /*msg*/) { std::cout << oss.str() << std::endl; }
 }  // end namespace mfplugins
 //======================================================================
 //
@@ -317,7 +351,7 @@ void ELOTS::routePayload(const std::ostringstream& oss, const ErrorObj&) { std::
 #define EXTERN_C_FUNC_DECLARE_START extern "C" {
 #endif
 
-EXTERN_C_FUNC_DECLARE_START auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+EXTERN_C_FUNC_DECLARE_START auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELOTS>(pset);
 }

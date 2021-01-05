@@ -10,7 +10,6 @@
 #include <fstream>
 
 namespace mfplugins {
-using mf::ELseverityLevel;
 using mf::ErrorObj;
 using mf::service::ELdestination;
 
@@ -55,26 +54,31 @@ public:
 	/// ELMultiFileOutput Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELMultiFileOutput</param>
-	ELMultiFileOutput(Parameters const& pset);
+	explicit ELMultiFileOutput(Parameters const& pset);
 
 	/// <summary>
 	/// Default virtual Destructor
 	/// </summary>
-	virtual ~ELMultiFileOutput() {}
+	~ELMultiFileOutput() override = default;
 
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param oss Stringstream object containing message data
    * \param msg MessageFacility object containing header information
    */
-	virtual void routePayload(const std::ostringstream& oss, const ErrorObj& msg) override;
+	void routePayload(const std::ostringstream& oss, const ErrorObj& msg) override;
 
 	/**
    * \brief Flush any text in the ostream buffer to disk
    */
-	virtual void flush() override;
+	void flush() override;
 
 private:
+	ELMultiFileOutput(ELMultiFileOutput const&) = delete;
+	ELMultiFileOutput(ELMultiFileOutput&&) = delete;
+	ELMultiFileOutput& operator=(ELMultiFileOutput const&) = delete;
+	ELMultiFileOutput& operator=(ELMultiFileOutput&&) = delete;
+
 	std::string baseDir_;
 	bool append_;
 	std::unordered_map<std::string, std::unique_ptr<cet::ostream_handle>> outputs_;
@@ -130,9 +134,9 @@ void ELMultiFileOutput::routePayload(const std::ostringstream& oss, const ErrorO
 
 void ELMultiFileOutput::flush()
 {
-	for (auto i = outputs_.begin(); i != outputs_.end(); ++i)
+	for (auto& output : outputs_)
 	{
-		(*i).second->flush();
+		output.second->flush();
 	}
 }
 }  // end namespace mfplugins
@@ -148,7 +152,7 @@ void ELMultiFileOutput::flush()
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELMultiFileOutput>(pset);
 }

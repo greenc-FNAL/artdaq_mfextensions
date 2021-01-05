@@ -59,9 +59,9 @@ public:
 	/**
    * \brief Serialize a MessageFacility message to the output
    * \param o Stringstream object containing message data
-   * \param e MessageFacility object containing header information
+   * \param msg MessageFacility object containing header information
    */
-	virtual void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
+	void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
 
 private:
 	bool bellError_;
@@ -143,7 +143,7 @@ void ELANSI::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 #endif
 
 EXTERN_C_FUNC_DECLARE_START
-auto makePlugin(const std::string&, const fhicl::ParameterSet& pset)
+auto makePlugin(const std::string& /*unused*/, const fhicl::ParameterSet& pset)
 {
 	return std::make_unique<mfplugins::ELANSI>(pset);
 }

@@ -6,8 +6,8 @@
 #define MF_DEBUG
 #endif
 
-#include <stdlib.h>
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -23,8 +23,6 @@ void anotherLogger()
 
 	mf::LogWarning("warn1 | warn2") << "Followed by a WARNING message.";
 	mf::LogDebug("debug") << "The debug message in the other thread";
-
-	return;
 }
 
 int main()

@@ -34,7 +34,7 @@ def main(argv):
         text  = f.read()
     if len(argv) >= 5: sleep_time = float(argv[4]) / 1000
 
-    print "Sending %d test messages" % ( count )
+    print('node:port=%s:%d, count=%d'%(node,portint,count))
     for ii  in range(0, count):
         sev = randrange(0,15)
         buf='MF: 01-Jan-1970 01:01:01'
@@ -58,7 +58,7 @@ def main(argv):
         buf+="|This is the ARTDAQ UDP test string.\n\t It contains exactly 111 characters, making for a total size of 113 bytes."
         buf+=text
         s = socket.socket( socket.AF_INET, socket.SOCK_DGRAM )
-        s.sendto( buf, (node,portint) )
+        s.sendto( buf.encode('uft-8'), (node,portint) )
         time.sleep(sleep_time)
     pass
 

@@ -1,9 +1,9 @@
 #ifndef MSGVIEWERDLG_H
 #define MSGVIEWERDLG_H
 
-#include "mfextensions/Binaries/ReceiverManager.hh"
 #include "mfextensions/Extensions/suppress.hh"
 #include "mfextensions/Extensions/throttle.hh"
+#include "mfextensions/Receivers/ReceiverManager.hh"
 #include "mfextensions/Receivers/qt_mf_msg.hh"
 #include "ui_msgviewerdlgui.h"
 
@@ -34,7 +34,7 @@ public:
    * \param conf Configuration filename (fhicl document)
    * \param parent Parent Qt window
    */
-	msgViewerDlg(std::string const& conf, QDialog* parent = 0);
+	msgViewerDlg(std::string const& conf, QDialog* parent = nullptr);
 
 	virtual ~msgViewerDlg();
 
@@ -95,10 +95,15 @@ private slots:
 	//---------------------------------------------------------------------------
 
 private:
+	msgViewerDlg(msgViewerDlg const&) = delete;
+	msgViewerDlg(msgViewerDlg&&) = delete;
+	msgViewerDlg& operator=(msgViewerDlg const&) = delete;
+	msgViewerDlg& operator=(msgViewerDlg&&) = delete;
+
 	// Display all messages stored in the buffer
 	void displayMsgs(int display);
 
-	void UpdateTextAreaDisplay(QStringList texts, QPlainTextEdit* widget);
+	void UpdateTextAreaDisplay(QStringList const& texts, QPlainTextEdit* widget);
 
 	void updateDisplays();
 
@@ -134,7 +139,7 @@ private:
 
 	// # of received messages
 	int nMsgs;
-	int nSupMsgs;     // suppressed msgs
+	int nSupMsgs;  // suppressed msgs
 	int nThrMsgs;  // throttled msgs
 	int nFilters;
 	size_t maxMsgs;         // Maximum number of messages to store

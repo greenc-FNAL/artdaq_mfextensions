@@ -7,7 +7,7 @@
 #include "mfextensions/Receivers/ReceiverMacros.hh"
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
 
-mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet pset)
+mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet const& pset)
     : MVReceiver(pset)
     , message_port_(pset.get<int>("port", 5140))
     , message_addr_(pset.get<std::string>("message_address", "227.128.12.27"))
@@ -40,7 +40,7 @@ void mfviewer::UDPReceiver::setupMessageListener_()
 	si_me_request.sin_family = AF_INET;
 	si_me_request.sin_port = htons(message_port_);
 	si_me_request.sin_addr.s_addr = htonl(INADDR_ANY);
-	if (bind(message_socket_, (struct sockaddr*)&si_me_request, sizeof(si_me_request)) == -1)
+	if (bind(message_socket_, reinterpret_cast<struct sockaddr*>(&si_me_request), sizeof(si_me_request)) == -1)  // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	{
 		TLOG(TLVL_ERROR) << "Cannot bind message socket to port " << message_port_ << ", err=" << strerror(errno);
 		exit(1);
@@ -113,7 +113,7 @@ void mfviewer::UDPReceiver::run()
 		else
 		{
 			TLOG(TLVL_TRACE) << "Recieved message; validating...(packetSize=" << packetSize << ")";
-			std::string message(buffer, buffer + packetSize);
+			std::string message(buffer, buffer + packetSize);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			if (validate_packet(message))
 			{
 				TLOG(TLVL_TRACE) << "Valid UDP Message received! Sending to GUI!";
@@ -148,7 +148,7 @@ std::list<std::string> mfviewer::UDPReceiver::tokenize_(std::string const& input
 	return output;
 }
 
-msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string input)
+msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string const& input)
 {
 	std::string hostname, category, application, message, hostaddr, file, line, module, eventID;
 	mf::ELseverityLevel sev;
@@ -169,7 +169,7 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string input)
 		while (it != tokens.end() && !timestamp_found)
 		{
 			std::string thisString = *it;
-			while (thisString.size() > 0 && !timestamp_found)
+			while (!thisString.empty() && !timestamp_found)
 			{
 				auto pos = thisString.find_first_of("0123456789");
 				if (pos != std::string::npos)
@@ -177,13 +177,13 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string input)
 					thisString = thisString.erase(0, pos);
 					//TLOG(TLVL_TRACE) << "thisString: " << thisString;
 
-					if (strptime(thisString.c_str(), "%d-%b-%Y %H:%M:%S", &tm) != NULL)
+					if (strptime(thisString.c_str(), "%d-%b-%Y %H:%M:%S", &tm) != nullptr)
 					{
 						timestamp_found = true;
 						break;
 					}
 
-					if (thisString.size() > 0)
+					if (!thisString.empty())
 						thisString = thisString.erase(0, 1);
 				}
 			}
@@ -286,7 +286,7 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string input)
 	return msg;
 }
 
-bool mfviewer::UDPReceiver::validate_packet(std::string input)
+bool mfviewer::UDPReceiver::validate_packet(std::string const& input)
 {
 	// Run some checks on the input packet
 	if (input.find("MF") == std::string::npos)

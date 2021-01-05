@@ -7,7 +7,7 @@
 
 size_t qt_mf_msg::sequence = 0;
 
-qt_mf_msg::qt_mf_msg(std::string hostname, std::string category, std::string application, pid_t pid, timeval time)
+qt_mf_msg::qt_mf_msg(const std::string& hostname, const std::string& category, const std::string& application, pid_t pid, timeval time)
     : text_()
     , shortText_()
     , color_()
@@ -52,7 +52,7 @@ void qt_mf_msg::setSeverity(mf::ELseverityLevel sev)
 	}
 }
 
-void qt_mf_msg::setMessage(std::string prefix, int iteration, std::string msg)
+void qt_mf_msg::setMessage(std::string const& prefix, int iteration, std::string const& msg)
 {
 	sourceType_ = QString(prefix.c_str()).toHtmlEscaped();
 	sourceSequence_ = iteration;
