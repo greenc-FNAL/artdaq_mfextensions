@@ -39,7 +39,7 @@ protected:
 	/// <summary>
 	/// Whether the MVRecevier should stop
 	/// </summary>
-	bool stopRequested_;
+	std::atomic<bool> stopRequested_;
 signals:
 	/// <summary>
 	/// When a message is received by the MVReceiver, this signal should be raised so that the connected listener can
