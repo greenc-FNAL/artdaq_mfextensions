@@ -23,7 +23,6 @@ BOOST_AUTO_TEST_CASE(Suppress)
 
 	s.use(true);
 	BOOST_REQUIRE(s.match("test"));
-
 }
 
 BOOST_AUTO_TEST_SUITE_END()
