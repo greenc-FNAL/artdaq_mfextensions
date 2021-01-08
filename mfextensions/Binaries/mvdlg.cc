@@ -348,8 +348,10 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 		// Check to display the message
 		if (hostMatch && appMatch && catMatch)
 		{
-			std::lock_guard<std::mutex> lk(filter_mutex_);
-			msgFilters_[d].msgs.push_back(msg);
+			{
+				std::lock_guard<std::mutex> lk(filter_mutex_);
+				msgFilters_[d].msgs.push_back(msg);
+			}
 			if ((int)d == tabWidget->currentIndex())
 				displayMsg(msg, d);
 		}
@@ -525,11 +527,10 @@ void msgViewerDlg::displayMsgs(int display)
 
 			if (progress.wasCanceled()) break;
 		}
-
-		if (display == tabWidget->currentIndex())
-		{
-			lcdDisplayedMsgs->display(msgFilters_[display].nDisplayMsgs);
-		}
+	}
+	if (display == tabWidget->currentIndex())
+	{
+		lcdDisplayedMsgs->display(msgFilters_[display].nDisplayMsgs);
 	}
 	UpdateTextAreaDisplay(txts, msgFilters_[display].txtDisplay);
 }
