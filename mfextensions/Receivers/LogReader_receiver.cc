@@ -8,6 +8,7 @@ mfviewer::LogReader::LogReader(const fhicl::ParameterSet& pset)
 //  ( "([^\\s]*)\\s([^\\s]*)\\s([^\\s]*)\\s(([^\\s]*)\\s)?([^:]*):(\\d*)" )
 {
 	std::cout << "LogReader_receiver Constructor" << std::endl;
+	this->setObjectName("viewer Log");
 }
 
 mfviewer::LogReader::~LogReader()
