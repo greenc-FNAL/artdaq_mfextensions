@@ -18,6 +18,7 @@
 #include <netinet/in.h>
 #include <algorithm>
 #include <fstream>
+#include <mutex>
 #include <iostream>
 #include <memory>
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
@@ -242,6 +243,10 @@ ELUDP::ELUDP(Parameters const& pset)
 
 void ELUDP::reconnect_()
 {
+	static std::mutex mutex;
+	std::lock_guard<std::mutex> lk(mutex);
+	if (message_socket_ == -1)
+	{
 	message_socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (message_socket_ < 0)
 	{
@@ -298,6 +303,7 @@ void ELUDP::reconnect_()
 	{
 		TLOG(TLVL_ERROR) << "Cannot set message socket to broadcast, err=" << strerror(errno);
 		exit(1);
+	}
 	}
 }
 
