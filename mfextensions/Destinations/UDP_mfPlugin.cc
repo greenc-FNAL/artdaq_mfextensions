@@ -3,11 +3,7 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // v2_02_01 is s67
-#include "messagefacility/MessageService/MessageDrop.h"
-#else
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#endif
 #include "cetlib/compiler_macros.h"
 #include "messagefacility/Utilities/exception.h"
 
@@ -27,10 +23,6 @@
 
 // Boost includes
 #include <boost/algorithm/string.hpp>
-
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  // format changed to format_ for s67
-#define format_ format
-#endif
 
 namespace mfplugins {
 using mf::ErrorObj;
@@ -322,17 +314,11 @@ void ELUDP::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 	oss << xid.severity().getName() << "|";            // severity
 	oss << id << "|";                                  // category
 	oss << app << "|";                                 // application
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20201             // an indication of s67
 	oss << pid_ << "|";
 	oss << mf::GetIteration() << "|";  // run/event no
-#else
-	oss << pid_ << "|";                                    // process id
-	oss << mf::MessageDrop::instance()->iteration << "|";  // run/event no
-#endif
+
 	oss << module << "|";  // module name
-#if MESSAGEFACILITY_HEX_VERSION >= 0x20201
 	oss << msg.filename() << "|" << std::to_string(msg.lineNumber()) << "|";
-#endif
 }
 
 //======================================================================
