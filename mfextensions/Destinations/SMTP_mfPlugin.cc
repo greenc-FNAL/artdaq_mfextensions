@@ -6,11 +6,7 @@
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#if MESSAGEFACILITY_HEX_VERSION < 0x20201  //  v2_02_01 is s67
-#include "messagefacility/MessageService/MessageDrop.h"
-#else
 #include "messagefacility/MessageLogger/MessageLogger.h"
-#endif
 #include "messagefacility/Utilities/exception.h"
 
 // C/C++ includes
