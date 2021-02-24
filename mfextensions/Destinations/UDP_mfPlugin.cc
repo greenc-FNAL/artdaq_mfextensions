@@ -14,6 +14,7 @@
 #include <netinet/in.h>
 #include <algorithm>
 #include <fstream>
+#include <mutex>
 #include <iostream>
 #include <memory>
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
@@ -63,6 +64,10 @@ public:
 		fhicl::Atom<std::string> output_address = fhicl::Atom<std::string>{
 		    fhicl::Name{"multicast_interface_ip"},
 		    fhicl::Comment{"Use this hostname for multicast output(to assign to the proper NIC)"}, "0.0.0.0"};
+		/// filename_delimit (Default: "/"): Grab path after this. "/srcs/" /x/srcs/y/z.cc => y/z.cc
+		fhicl::Atom<std::string> filename_delimit =
+		    fhicl::Atom<std::string>{fhicl::Name{"filename_delimit"},
+		                             fhicl::Comment{"Grab path after this. \"/srcs/\" /x/srcs/y/z.cc => y/z.cc. NOTE: only works if full filename is given to this plugin (based on which mf::<method> is used)."}, "/"};
 	};
 	/// Used for ParameterSet validation
 	using Parameters = fhicl::WrappedTable<Config>;
@@ -124,6 +129,7 @@ private:
 	std::string hostname_;
 	std::string hostaddr_;
 	std::string app_;
+	std::string filename_delimit_;
 };
 
 // END DECLARATION
@@ -135,7 +141,10 @@ private:
 //======================================================================
 
 ELUDP::ELUDP(Parameters const& pset)
-    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max()), host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address()), message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<int64_t>(getpid()))
+    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max())
+	, host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address())
+	, message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<int64_t>(getpid()))
+	, filename_delimit_(pset().filename_delimit())
 {
 	// hostname
 	char hostname_c[1024];
@@ -234,6 +243,10 @@ ELUDP::ELUDP(Parameters const& pset)
 
 void ELUDP::reconnect_()
 {
+	static std::mutex mutex;
+	std::lock_guard<std::mutex> lk(mutex);
+	if (message_socket_ == -1)
+	{
 	message_socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (message_socket_ < 0)
 	{
@@ -291,6 +304,7 @@ void ELUDP::reconnect_()
 		TLOG(TLVL_ERROR) << "Cannot set message socket to broadcast, err=" << strerror(errno);
 		exit(1);
 	}
+	}
 }
 
 //======================================================================
@@ -318,7 +332,31 @@ void ELUDP::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 	oss << mf::GetIteration() << "|";  // run/event no
 
 	oss << module << "|";  // module name
-	oss << msg.filename() << "|" << std::to_string(msg.lineNumber()) << "|";
+	if (filename_delimit_.empty())
+	{
+		oss << msg.filename();
+	}
+	else if (filename_delimit_.size() == 1) // for a single character (i.e '/'), search in reverse.
+	{
+		oss << (strrchr(&msg.filename()[0], filename_delimit_[0]) != nullptr  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		        ? strrchr(&msg.filename()[0], filename_delimit_[0]) + 1   // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		        : msg.filename());
+	}
+	else
+	{
+		const char* cp = strstr(&msg.filename()[0], &filename_delimit_[0]);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		if (cp != nullptr)
+		{
+			// make sure to remove a part that ends with '/'
+			cp += filename_delimit_.size() - 1;  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+			while (*cp && *cp != '/') ++cp;
+			++cp;  // increment past '/'
+			oss << cp;
+		}
+		else
+			oss << msg.filename();
+	}
+	oss << "|" << std::to_string(msg.lineNumber()) << "|";
 }
 
 //======================================================================
