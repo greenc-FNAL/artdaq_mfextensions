@@ -16,6 +16,7 @@ mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet const& pset)
     , message_socket_(-1)
 {
 	TLOG(TLVL_TRACE) << "UDPReceiver Constructor";
+	this->setObjectName("viewer UDP");
 }
 
 void mfviewer::UDPReceiver::setupMessageListener_()
