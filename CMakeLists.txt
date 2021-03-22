@@ -13,11 +13,11 @@
 #  make package
 # ======================================================================
 
-# use cmake 3.17 or later
-# CMake 3.17 changed the way that AUTOMOC and AUTOUIC work
-cmake_minimum_required(VERSION 3.17.3)
+cmake_minimum_required (VERSION 3.17)
 
-project(artdaq-mfextensions)
+find_package(cetbuildtools)
+
+project(artdaq_mfextensions VERSION 1.05.05)
 # cetbuildtools contains our cmake modules
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
 IF (NOT CETBUILDTOOLS_VERSION)
@@ -69,6 +69,7 @@ find_ups_product( messagefacility v1_14_00 )
 find_ups_product( cetbuildtools   v4_01_03 )
 find_ups_product( cetlib          v0_4_11 )
 find_ups_product( TRACE           v3_06_00 )
+find_ups_boost(v1_53_0)
 
 
 string(REGEX MATCHALL "[0-9][0-9]?[0-9]?" MESSAGEFACILITY_VERSION_LIST "$ENV{MESSAGEFACILITY_VERSION}")
