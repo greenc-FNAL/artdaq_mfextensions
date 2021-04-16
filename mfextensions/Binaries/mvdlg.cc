@@ -327,7 +327,7 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 
 	// push the message to the message pool
 	{
-		std::lock_guard<std::mutex> lk(msg_pool_mutex_);
+		//std::lock_guard<std::mutex> lk(msg_pool_mutex_);
 		msg_pool_.emplace_back(msg);
 	}
 	trim_msg_pool();
@@ -349,7 +349,7 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 		if (hostMatch && appMatch && catMatch)
 		{
 			{
-				std::lock_guard<std::mutex> lk(filter_mutex_);
+				//std::lock_guard<std::mutex> lk(filter_mutex_);
 				msgFilters_[d].msgs.push_back(msg);
 			}
 			if ((int)d == tabWidget->currentIndex())
@@ -493,7 +493,6 @@ void msgViewerDlg::displayMsg(msg_ptr_t const& it, int display)
 
 void msgViewerDlg::displayMsgs(int display)
 {
-	int n = 0;
 	msgFilters_[display].txtDisplay->clear();
 	msgFilters_[display].nDisplayMsgs = 0;
 	msgFilters_[display].nDisplayedDeletedMsgs = 0;
@@ -501,31 +500,13 @@ void msgViewerDlg::displayMsgs(int display)
 	QStringList txts;
 	{
 		std::lock_guard<std::mutex> lk(filter_mutex_);
-		n = msgFilters_[display].msgs.size();
-
-		QProgressDialog progress("Fetching data...", "Cancel", 0, n / 1000, this);
-
-		progress.setWindowModality(Qt::WindowModal);
-		progress.setMinimumDuration(2000);  // 2 seconds
-
-		int i = 0, prog = 0;
-
-		for (auto it = msgFilters_[display].msgs.begin(); it != msgFilters_[display].msgs.end(); ++it, ++i)
+		for (auto it = msgFilters_[display].msgs.begin(); it != msgFilters_[display].msgs.end(); ++it)
 		{
 			if ((*it)->sev() >= msgFilters_[display].sevThresh)
 			{
 				txts.push_back((*it)->text(shortMode_));
 				++msgFilters_[display].nDisplayMsgs;
 			}
-
-			if (i == 1000)
-			{
-				i = 0;
-				++prog;
-				progress.setValue(prog);
-			}
-
-			if (progress.wasCanceled()) break;
 		}
 	}
 	if (display == tabWidget->currentIndex())
