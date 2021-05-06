@@ -34,8 +34,8 @@ g++ -g -Wall -I$MESSAGEFACILITY_INC -I$CETLIB_INC -I$CETLIB_EXCEPT_INC -I$FHICLC
 #include <string>
 #include "TRACE/tracemf.h"  // TRACE
 #include "fhiclcpp/ParameterSet.h"
-#include "fhiclcpp/make_ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
+#include "mfextensions/Binaries/MakeParameterSet.hh"
 //#include "TRACE/trace.h"				// TRACE
 
 #define TRACE_NAME "mftest"
@@ -156,26 +156,22 @@ int main(int argc, char *argv[])
 	fhicl::ParameterSet pset;
 	if (argc == 2 && strcmp(argv[1], "test") == 0)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
-		std::string pstr(mf_test_config);
-		fhicl::make_ParameterSet(pstr, pset);
+		pset = artdaq::make_pset(std::string(mf_test_config));
 		// ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
 	}
 	else if (argc == 2 && strcmp(argv[1], "TRACE") == 0)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
-		std::string pstr(mf_TRACE_config);
-		fhicl::make_ParameterSet(pstr, pset);
+		pset = artdaq::make_pset(std::string(mf_TRACE_config));
 		// ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
 	}
 	else if (argc == 2 && strcmp(argv[1], "friendly") == 0)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
-		std::string pstr(mf_friendly_config);
-		fhicl::make_ParameterSet(pstr, pset);
+		pset = artdaq::make_pset(std::string(mf_friendly_config));
 		// ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
 	}
 	else if (argc == 2 && strcmp(argv[1], "OTS") == 0)  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	{
-		std::string pstr(mf_OTS_config);
-		fhicl::make_ParameterSet(pstr, pset);
+		pset = artdaq::make_pset(std::string(mf_OTS_config));
 		// ref. https://cdcvs.fnal.gov/redmine/projects/messagefacility/wiki/Build_and_start_messagefacility
 	}
 	else if (argc == 2)
@@ -183,7 +179,7 @@ int main(int argc, char *argv[])
 		// i.e ./MessageFacility.cfg
 		setenv("FHICL_FILE_PATH", ".", 0);
 		cet::filepath_maker fpm;
-		fhicl::make_ParameterSet(argv[1], fpm, pset);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		pset = artdaq::make_pset(argv[1], fpm);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 	}
 #if defined(__cplusplus) && (__cplusplus == 201300L)
 	mf::StartMessageFacility(mf::MessageFacilityService::MultiThread, pset);

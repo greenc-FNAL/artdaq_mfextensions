@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <string>
-#include "fhiclcpp/make_ParameterSet.h"
+#include "mfextensions/Binaries/MakeParameterSet.hh"
 #include "mfextensions/Receivers/ReceiverManager.hh"
 
 namespace po = boost::program_options;
@@ -59,9 +59,8 @@ int main(int argc, char* argv[])
 	fhicl::ParameterSet main_pset;
 	mf::StartMessageFacility(main_pset);
 
-	fhicl::ParameterSet pset;
 	auto maker = cet::filepath_maker();
-	fhicl::make_ParameterSet(configFile, maker, pset);
+	fhicl::ParameterSet pset = artdaq::make_pset(configFile, maker);
 	mfviewer::ReceiverManager rm(pset);
 
 	// Welcome message

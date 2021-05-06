@@ -6,7 +6,7 @@
 
 #include "cetlib/filepath_maker.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "fhiclcpp/make_ParameterSet.h"
+#include "mfextensions/Binaries/MakeParameterSet.hh"
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
@@ -76,8 +76,7 @@ static fhicl::ParameterSet readConf(std::string const& fname)
 	cet::filepath_lookup policy("FHICL_FILE_PATH");
 
 	// it throws when the file is not parsable
-	fhicl::ParameterSet pset;
-	fhicl::make_ParameterSet(filename, policy, pset);
+	fhicl::ParameterSet pset = artdaq::make_pset(filename, policy);
 
 	return pset;
 }
