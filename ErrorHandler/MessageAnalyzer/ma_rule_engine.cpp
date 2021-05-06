@@ -44,7 +44,7 @@ void ma_rule_engine::init_engine()
 		ParameterSet gran = cond.get<ParameterSet>("granularity", nulp);
 
 		// decide whether "at_least" or "at_most"
-		int occur, occur_at_most, occur_at_least;
+		int occur{0}, occur_at_most{0}, occur_at_least{0};
 		bool at_most = rate.get_if_present<int>("occur_at_most", occur_at_most);
 		bool at_least = rate.get_if_present<int>("occur_at_least", occur_at_least);
 
@@ -69,7 +69,9 @@ void ma_rule_engine::init_engine()
 		}
 
 		// construct the condition object
-		ma_condition c(cond.get<std::string>("description", std::string()), cond.get<std::string>("severity"), cond.get<std::vector<std::string>>("source"), cond.get<std::vector<std::string>>("category", std::vector<std::string>(1, "*")), cond.get<std::string>("regex"), cond.get<std::string>("test", std::string()), cond.get<bool>("persistent", true), occur, at_least, rate.get<int>("timespan", 4372596)  // a random long time
+		ma_condition c(cond.get<std::string>("description", std::string()), cond.get<std::string>("severity"), cond.get<std::vector<std::string>>("source"),
+		               cond.get<std::vector<std::string>>("category", std::vector<std::string>(1, "*")), cond.get<std::string>("regex"), cond.get<std::string>("test", std::string()),
+		               cond.get<bool>("persistent", true), occur, at_least, rate.get<int>("timespan", 4372596)  // a random long time
 		               ,
 		               gran.get<bool>("per_source", false), gran.get<bool>("per_target", false), gran.get<unsigned int>("target_group", 1), events);
 
