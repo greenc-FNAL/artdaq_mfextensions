@@ -1,5 +1,6 @@
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "fhiclcpp/types/ConfigurationTable.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"

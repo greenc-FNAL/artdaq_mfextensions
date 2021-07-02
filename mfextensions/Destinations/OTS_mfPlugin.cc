@@ -1,5 +1,6 @@
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "fhiclcpp/types/ConfigurationTable.h"
 
 #include "cetlib/compiler_macros.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"

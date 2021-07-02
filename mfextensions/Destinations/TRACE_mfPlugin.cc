@@ -1,6 +1,7 @@
 #include "cetlib/PluginTypeDeducer.h"
 #include "cetlib/ProvideMakePluginMacros.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "fhiclcpp/types/ConfigurationTable.h"
 
 #include "cetlib/compiler_macros.h"
 #include "messagefacility/MessageService/ELdestination.h"
