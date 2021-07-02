@@ -17,7 +17,7 @@ cmake_minimum_required (VERSION 3.17)
 
 find_package(cetbuildtools)
 
-project(artdaq_mfextensions VERSION 1.06.01)
+project(artdaq_mfextensions VERSION 1.06.02)
 # cetbuildtools contains our cmake modules
 SET ( CETBUILDTOOLS_VERSION $ENV{CETBUILDTOOLS_VERSION} )
 IF (NOT CETBUILDTOOLS_VERSION)
@@ -30,6 +30,7 @@ set(CMAKE_MODULE_PATH #$ENV{ART_DIR}/Modules
 
 include(CetCMakeEnv)
 cet_cmake_env()
+set(artdaq_mfextensions_OLD_STYLE_CONFIG_VARS TRUE)
 check_ups_version(gcc $ENV{GCC_VERSION} v7_2_0 PRODUCT_OLDER_VAR STDCXX14)
 if(STDCXX14 AND NOT DEFINED ENV{CLANG_VERSION}) # CLANG uses CXX_STANDARD 17
 set(CMAKE_CXX_STANDARD 14)
@@ -43,22 +44,26 @@ cet_set_compiler_flags(DIAGS VIGILANT
   EXTRA_FLAGS -pedantic
 )
 
-string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC )
-if( ${BTYPE_UC} MATCHES "DEBUG" )
+string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
+if(BTYPE_UC STREQUAL DEBUG)
+  add_definitions(-DDEBUGME)
 	if(DEFINED ENV{USE_ASAN})
 		if($ENV{USE_ASAN} GREATER 0)
 			message("!!! Address Sanitizer Activated!!!")
-			cet_add_compiler_flags(-fsanitize=address -lasan -Wno-unused-command-line-argument)
+			add_compile_options(-fsanitize=address -Wno-unused-command-line-argument)
+			add_link_options(-lasan)
 		endif()
 	endif()
 	if(DEFINED ENV{USE_TSAN})
 		if($ENV{USE_TSAN} GREATER 0)
 			message("!!! Thread Sanitizer Activated!!!")
-			cet_add_compiler_flags(-fsanitize=thread -ltsan -Wno-unused-command-line-argument)
+			add_compile_options(-fsanitize=thread -Wno-unused-command-line-argument)
+			add_link_options(-ltsan)
 		endif()
 	endif()
 	if(DEFINED ENV{USE_GCOV})
-		cet_add_compiler_flags(-fprofile-arcs -ftest-coverage --coverage)
+		add_compile_options(-fprofile-arcs -ftest-coverage --coverage)
+		add_link_options(--coverage)
 	endif()
 endif()
 
