@@ -8,7 +8,7 @@ cet_make(LIBRARY_NAME Components
   ${FHICLCPP}
   ${CETLIB}
   ${CETLIB_EXCEPT}
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 Qt5::Widgets
 Qt5::Core
 mfextensions_Receivers_LogReader_receiver

@@ -85,14 +85,6 @@ message("-DMESSAGEFACILITY_HEX_VERSION=0x${MESSAGEFACILITY_MAJOR_VERSION}${MESSA
 add_definitions(-DMESSAGEFACILITY_HEX_VERSION=0x${MESSAGEFACILITY_MAJOR_VERSION}${MESSAGEFACILITY_MINOR_VERSION}${MESSAGEFACILITY_PATCH_VERSION})
 
 
-# as of art v2_11_00, messagefacility has a single library
-check_ups_version(messagefacility $ENV{MESSAGEFACILITY_VERSION} v2_02_00 PRODUCT_MATCHES_VAR ONE_MF_LIBRARY)
-if(ONE_MF_LIBRARY)
-    set( MESSAGEFACILITY_LIBS MF_MessageLogger)
-else()
-    set( MESSAGEFACILITY_LIBS MF_MessageLogger MF_Utilities)
-endif()
-
 # as of fhiclcpp v4_15_00 (s108), ParameterSet::make is the preferred way to make a ParameterSet
 check_ups_version(fhiclcpp $ENV{FHICLCPP_VERSION} v4_15_00 PRODUCT_MATCHES_VAR PSET_MAKE)
 if(PSET_MAKE)

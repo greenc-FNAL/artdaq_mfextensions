@@ -12,7 +12,7 @@ cet_make_library(LIBRARY_NAME curl_send_message
 
 basic_plugin( "SMTP" "mfPlugin"
 curl_send_message
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -26,7 +26,7 @@ ${MF_MESSAGESERVICE}
 endif()
 
 basic_plugin( "UDP" "mfPlugin"
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 ${MF_MESSAGESERVICE}
   ${Boost_SYSTEM_LIBRARY}
   ${FHICLCPP}
@@ -35,7 +35,7 @@ ${MF_MESSAGESERVICE}
   pthread
 )
 basic_plugin( "OTS" "mfPlugin"
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -44,7 +44,7 @@ ${MF_MESSAGESERVICE}
 
 
 basic_plugin( "TRACE" "mfPlugin"
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -53,7 +53,7 @@ ${MF_MESSAGESERVICE}
 
 
 basic_plugin( "Friendly" "mfPlugin"
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -61,7 +61,7 @@ ${MF_MESSAGESERVICE}
 )
 
 basic_plugin( "MultiFile" "mfPlugin"
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 ${MF_MESSAGESERVICE}
     ${FHICLCPP}
     ${CETLIB}
@@ -69,7 +69,7 @@ ${MF_MESSAGESERVICE}
 )
     
 basic_plugin( "ANSI" "mfPlugin"
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
      ${MF_MESSAGESERVICE}
      ${FHICLCPP}
      ${CETLIB}

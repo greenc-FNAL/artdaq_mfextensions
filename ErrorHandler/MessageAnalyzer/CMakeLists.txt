@@ -8,7 +8,7 @@ cet_make(LIBRARY_NAME MessageAnalyzer
   ${FHICLCPP}
   ${CETLIB}
   ${CETLIB_EXCEPT}
-  ${MESSAGEFACILITY_LIBS}
+  ${MF_MESSAGELOGGER}
 Qt5::Widgets
 Qt5::Core
 ${Boost_REGEX_LIBRARY}
