@@ -30,7 +30,7 @@ set(CMAKE_MODULE_PATH #$ENV{ART_DIR}/Modules
 
 include(CetCMakeEnv)
 cet_cmake_env()
-set(artdaq_mfextensions_OLD_STYLE_CONFIG_VARS TRUE)
+
 check_ups_version(gcc $ENV{GCC_VERSION} v7_2_0 PRODUCT_OLDER_VAR STDCXX14)
 if(STDCXX14 AND NOT DEFINED ENV{CLANG_VERSION}) # CLANG uses CXX_STANDARD 17
 set(CMAKE_CXX_STANDARD 14)

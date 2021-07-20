@@ -6,10 +6,10 @@ file(REMOVE ${MOCFILES})
 cet_make(LIBRARY_NAME MFReceivers
   EXCLUDE UDP_receiver.cc LogReader_receiver.cc
   LIBRARIES
-  ${FHICLCPP}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
-  ${MF_MESSAGELOGGER}
+  fhiclcpp
+  cetlib
+  cetlib_except
+  MF_MessageLogger
 Qt5::Widgets
 Qt5::Core
 )
@@ -18,10 +18,10 @@ basic_plugin("UDP" "receiver"
   MFReceivers
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_REGEX_LIBRARY}
-  ${MF_MESSAGELOGGER}
-  ${FHICLCPP}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
+  MF_MessageLogger
+  fhiclcpp
+  cetlib
+  cetlib_except
   Qt5::Core
   pthread
 )
@@ -35,10 +35,10 @@ basic_plugin("LogReader" "receiver"
   MFReceivers
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_REGEX_LIBRARY}
-  ${MF_MESSAGELOGGER}
-  ${FHICLCPP}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
+  MF_MessageLogger
+  fhiclcpp
+  cetlib
+  cetlib_except
   Qt5::Core
 )
 

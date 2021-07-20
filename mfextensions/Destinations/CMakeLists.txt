@@ -12,11 +12,11 @@ cet_make_library(LIBRARY_NAME curl_send_message
 
 basic_plugin( "SMTP" "mfPlugin"
 curl_send_message
-  ${MF_MESSAGELOGGER}
+  MF_MessageLogger
 ${MF_MESSAGESERVICE}
-    ${FHICLCPP}
-    ${CETLIB}
-	${CETLIB_EXCEPT}
+    fhiclcpp
+    cetlib
+	cetlib_except
 	Qt5::Widgets
 	Qt5::Core
 	pthread
@@ -26,54 +26,54 @@ ${MF_MESSAGESERVICE}
 endif()
 
 basic_plugin( "UDP" "mfPlugin"
-  ${MF_MESSAGELOGGER}
+  MF_MessageLogger
 ${MF_MESSAGESERVICE}
   ${Boost_SYSTEM_LIBRARY}
-  ${FHICLCPP}
-  ${CETLIB}
-	${CETLIB_EXCEPT}
+  fhiclcpp
+  cetlib
+	cetlib_except
   pthread
 )
 basic_plugin( "OTS" "mfPlugin"
-  ${MF_MESSAGELOGGER}
+  MF_MessageLogger
 ${MF_MESSAGESERVICE}
-    ${FHICLCPP}
-    ${CETLIB}
-	${CETLIB_EXCEPT}
+    fhiclcpp
+    cetlib
+	cetlib_except
 )
 
 
 basic_plugin( "TRACE" "mfPlugin"
-  ${MF_MESSAGELOGGER}
+  MF_MessageLogger
 ${MF_MESSAGESERVICE}
-    ${FHICLCPP}
-    ${CETLIB}
-	${CETLIB_EXCEPT}
+    fhiclcpp
+    cetlib
+	cetlib_except
 )
 
 
 basic_plugin( "Friendly" "mfPlugin"
-  ${MF_MESSAGELOGGER}
+  MF_MessageLogger
 ${MF_MESSAGESERVICE}
-    ${FHICLCPP}
-    ${CETLIB}
-	${CETLIB_EXCEPT}
+    fhiclcpp
+    cetlib
+	cetlib_except
 )
 
 basic_plugin( "MultiFile" "mfPlugin"
-  ${MF_MESSAGELOGGER}
+  MF_MessageLogger
 ${MF_MESSAGESERVICE}
-    ${FHICLCPP}
-    ${CETLIB}
-	${CETLIB_EXCEPT}
+    fhiclcpp
+    cetlib
+	cetlib_except
 )
     
 basic_plugin( "ANSI" "mfPlugin"
-  ${MF_MESSAGELOGGER}
+  MF_MessageLogger
      ${MF_MESSAGESERVICE}
-     ${FHICLCPP}
-     ${CETLIB}
-	${CETLIB_EXCEPT}
+     fhiclcpp
+     cetlib
+	cetlib_except
      )
 
 install_fhicl(SUBDIRS fcl)

@@ -2,14 +2,14 @@ cet_make_exec(msgsender SOURCE msgsender.cc
 LIBRARIES
 ${Boost_PROGRAM_OPTIONS_LIBRARY}
 ${Boost_SYSTEM_LIBRARY}
-${MF_MESSAGELOGGER}
-${FHICLCPP}
+MF_MessageLogger
+fhiclcpp
 )
 
 cet_make_exec(MFTest SOURCE MFTest.cc 
 LIBRARIES
-  ${MF_MESSAGELOGGER}
-${FHICLCPP}
+  MF_MessageLogger
+fhiclcpp
 )
 
 #get_cmake_property(_variableNames VARIABLES)
@@ -23,8 +23,8 @@ LIBRARIES
 MFExtensions
 MFReceivers
 ${Boost_PROGRAM_OPTIONS_LIBRARY}
-${MF_MESSAGELOGGER}
-${FHICLCPP}
+MF_MessageLogger
+fhiclcpp
 Qt5::Core
 )
 
@@ -32,8 +32,8 @@ cet_make_exec(msgviewer SOURCE msgviewer.cc mvdlg.cc
 LIBRARIES
 MFExtensions
 MFReceivers
-${MF_MESSAGELOGGER}
-${FHICLCPP}
+MF_MessageLogger
+fhiclcpp
 Qt5::Widgets
 Qt5::Core
 )

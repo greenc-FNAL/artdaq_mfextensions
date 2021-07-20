@@ -6,8 +6,8 @@ cet_make_exec(MsgAnalyzer SOURCE MsgAnalyzer.cc MsgAnalyzerDlg.cpp MsgBox.cpp
 LIBRARIES
 MessageAnalyzer
 Components
-${MF_MESSAGELOGGER}
-${FHICLCPP}
+MF_MessageLogger
+fhiclcpp
 Qt5::Widgets
 Qt5::Core
 )

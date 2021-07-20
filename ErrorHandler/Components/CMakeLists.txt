@@ -5,10 +5,10 @@ file(REMOVE ${MOCFILES})
 
 cet_make(LIBRARY_NAME Components
   LIBRARIES
-  ${FHICLCPP}
-  ${CETLIB}
-  ${CETLIB_EXCEPT}
-  ${MF_MESSAGELOGGER}
+  fhiclcpp
+  cetlib
+  cetlib_except
+  MF_MessageLogger
 Qt5::Widgets
 Qt5::Core
 mfextensions_Receivers_LogReader_receiver
