@@ -26,8 +26,9 @@ messagefacility	v2_07_02	s110
 messagefacility	v2_08_02	s109
 messagefacility	v2_08_01	s108
 messagefacility	v2_07_02	s106
+messagefacility v2_07_02	s105
 qt				v5_12_3a
-TRACE			v3_17_01	-	only_for_build
+TRACE			v3_17_01
 cetbuildtools	v8_13_03	-	only_for_build
 end_product_list
 

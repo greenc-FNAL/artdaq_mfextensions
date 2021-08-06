@@ -99,6 +99,7 @@ if(BTYPE_UC STREQUAL DEBUG)
 endif()
 
 # macros for artdaq_dictionary and simple_plugin
+include(CetMake)
 include(BasicPlugin)
 
 # Configuration Files
