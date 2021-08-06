@@ -31,13 +31,6 @@ set(CMAKE_MODULE_PATH #$ENV{ART_DIR}/Modules
 include(CetCMakeEnv)
 cet_cmake_env()
 
-check_ups_version(gcc $ENV{GCC_VERSION} v7_2_0 PRODUCT_OLDER_VAR STDCXX14)
-if(STDCXX14 AND NOT DEFINED ENV{CLANG_VERSION}) # CLANG uses CXX_STANDARD 17
-set(CMAKE_CXX_STANDARD 14)
-else()
-set(CMAKE_CXX_STANDARD 17)
-endif()
-
 cet_set_compiler_flags(DIAGS VIGILANT
   WERROR
   NO_UNDEFINED
@@ -70,12 +63,13 @@ endif()
 #cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_product( messagefacility v1_14_00 )
-find_ups_product( cetbuildtools   v4_01_03 )
-find_ups_product( cetlib          v0_4_11 )
-find_ups_product( TRACE           v3_06_00 )
 find_ups_boost(v1_53_0)
-
+find_ups_product (cetbuildtools)
+find_ups_product( cetlib v1_08_00 )
+find_ups_product( cetpkgsupport v1_08_03 )
+find_ups_product( fhiclcpp v3_04_00 )
+find_ups_product( messagefacility v1_14_01 )
+find_ups_product( TRACE v3_03_00 )
 
 string(REGEX MATCHALL "[0-9][0-9]?[0-9]?" MESSAGEFACILITY_VERSION_LIST "$ENV{MESSAGEFACILITY_VERSION}")
 list(GET MESSAGEFACILITY_VERSION_LIST 0 MESSAGEFACILITY_MAJOR_VERSION)
