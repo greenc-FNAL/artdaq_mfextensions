@@ -25,11 +25,9 @@ messagefacility	v2_07_02	s110
 messagefacility	v2_08_02	s109
 messagefacility	v2_08_01	s108
 messagefacility	v2_07_02	s106
-messagefacility	v2_07_02	s105
-messagefacility	v2_07_02	s104
 qt				v5_12_3a
 TRACE			v3_17_01	-	only_for_build
-cetbuildtools	v8_11_00	-	only_for_build
+cetbuildtools	v8_13_03	-	only_for_build
 end_product_list
 
 # See https://cdcvs.fnal.gov/redmine/projects/cet-is-public/wiki/AboutQualifiers for information about the qualifiers used
@@ -77,13 +75,6 @@ e20:s105:debug	e20:debug		e20	-nq-	-std=c++17
 e20:s105:prof	e20:prof		e20	-nq-	-std=c++17
 e19:s105:debug	e19:debug		e19	-nq-	-std=c++17
 e19:s105:prof	e19:prof		e19	-nq-	-std=c++17
-
-c7:s104:debug	c7:debug		c7	-nq-	-std=c++17
-c7:s104:prof	c7:prof			c7	-nq-	-std=c++17
-e20:s104:debug	e20:debug		e20	-nq-	-std=c++17
-e20:s104:prof	e20:prof		e20	-nq-	-std=c++17
-e19:s104:debug	e19:debug		e19	-nq-	-std=c++17
-e19:s104:prof	e19:prof		e19	-nq-	-std=c++17
 
 end_qualifier_list
 
