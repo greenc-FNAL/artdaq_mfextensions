@@ -117,5 +117,4 @@ add_subdirectory(tools)
 # ups - table and config files
 add_subdirectory(ups)
 
-# packaging utility
-include(UseCPack)
+cet_cmake_config()
