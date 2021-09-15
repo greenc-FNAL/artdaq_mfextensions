@@ -20,7 +20,7 @@ set(CET_CETBUILDTOOLS_COMPAT TRUE)
 include(Compatibility)
 set(CET_WARN_DEPRECATED)
 
-project(artdaq_mfextensions VERSION 1.06.03)
+project(artdaq_mfextensions VERSION 1.07.00)
 
 include(CetCMakeEnv)
 cet_cmake_env()
