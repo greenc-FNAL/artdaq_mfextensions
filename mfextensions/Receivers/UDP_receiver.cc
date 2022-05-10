@@ -15,7 +15,7 @@ mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet const& pset)
     , multicast_out_addr_(pset.get<std::string>("multicast_interface_ip", "0.0.0.0"))
     , message_socket_(-1)
 {
-	TLOG(TLVL_TRACE) << "UDPReceiver Constructor";
+	TLOG(TLVL_DEBUG + 33) << "UDPReceiver Constructor";
 	this->setObjectName("viewer UDP");
 }
 
@@ -73,7 +73,7 @@ void mfviewer::UDPReceiver::setupMessageListener_()
 
 mfviewer::UDPReceiver::~UDPReceiver()
 {
-	TLOG(TLVL_DEBUG) << "Closing message receive socket";
+	TLOG(TLVL_DEBUG + 32) << "Closing message receive socket";
 	close(message_socket_);
 	message_socket_ = -1;
 }
@@ -113,11 +113,11 @@ void mfviewer::UDPReceiver::run()
 		}
 		else
 		{
-			TLOG(TLVL_TRACE) << "Recieved message; validating...(packetSize=" << packetSize << ")";
+			TLOG(TLVL_DEBUG + 33) << "Recieved message; validating...(packetSize=" << packetSize << ")";
 			std::string message(buffer, buffer + packetSize);  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 			if (validate_packet(message))
 			{
-				TLOG(TLVL_TRACE) << "Valid UDP Message received! Sending to GUI!";
+				TLOG(TLVL_DEBUG + 33) << "Valid UDP Message received! Sending to GUI!";
 				emit NewMessage(read_msg(message));
 			}
 		}
@@ -136,13 +136,13 @@ std::list<std::string> mfviewer::UDPReceiver::tokenize_(std::string const& input
 		if (newpos != std::string::npos)
 		{
 			output.emplace_back(input, pos, newpos - pos);
-			//TLOG(TLVL_TRACE) << "tokenize_: " << output.back();
+			//TLOG(TLVL_DEBUG + 33) << "tokenize_: " << output.back();
 			pos = newpos + 1;
 		}
 		else
 		{
 			output.emplace_back(input, pos);
-			//TLOG(TLVL_TRACE) << "tokenize_: " << output.back();
+			//TLOG(TLVL_DEBUG + 33) << "tokenize_: " << output.back();
 			pos = newpos;
 		}
 	}
@@ -157,7 +157,7 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string const& input)
 	int pid = 0;
 	int seqNum = 0;
 
-	TLOG(TLVL_TRACE) << "Recieved MF/Syslog message with contents: " << input;
+	TLOG(TLVL_DEBUG + 33) << "Recieved MF/Syslog message with contents: " << input;
 
 	auto tokens = tokenize_(input);
 	auto it = tokens.begin();
@@ -176,7 +176,7 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string const& input)
 				if (pos != std::string::npos)
 				{
 					thisString = thisString.erase(0, pos);
-					//TLOG(TLVL_TRACE) << "thisString: " << thisString;
+					//TLOG(TLVL_DEBUG + 33) << "thisString: " << thisString;
 
 					if (strptime(thisString.c_str(), "%d-%b-%Y %H:%M:%S", &tm) != nullptr)
 					{
@@ -270,7 +270,7 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string const& input)
 			}
 			oss << *it;
 		}
-		TLOG(TLVL_TRACE) << "Message content: " << oss.str();
+		TLOG(TLVL_DEBUG + 33) << "Message content: " << oss.str();
 		message = oss.str();
 	}
 

@@ -82,7 +82,7 @@ int TCP_listen_fd(int port, int rcvbuf)
 		if (len < (rcvbuf * 2))
 			TLOG(TLVL_WARNING) << "RCVBUF " << len << " not expected (" << rcvbuf << " sts/errno=" << sts << "/" << errno;
 		else
-			TLOG(TLVL_DEBUG) << "RCVBUF " << len << " sts/errno=" << sts << "/" << errno;
+			TLOG(TLVL_DEBUG + 32) << "RCVBUF " << len << " sts/errno=" << sts << "/" << errno;
 	}
 
 	// printf( "listen..." );fflush(stdout);

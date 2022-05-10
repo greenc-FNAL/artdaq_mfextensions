@@ -628,7 +628,7 @@ msgs_t msgViewerDlg::list_intersect(msgs_t const& l1, msgs_t const& l2)
 		}
 	}
 
-	TLOG(10) << "list_intersect: output list has " << output.size() << " entries";
+	TLOG(TLVL_DEBUG + 35) << "list_intersect: output list has " << output.size() << " entries";
 	return output;
 }
 
@@ -674,7 +674,7 @@ void msgViewerDlg::setFilter()
 			appFilterExpression += QString(first ? "" : " || ") + appFilter[app];
 			first = false;
 		}
-		TLOG(10) << "setFilter: result contains %zu messages", result.size();
+		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains %zu messages", result.size();
 
 		first = true;
 		if (!hostFilter.isEmpty())
@@ -730,11 +730,11 @@ void msgViewerDlg::setFilter()
 			if (it != app_msgs_.end())
 			{
 				msgs_t temp(it->second);
-				TLOG(10) << "setFilter: app " << appFilter[app].toStdString() << " has " << temp.size() << " messages";
+				TLOG(TLVL_DEBUG + 35) << "setFilter: app " << appFilter[app].toStdString() << " has " << temp.size() << " messages";
 				result.merge(temp);
 			}
 		}
-		TLOG(10) << "setFilter: result contains %zu messages", result.size();
+		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains %zu messages", result.size();
 
 		if (!hostFilter.isEmpty())
 		{
@@ -745,7 +745,7 @@ void msgViewerDlg::setFilter()
 				if (it != host_msgs_.end())
 				{
 					msgs_t temp(it->second);
-					TLOG(10) << "setFilter: host " << hostFilter[host].toStdString() << " has " << temp.size() << " messages";
+					TLOG(TLVL_DEBUG + 35) << "setFilter: host " << hostFilter[host].toStdString() << " has " << temp.size() << " messages";
 					hostResult.merge(temp);
 				}
 			}
@@ -757,7 +757,7 @@ void msgViewerDlg::setFilter()
 			{
 				result = list_intersect(result, hostResult);
 			}
-			TLOG(10) << "setFilter: result contains " << result.size() << " messages";
+			TLOG(TLVL_DEBUG + 35) << "setFilter: result contains " << result.size() << " messages";
 		}
 
 		if (!catFilter.isEmpty())
@@ -769,7 +769,7 @@ void msgViewerDlg::setFilter()
 				if (it != cat_msgs_.end())
 				{
 					msgs_t temp(it->second);
-					TLOG(10) << "setFilter: cat " << catFilter[cat].toStdString() << " has " << temp.size() << " messages";
+					TLOG(TLVL_DEBUG + 35) << "setFilter: cat " << catFilter[cat].toStdString() << " has " << temp.size() << " messages";
 					catResult.merge(temp);
 				}
 			}
@@ -781,7 +781,7 @@ void msgViewerDlg::setFilter()
 			{
 				result = list_intersect(result, catResult);
 			}
-			TLOG(10) << "setFilter: result contains " << result.size() << " messages";
+			TLOG(TLVL_DEBUG + 35) << "setFilter: result contains " << result.size() << " messages";
 		}
 	}
 
