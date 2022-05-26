@@ -1,4 +1,5 @@
 
+include(mfPlugin)
 find_package(CURL 7.20.0)
 
 if(CURL_FOUND)
@@ -10,71 +11,16 @@ cet_make_library(LIBRARY_NAME curl_send_message
 				 ${CURL_LIBRARIES}
                            WITH_STATIC_LIBRARY)
 
-basic_plugin( "SMTP" "mfPlugin"
-curl_send_message
-  MF_MessageLogger
-${MF_MESSAGESERVICE}
-    fhiclcpp
-    cetlib
-	cetlib_except
-	Qt5::Widgets
-	Qt5::Core
-	pthread
-	${Boost_SYSTEM_LIBRARY}
-	${Boost_THREAD_LIBRARY}
-)
+mfPlugin( SMTP LIBRARIES REG curl_send_message Qt5::Core Boost::thread)
+
 endif()
 
-basic_plugin( "UDP" "mfPlugin"
-  MF_MessageLogger
-${MF_MESSAGESERVICE}
-  ${Boost_SYSTEM_LIBRARY}
-  fhiclcpp
-  cetlib
-	cetlib_except
-  pthread
-)
-basic_plugin( "OTS" "mfPlugin"
-  MF_MessageLogger
-${MF_MESSAGESERVICE}
-    fhiclcpp
-    cetlib
-	cetlib_except
-)
-
-
-basic_plugin( "TRACE" "mfPlugin"
-  MF_MessageLogger
-${MF_MESSAGESERVICE}
-    fhiclcpp
-    cetlib
-	cetlib_except
-)
-
-
-basic_plugin( "Friendly" "mfPlugin"
-  MF_MessageLogger
-${MF_MESSAGESERVICE}
-    fhiclcpp
-    cetlib
-	cetlib_except
-)
-
-basic_plugin( "MultiFile" "mfPlugin"
-  MF_MessageLogger
-${MF_MESSAGESERVICE}
-    fhiclcpp
-    cetlib
-	cetlib_except
-)
-    
-basic_plugin( "ANSI" "mfPlugin"
-  MF_MessageLogger
-     ${MF_MESSAGESERVICE}
-     fhiclcpp
-     cetlib
-	cetlib_except
-     )
+mfPlugin( UDP LIBRARIES REG TRACE::TRACE )
+mfPlugin( OTS LIBRARIES REG TRACE::TRACE )
+mfPlugin( TRACE  LIBRARIES REG TRACE::TRACE)
+mfPlugin( Friendly )
+mfPlugin( MultiFile )
+mfPlugin( ANSI )
 
 install_fhicl(SUBDIRS fcl)
 install_headers()

@@ -19,7 +19,7 @@
 #include <regex>
 #include <string>
 
-#include "trace.h"
+#include "TRACE/trace.h"
 
 // This file (TCPConnect.hh) was created by Ron Rechenmacher <ron@fnal.gov> on
 // Sep 15, 2016. "TERMS AND CONDITIONS" governing this file are in the README

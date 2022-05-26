@@ -5,16 +5,13 @@ file(REMOVE ${MOCFILES})
 
 cet_make(LIBRARY_NAME MessageAnalyzer
   LIBRARIES
-  fhiclcpp
-  cetlib
-  cetlib_except
-  MF_MessageLogger
-Qt5::Widgets
-Qt5::Core
-${Boost_REGEX_LIBRARY}
-${Boost_THREAD_LIBRARY}
-${Boost_SYSTEM_LIBRARY}
-pthread
+	messagefacility::MF_MessageLogger
+	Qt5::Core
+	Qt5::Gui
+	TRACE::TRACE
+	Boost::system
+	Boost::thread
+	Boost::regex
 )
 
 install_headers()

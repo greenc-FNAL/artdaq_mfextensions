@@ -8,7 +8,6 @@
 #include <iostream>
 #include <sstream>
 #include "fhiclcpp/ParameterSet.h"
-#include "mfextensions/Binaries/MakeParameterSet.hh"
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
@@ -36,7 +35,7 @@ int main()
 		}
 		
 		std::string pstr(ss.str());
-		fhicl::ParameterSet pset = artdaq::make_pset(pstr);
+		fhicl::ParameterSet pset = fhicl::ParameterSet::make(pstr);
 		mf::StartMessageFacility(pset);
 	}
 	catch (std::exception& e)

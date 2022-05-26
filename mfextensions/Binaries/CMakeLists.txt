@@ -1,15 +1,13 @@
-cet_make_exec(msgsender SOURCE msgsender.cc 
+cet_make_exec(NAME msgsender SOURCE msgsender.cc 
 LIBRARIES
-${Boost_PROGRAM_OPTIONS_LIBRARY}
-${Boost_SYSTEM_LIBRARY}
-MF_MessageLogger
-fhiclcpp
+messagefacility::MF_MessageLogger
+Boost::program_options
 )
 
-cet_make_exec(MFTest SOURCE MFTest.cc 
+cet_make_exec(NAME MFTest SOURCE MFTest.cc 
 LIBRARIES
-  MF_MessageLogger
-fhiclcpp
+fhiclcpp::fhiclcpp
+messagefacility::MF_MessageLogger
 )
 
 #get_cmake_property(_variableNames VARIABLES)
@@ -18,26 +16,26 @@ fhiclcpp
 #endforeach()
 
 # set(CMAKE_AUTOMOC_MOC_OPTIONS -p${CMAKE_CURRENT_SOURCE_DIR} -I${CMAKE_SOURCE_DIR}/Binaries)
-cet_make_exec(msgserver SOURCE msgserver.cc
+cet_make_exec(NAME msgserver SOURCE msgserver.cc
 LIBRARIES
-MFExtensions
-MFReceivers
-${Boost_PROGRAM_OPTIONS_LIBRARY}
-MF_MessageLogger
-fhiclcpp
+messagefacility::MF_MessageLogger
 Qt5::Core
+Boost::program_options
+artdaq_mfextensions::MFReceivers
 )
 
-cet_make_exec(msgviewer SOURCE msgviewer.cc mvdlg.cc
+cet_make_exec(NAME msgviewer SOURCE msgviewer.cc mvdlg.cc
 LIBRARIES
-MFExtensions
-MFReceivers
-MF_MessageLogger
-fhiclcpp
+Qt5::Core
 Qt5::Widgets
-Qt5::Core
+Boost::regex
+fhiclcpp::fhiclcpp
+messagefacility::MF_MessageLogger
+TRACE::TRACE
+artdaq_mfextensions::MFReceivers
+artdaq_mfextensions::MFExtensions
 )
 
-#install_source()
 install_headers()
+install_source()
 

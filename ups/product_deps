@@ -54,13 +54,6 @@ e20:s112:prof	e20:prof		e20	-nq-	-std=c++17
 e19:s112:debug	e19:debug		e19	-nq-	-std=c++17
 e19:s112:prof	e19:prof		e19	-nq-	-std=c++17
 
-c7:s110:debug	c7:debug		c7	-nq-	-std=c++17
-c7:s110:prof	c7:prof			c7	-nq-	-std=c++17
-e20:s110:debug	e20:debug		e20	-nq-	-std=c++17
-e20:s110:prof	e20:prof		e20	-nq-	-std=c++17
-e19:s110:debug	e19:debug		e19	-nq-	-std=c++17
-e19:s110:prof	e19:prof		e19	-nq-	-std=c++17
-
 end_qualifier_list
 
 # Preserve tabs and formatting in emacs and vi / vim:

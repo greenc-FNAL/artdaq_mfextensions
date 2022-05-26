@@ -2,14 +2,15 @@ add_subdirectory(MessageAnalyzer)
 add_subdirectory(Components)
 
 
-cet_make_exec(MsgAnalyzer SOURCE MsgAnalyzer.cc MsgAnalyzerDlg.cpp MsgBox.cpp
+cet_make_exec(NAME MsgAnalyzer SOURCE MsgAnalyzer.cc MsgAnalyzerDlg.cpp MsgBox.cpp
 LIBRARIES
-MessageAnalyzer
-Components
-MF_MessageLogger
-fhiclcpp
-Qt5::Widgets
 Qt5::Core
+Qt5::Widgets
+	messagefacility::MF_MessageLogger
+	TRACE::TRACE
+	Boost::thread
+	artdaq_mfextensions::Components
+	artdaq_mfextensions::MFReceivers
 )
 
 #install_fhicl(SUBDIRS config)

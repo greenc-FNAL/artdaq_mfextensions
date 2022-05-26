@@ -5,7 +5,7 @@
 #include "cetlib_except/exception.h"
 
 #define TRACE_NAME "throttle_t"
-#include "tracemf.h"
+#include "TRACE/tracemf.h"
 
 BOOST_AUTO_TEST_SUITE(throttle_t)
 

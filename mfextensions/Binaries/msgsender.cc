@@ -9,7 +9,6 @@
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 #include "fhiclcpp/ParameterSet.h"
-#include "mfextensions/Binaries/MakeParameterSet.hh"
 
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
@@ -132,7 +131,7 @@ int main(int ac, char* av[])
 		std::stringstream fhiclstream;
 		fhiclstream << logfhicl.rdbuf();
 		std::string pstr(fhiclstream.str());
-		pset = artdaq::make_pset(pstr);
+		pset = fhicl::ParameterSet::make(pstr);
 	}
 
 	// start up message facility service

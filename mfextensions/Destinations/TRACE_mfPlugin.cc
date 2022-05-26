@@ -15,7 +15,7 @@
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #endif
 
-#include "trace.h"
+#include "TRACE/trace.h"
 
 #if GCC_VERSION >= 701000 || defined(__clang__)
 #pragma GCC diagnostic pop

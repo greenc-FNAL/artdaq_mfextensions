@@ -3,7 +3,6 @@
 
 #include "ErrorHandler/MsgAnalyzerDlg.h"
 
-#include "mfextensions/Binaries/MakeParameterSet.hh"
 #include <messagefacility/MessageLogger/MessageLogger.h>
 #include <iostream>
 
@@ -66,7 +65,7 @@ int main(int argc, char* argv[])
 	try
 	{
 		cet::filepath_lookup_after1 lookup_policy("FHICL_FILE_PATH");
-		pset = artdaq::make_pset(mf_cfg, lookup_policy);
+		pset = fhicl::ParameterSet::make(mf_cfg, lookup_policy);
 	}
 	catch (cet::exception const& ex)
 	{

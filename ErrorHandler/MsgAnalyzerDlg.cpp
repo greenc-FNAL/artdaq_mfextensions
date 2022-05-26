@@ -4,7 +4,6 @@
 #include "ErrorHandler/MsgBox.h"
 
 #include <cetlib/filepath_maker.h>
-#include "mfextensions/Binaries/MakeParameterSet.hh"
 
 #include <QtCore/QDateTime>
 #include <QtCore/QSettings>
@@ -30,7 +29,7 @@ read_conf(std::string const fname)
 	{
 		// it throws when the file is not parsable
 		cet::filepath_lookup_after1 lookup_policy("FHICL_FILE_PATH");
-		pset = artdaq::make_pset(fname, lookup_policy);
+		pset = fhicl::ParameterSet::make(fname, lookup_policy);
 	}
 	catch (cet::exception const &ex)
 	{

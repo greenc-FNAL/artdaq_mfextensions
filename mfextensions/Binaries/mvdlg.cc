@@ -6,7 +6,6 @@
 
 #include "cetlib/filepath_maker.h"
 #include "fhiclcpp/ParameterSet.h"
-#include "mfextensions/Binaries/MakeParameterSet.hh"
 
 #include "mfextensions/Binaries/mvdlg.hh"
 
@@ -16,7 +15,7 @@
 #endif
 
 #define TRACE_NAME "MessageViewer"
-#include "trace.h"
+#include "TRACE/trace.h"
 
 #if GCC_VERSION >= 701000 || defined(__clang__)
 #pragma GCC diagnostic pop
@@ -76,7 +75,7 @@ static fhicl::ParameterSet readConf(std::string const& fname)
 	cet::filepath_lookup policy("FHICL_FILE_PATH");
 
 	// it throws when the file is not parsable
-	fhicl::ParameterSet pset = artdaq::make_pset(filename, policy);
+	fhicl::ParameterSet pset = fhicl::ParameterSet::make(filename, policy);
 
 	return pset;
 }
