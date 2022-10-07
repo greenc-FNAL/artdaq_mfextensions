@@ -20,7 +20,7 @@ old_style_config_vars
 
 #
 product			version		optional
-messagefacility	v2_08_07	s118
+messagefacility	v2_09_00	s118
 messagefacility	v2_08_04	s112
 qt				v5_15_6
 TRACE			v3_17_05

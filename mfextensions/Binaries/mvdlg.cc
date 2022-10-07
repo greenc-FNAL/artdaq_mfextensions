@@ -673,7 +673,7 @@ void msgViewerDlg::setFilter()
 			appFilterExpression += QString(first ? "" : " || ") + appFilter[app];
 			first = false;
 		}
-		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains %zu messages", result.size();
+		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains " << result.size() << " messages";
 
 		first = true;
 		if (!hostFilter.isEmpty())
@@ -733,7 +733,7 @@ void msgViewerDlg::setFilter()
 				result.merge(temp);
 			}
 		}
-		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains %zu messages", result.size();
+		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains " << result.size() << " messages";
 
 		if (!hostFilter.isEmpty())
 		{
