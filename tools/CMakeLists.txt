@@ -5,3 +5,6 @@ LIBRARIES
 TRACE::TRACE
 messagefacility::MF_MessageLogger
 )
+
+install_headers()
+install_source()
