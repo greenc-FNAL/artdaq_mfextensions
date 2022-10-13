@@ -35,7 +35,7 @@ NodeInfo::NodeInfo(node_type_t type, std::string const& key, QListWidget* parent
 	item_ptr->setSizeHint(sz);
 
 	// user data
-	QVariant v = qVariantFromValue((void*)this);
+	QVariant v = QVariant::fromValue((void*)this);
 	item_ptr->setData(Qt::UserRole, v);
 
 	//item_ptr->setData(Qt::UserRole, QVariant(key.c_str()));

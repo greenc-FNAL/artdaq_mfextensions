@@ -180,7 +180,7 @@ static void str_to_suppress(std::vector<std::string> const& vs, std::vector<supp
 		act = menu->addAction(QString(vs[i].c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
-		QVariant v = qVariantFromValue(static_cast<void*>(&s[i]));
+		QVariant v = QVariant::fromValue(static_cast<void*>(&s[i]));
 		act->setData(v);
 	}
 }
@@ -205,7 +205,7 @@ static void pset_to_throttle(std::vector<fhicl::ParameterSet> const& ps, std::ve
 		act = menu->addAction(QString(name.c_str()));
 		act->setCheckable(true);
 		act->setChecked(true);
-		QVariant v = qVariantFromValue(static_cast<void*>(&t[i]));
+		QVariant v = QVariant::fromValue(static_cast<void*>(&t[i]));
 		act->setData(v);
 	}
 }
@@ -673,7 +673,7 @@ void msgViewerDlg::setFilter()
 			appFilterExpression += QString(first ? "" : " || ") + appFilter[app];
 			first = false;
 		}
-		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains %zu messages", result.size();
+		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains " << result.size() << " messages";
 
 		first = true;
 		if (!hostFilter.isEmpty())
@@ -733,7 +733,7 @@ void msgViewerDlg::setFilter()
 				result.merge(temp);
 			}
 		}
-		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains %zu messages", result.size();
+		TLOG(TLVL_DEBUG + 35) << "setFilter: result contains " << result.size() << " messages";
 
 		if (!hostFilter.isEmpty())
 		{
