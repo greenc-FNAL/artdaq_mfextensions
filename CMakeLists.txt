@@ -64,8 +64,8 @@ endif()
 
 #cet_report_compiler_flags()
 
-find_package(messagefacility)
-find_package(Boost COMPONENTS regex system program_options thread)
+find_package(messagefacility QUIET)
+find_package(Boost QUIET COMPONENTS regex system program_options thread)
 find_package(TRACE)
 
 # Qt
