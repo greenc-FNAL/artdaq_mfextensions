@@ -325,7 +325,7 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 
 	// push the message to the message pool
 	{
-		//std::lock_guard<std::mutex> lk(msg_pool_mutex_);
+		// std::lock_guard<std::mutex> lk(msg_pool_mutex_);
 		msg_pool_.emplace_back(msg);
 	}
 	trim_msg_pool();
@@ -347,7 +347,7 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 		if (hostMatch && appMatch && catMatch)
 		{
 			{
-				//std::lock_guard<std::mutex> lk(filter_mutex_);
+				// std::lock_guard<std::mutex> lk(filter_mutex_);
 				msgFilters_[d].msgs.push_back(msg);
 			}
 			if ((int)d == tabWidget->currentIndex())

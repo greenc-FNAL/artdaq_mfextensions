@@ -35,7 +35,7 @@ using ascii::no_case;
 using ascii::space;
 
 using phx::ref;
-//using phx::bind;
+// using phx::bind;
 
 using qi::bool_;
 using qi::double_;
@@ -48,7 +48,7 @@ using qi::no_skip;
 using qi::raw;
 using qi::skip;
 
-//using namespace qi::labels;
+// using namespace qi::labels;
 
 using novadaq::errorhandler::CO_E;
 using novadaq::errorhandler::CO_G;

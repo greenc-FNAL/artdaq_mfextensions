@@ -21,8 +21,8 @@ class ELMultiFileOutput : public ELdestination
 {
 public:
 	/**
-   * \brief Configuration parameters for ELMultiFileOutput
-   */
+	 * \brief Configuration parameters for ELMultiFileOutput
+	 */
 	struct Config
 	{
 		/// ELdestination common config parameters
@@ -63,15 +63,15 @@ public:
 	~ELMultiFileOutput() override = default;
 
 	/**
-   * \brief Serialize a MessageFacility message to the output
-   * \param oss Stringstream object containing message data
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Serialize a MessageFacility message to the output
+	 * \param oss Stringstream object containing message data
+	 * \param msg MessageFacility object containing header information
+	 */
 	void routePayload(const std::ostringstream& oss, const ErrorObj& msg) override;
 
 	/**
-   * \brief Flush any text in the ostream buffer to disk
-   */
+	 * \brief Flush any text in the ostream buffer to disk
+	 */
 	void flush() override;
 
 private:

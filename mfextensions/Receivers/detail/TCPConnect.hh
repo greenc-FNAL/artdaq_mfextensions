@@ -128,7 +128,7 @@ inline int GetInterfaceForNetwork(char const* host_in, in_addr& addr)
 		}
 
 		/* Walk through linked list, maintaining head pointer so we
-    can free list later */
+	can free list later */
 
 		for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
 		{
@@ -142,7 +142,7 @@ inline int GetInterfaceForNetwork(char const* host_in, in_addr& addr)
 				auto sa = reinterpret_cast<struct sockaddr_in*>(ifa->ifa_netmask);    // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 
 				TLOG(TLVL_DEBUG + 40) << "IF: " << ifa->ifa_name << " Desired: " << desired_host.s_addr
-				         << " netmask: " << sa->sin_addr.s_addr << " this interface: " << if_addr->sin_addr.s_addr;
+				                      << " netmask: " << sa->sin_addr.s_addr << " this interface: " << if_addr->sin_addr.s_addr;
 
 				if ((if_addr->sin_addr.s_addr & sa->sin_addr.s_addr) == (desired_host.s_addr & sa->sin_addr.s_addr))
 				{
@@ -281,7 +281,7 @@ inline int TCPConnect(char const* host_in, int dflt_port, int64_t flags = 0, int
 		len = 0;
 		sts = getsockopt(s_fd, SOL_SOCKET, SO_SNDBUF, &len, &lenlen);
 		TLOG(TLVL_DEBUG + 32) << "TCPConnect SNDBUF initial: " << len << " sts/errno=" << sts << "/" << errno
-		                 << " lenlen=" << lenlen;
+		                      << " lenlen=" << lenlen;
 		len = sndbufsiz;
 		sts = setsockopt(s_fd, SOL_SOCKET, SO_SNDBUF, &len, lenlen);
 		if (sts == -1) TLOG(TLVL_ERROR) << "Error with setsockopt SNDBUF " << errno;

@@ -38,8 +38,8 @@ NodeInfo::NodeInfo(node_type_t type, std::string const& key, QListWidget* parent
 	QVariant v = QVariant::fromValue((void*)this);
 	item_ptr->setData(Qt::UserRole, v);
 
-	//item_ptr->setData(Qt::UserRole, QVariant(key.c_str()));
-	//item_ptr->setData(Qt::UserRole, QVariant::fromValue<msgs_ptr_t>(msgs_ptr));
+	// item_ptr->setData(Qt::UserRole, QVariant(key.c_str()));
+	// item_ptr->setData(Qt::UserRole, QVariant::fromValue<msgs_ptr_t>(msgs_ptr));
 }
 
 node_status NodeInfo::push_msg(qt_mf_msg const& msg)
@@ -196,8 +196,8 @@ void NodeInfo::get_node_geometry(int& node_w, int& node_h) const
 
 QString NodeInfo::get_caption(std::string const& key) const
 {
-	//if (node_type==BufferNode)  return key.substr(18).c_str();
-	//if (node_type==DCM)         return key.substr(4 ).c_str();
+	// if (node_type==BufferNode)  return key.substr(18).c_str();
+	// if (node_type==DCM)         return key.substr(4 ).c_str();
 
 	return key.c_str();
 }

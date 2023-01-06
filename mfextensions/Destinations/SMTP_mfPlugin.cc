@@ -4,9 +4,9 @@
 #include "fhiclcpp/types/Sequence.h"
 #include "fhiclcpp/types/TableFragment.h"
 
+#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "messagefacility/Utilities/exception.h"
 
 // C/C++ includes
@@ -37,8 +37,8 @@ class ELSMTP : public ELdestination
 {
 public:
 	/**
-   * \brief Configuration parameters for ELSMTP
-   */
+	 * \brief Configuration parameters for ELSMTP
+	 */
 	struct Config
 	{
 		/// ELDestination common config parameters
@@ -95,10 +95,10 @@ public:
 	}
 
 	/**
-   * \brief Serialize a MessageFacility message to the output
-   * \param o Stringstream object containing message data
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Serialize a MessageFacility message to the output
+	 * \param o Stringstream object containing message data
+	 * \param msg MessageFacility object containing header information
+	 */
 	virtual void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
 
 private:

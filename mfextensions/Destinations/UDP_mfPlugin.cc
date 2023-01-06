@@ -2,10 +2,10 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/types/ConfigurationTable.h"
 
+#include "cetlib/compiler_macros.h"
+#include "messagefacility/MessageLogger/MessageLogger.h"
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
-#include "cetlib/compiler_macros.h"
 #include "messagefacility/Utilities/exception.h"
 
 // C/C++ includes
@@ -15,9 +15,9 @@
 #include <netinet/in.h>
 #include <algorithm>
 #include <fstream>
-#include <mutex>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
 
 #define TRACE_NAME "UDP_mfPlugin"
@@ -38,8 +38,8 @@ class ELUDP : public ELdestination
 {
 public:
 	/**
-   * \brief Configuration Parameters for ELUDP
-   */
+	 * \brief Configuration Parameters for ELUDP
+	 */
 	struct Config
 	{
 		/// ELDestination common config parameters
@@ -81,29 +81,29 @@ public:
 	ELUDP(Parameters const& pset);
 
 	/**
-   * \brief Fill the "Prefix" portion of the message
-   * \param o Output stringstream
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Fill the "Prefix" portion of the message
+	 * \param o Output stringstream
+	 * \param msg MessageFacility object containing header information
+	 */
 	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
-   * \brief Fill the "User Message" portion of the message
-   * \param o Output stringstream
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Fill the "User Message" portion of the message
+	 * \param o Output stringstream
+	 * \param msg MessageFacility object containing header information
+	 */
 	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
-   * \brief Fill the "Suffix" portion of the message (Unused)
-   */
+	 * \brief Fill the "Suffix" portion of the message (Unused)
+	 */
 	void fillSuffix(std::ostringstream& /*unused*/, const ErrorObj& /*msg*/) override {}
 
 	/**
-   * \brief Serialize a MessageFacility message to the output
-   * \param o Stringstream object containing message data
-   * \param e MessageFacility object containing header information
-   */
+	 * \brief Serialize a MessageFacility message to the output
+	 * \param o Stringstream object containing message data
+	 * \param e MessageFacility object containing header information
+	 */
 	void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 private:
@@ -142,10 +142,7 @@ private:
 //======================================================================
 
 ELUDP::ELUDP(Parameters const& pset)
-    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max())
-	, host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address())
-	, message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<int64_t>(getpid()))
-	, filename_delimit_(pset().filename_delimit())
+    : ELdestination(pset().elDestConfig()), error_report_backoff_factor_(pset().error_report()), error_max_(pset().error_max()), host_(pset().host()), port_(pset().port()), multicast_enabled_(pset().multicast_enabled()), multicast_out_addr_(pset().output_address()), message_socket_(-1), consecutive_success_count_(0), error_count_(0), next_error_report_(1), seqNum_(0), pid_(static_cast<int64_t>(getpid())), filename_delimit_(pset().filename_delimit())
 {
 	// hostname
 	char hostname_c[1024];
@@ -248,63 +245,63 @@ void ELUDP::reconnect_()
 	std::lock_guard<std::mutex> lk(mutex);
 	if (message_socket_ == -1)
 	{
-	message_socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	if (message_socket_ < 0)
-	{
-		TLOG(TLVL_ERROR) << "I failed to create the socket for sending Data messages! err=" << strerror(errno);
-		exit(1);
-	}
-	int sts = ResolveHost(host_.c_str(), port_, message_addr_);
-	if (sts == -1)
-	{
-		TLOG(TLVL_ERROR) << "Unable to resolve Data message address, err=" << strerror(errno);
-		exit(1);
-	}
-
-	if (multicast_out_addr_ == "0.0.0.0")
-	{
-		multicast_out_addr_.reserve(HOST_NAME_MAX);
-		sts = gethostname(&multicast_out_addr_[0], HOST_NAME_MAX);
-		if (sts < 0)
+		message_socket_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if (message_socket_ < 0)
 		{
-			TLOG(TLVL_ERROR) << "Could not get current hostname,  err=" << strerror(errno);
+			TLOG(TLVL_ERROR) << "I failed to create the socket for sending Data messages! err=" << strerror(errno);
 			exit(1);
 		}
-	}
-
-	if (multicast_out_addr_ != "localhost")
-	{
-		struct in_addr addr;
-		sts = GetInterfaceForNetwork(multicast_out_addr_.c_str(), addr);
-		// sts = ResolveHost(multicast_out_addr_.c_str(), addr);
+		int sts = ResolveHost(host_.c_str(), port_, message_addr_);
 		if (sts == -1)
 		{
-			TLOG(TLVL_ERROR) << "Unable to resolve multicast interface address, err=" << strerror(errno);
+			TLOG(TLVL_ERROR) << "Unable to resolve Data message address, err=" << strerror(errno);
 			exit(1);
 		}
 
-		if (setsockopt(message_socket_, IPPROTO_IP, IP_MULTICAST_IF, &addr, sizeof(addr)) == -1)
+		if (multicast_out_addr_ == "0.0.0.0")
 		{
-			TLOG(TLVL_ERROR) << "Cannot set outgoing interface, err=" << strerror(errno);
+			multicast_out_addr_.reserve(HOST_NAME_MAX);
+			sts = gethostname(&multicast_out_addr_[0], HOST_NAME_MAX);
+			if (sts < 0)
+			{
+				TLOG(TLVL_ERROR) << "Could not get current hostname,  err=" << strerror(errno);
+				exit(1);
+			}
+		}
+
+		if (multicast_out_addr_ != "localhost")
+		{
+			struct in_addr addr;
+			sts = GetInterfaceForNetwork(multicast_out_addr_.c_str(), addr);
+			// sts = ResolveHost(multicast_out_addr_.c_str(), addr);
+			if (sts == -1)
+			{
+				TLOG(TLVL_ERROR) << "Unable to resolve multicast interface address, err=" << strerror(errno);
+				exit(1);
+			}
+
+			if (setsockopt(message_socket_, IPPROTO_IP, IP_MULTICAST_IF, &addr, sizeof(addr)) == -1)
+			{
+				TLOG(TLVL_ERROR) << "Cannot set outgoing interface, err=" << strerror(errno);
+				exit(1);
+			}
+		}
+		int yes = 1;
+		if (setsockopt(message_socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0)
+		{
+			TLOG(TLVL_ERROR) << "Unable to enable port reuse on message socket, err=" << strerror(errno);
 			exit(1);
 		}
-	}
-	int yes = 1;
-	if (setsockopt(message_socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) < 0)
-	{
-		TLOG(TLVL_ERROR) << "Unable to enable port reuse on message socket, err=" << strerror(errno);
-		exit(1);
-	}
-	if (setsockopt(message_socket_, IPPROTO_IP, IP_MULTICAST_LOOP, &yes, sizeof(yes)) < 0)
-	{
-		TLOG(TLVL_ERROR) << "Unable to enable multicast loopback on message socket, err=" << strerror(errno);
-		exit(1);
-	}
-	if (setsockopt(message_socket_, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes)) == -1)
-	{
-		TLOG(TLVL_ERROR) << "Cannot set message socket to broadcast, err=" << strerror(errno);
-		exit(1);
-	}
+		if (setsockopt(message_socket_, IPPROTO_IP, IP_MULTICAST_LOOP, &yes, sizeof(yes)) < 0)
+		{
+			TLOG(TLVL_ERROR) << "Unable to enable multicast loopback on message socket, err=" << strerror(errno);
+			exit(1);
+		}
+		if (setsockopt(message_socket_, SOL_SOCKET, SO_BROADCAST, &yes, sizeof(yes)) == -1)
+		{
+			TLOG(TLVL_ERROR) << "Cannot set message socket to broadcast, err=" << strerror(errno);
+			exit(1);
+		}
 	}
 }
 
@@ -337,11 +334,11 @@ void ELUDP::fillPrefix(std::ostringstream& oss, const ErrorObj& msg)
 	{
 		oss << msg.filename();
 	}
-	else if (filename_delimit_.size() == 1) // for a single character (i.e '/'), search in reverse.
+	else if (filename_delimit_.size() == 1)  // for a single character (i.e '/'), search in reverse.
 	{
 		oss << (strrchr(&msg.filename()[0], filename_delimit_[0]) != nullptr  // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-		        ? strrchr(&msg.filename()[0], filename_delimit_[0]) + 1   // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-		        : msg.filename());
+		            ? strrchr(&msg.filename()[0], filename_delimit_[0]) + 1   // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+		            : msg.filename());
 	}
 	else
 	{

@@ -33,7 +33,7 @@ public:
 
 private:
 	// all conditions in the parent rule
-	//cond_vec_t const &  conditions;
+	// cond_vec_t const &  conditions;
 
 	// list of and-expressions
 	domain_andexprs_t andexprs;

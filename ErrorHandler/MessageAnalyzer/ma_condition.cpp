@@ -130,7 +130,7 @@ bool ma_condition::match(qt_mf_msg const& msg, conds_t& status, conds_t& source,
 	if (result & SOURCE_CHANGE) source.push_back(this);
 	if (result & TARGET_CHANGE) target.push_back(this);
 
-	//if (result & STATUS_CHANGE)  update_fields();
+	// if (result & STATUS_CHANGE)  update_fields();
 
 	++catched_messages;
 

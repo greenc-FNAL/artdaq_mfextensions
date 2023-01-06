@@ -30,10 +30,10 @@ class msgViewerDlg : public QDialog, private Ui::MsgViewerDlg
 
 public:
 	/**
-   * \brief Message Viewer Dialog Constructor
-   * \param conf Configuration filename (fhicl document)
-   * \param parent Parent Qt window
-   */
+	 * \brief Message Viewer Dialog Constructor
+	 * \param conf Configuration filename (fhicl document)
+	 * \param parent Parent Qt window
+	 */
 	msgViewerDlg(std::string const& conf, QDialog* parent = nullptr);
 
 	virtual ~msgViewerDlg();
@@ -57,9 +57,9 @@ public slots:
 
 protected:
 	/**
-   * \brief Perform actions on window close
-   * \param event QCloseEvent data
-   */
+	 * \brief Perform actions on window close
+	 * \param event QCloseEvent data
+	 */
 	void closeEvent(QCloseEvent* event);
 
 private slots:

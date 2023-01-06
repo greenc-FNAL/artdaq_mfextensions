@@ -238,10 +238,10 @@ private:
 	int catched_messages;
 };
 
-//typedef boost::shared_ptr<ma_condition> cond_sp;
-//typedef std::list<cond_sp>              conds_t;
-//typedef std::vector<cond_sp>            cond_vec_t;
-//typedef std::map<std::string, cond_sp>     cond_map_t;
+// typedef boost::shared_ptr<ma_condition> cond_sp;
+// typedef std::list<cond_sp>              conds_t;
+// typedef std::vector<cond_sp>            cond_vec_t;
+// typedef std::map<std::string, cond_sp>     cond_map_t;
 
 typedef std::vector<ma_condition *> cond_vec_t;
 typedef std::map<std::string, ma_condition> cond_map_t;

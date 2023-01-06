@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 	}
 
 	// message facility
-	//putenv((char*)"FHICL_FILE_PATH=.");
+	// putenv((char*)"FHICL_FILE_PATH=.");
 	fhicl::ParameterSet pset;
 	try
 	{

@@ -37,8 +37,8 @@ class ELOTS : public ELdestination
 {
 public:
 	/**
-   * \brief Configuration Parameters for ELOTS
-   */
+	 * \brief Configuration Parameters for ELOTS
+	 */
 	struct Config
 	{
 		/// ELDestination common config parameters
@@ -63,29 +63,29 @@ public:
 	ELOTS(Parameters const& pset);
 
 	/**
-   * \brief Fill the "Prefix" portion of the message
-   * \param o Output stringstream
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Fill the "Prefix" portion of the message
+	 * \param o Output stringstream
+	 * \param msg MessageFacility object containing header information
+	 */
 	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
-   * \brief Fill the "User Message" portion of the message
-   * \param o Output stringstream
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Fill the "User Message" portion of the message
+	 * \param o Output stringstream
+	 * \param msg MessageFacility object containing header information
+	 */
 	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 
 	/**
-   * \brief Fill the "Suffix" portion of the message (Unused)
-   */
+	 * \brief Fill the "Suffix" portion of the message (Unused)
+	 */
 	void fillSuffix(std::ostringstream& /*unused*/, const ErrorObj& /*msg*/) override {}
 
 	/**
-   * \brief Serialize a MessageFacility message to the output
-   * \param o Stringstream object containing message data
-   * \param e MessageFacility object containing header information
-   */
+	 * \brief Serialize a MessageFacility message to the output
+	 * \param o Stringstream object containing message data
+	 * \param e MessageFacility object containing header information
+	 */
 	void routePayload(const std::ostringstream& o, const ErrorObj& e) override;
 
 private:
