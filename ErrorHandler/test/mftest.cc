@@ -31,7 +31,7 @@ int main()
 	LogInfo("catInfo") << "Info information.";
 	LogDebug("debug") << "DEBUG information.";
 
-	//sleep(2);
+	// sleep(2);
 
 	return 0;
 }

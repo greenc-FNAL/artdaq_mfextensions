@@ -33,7 +33,7 @@ int main()
 			fhiclstream << logfhicl.rdbuf();
 			ss << fhiclstream.str();
 		}
-		
+
 		std::string pstr(ss.str());
 		fhicl::ParameterSet pset = fhicl::ParameterSet::make(pstr);
 		mf::StartMessageFacility(pset);

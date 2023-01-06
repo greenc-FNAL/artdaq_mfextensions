@@ -271,7 +271,7 @@ void ma_rule::reset()
 	cond_vec_t::iterator it = conditions.begin();
 	for (; it != conditions.end(); ++it) (*it)->reset();
 
-	//domains.clear();
+	// domains.clear();
 	alarms.clear();
 	itor_last_alarm = alarms.end();
 	alarm_count = 0;

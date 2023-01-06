@@ -25,8 +25,8 @@ class ELFriendly : public ELostreamOutput
 {
 public:
 	/**
-   * \brief Configuration Parameters for ELFriendly
-   */
+	 * \brief Configuration Parameters for ELFriendly
+	 */
 	struct Config
 	{
 		/// Configuration parameters for ELostreamOutput
@@ -46,22 +46,22 @@ public:
 	explicit ELFriendly(Parameters const& pset);
 
 	/**
-   * \brief Fill the "Prefix" portion of the message
-   * \param o Output stringstream
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Fill the "Prefix" portion of the message
+	 * \param o Output stringstream
+	 * \param msg MessageFacility object containing header information
+	 */
 	void fillPrefix(std::ostringstream& o, const ErrorObj& msg) override;
 	/**
-   * \brief Fill the "User Message" portion of the message
-   * \param o Output stringstream
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Fill the "User Message" portion of the message
+	 * \param o Output stringstream
+	 * \param msg MessageFacility object containing header information
+	 */
 	void fillUsrMsg(std::ostringstream& o, const ErrorObj& msg) override;
 	/**
-   * \brief Fill the "Suffix" portion of the message
-   * \param o Output stringstream
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Fill the "Suffix" portion of the message
+	 * \param o Output stringstream
+	 * \param msg MessageFacility object containing header information
+	 */
 	void fillSuffix(std::ostringstream& o, const ErrorObj& msg) override;
 
 private:

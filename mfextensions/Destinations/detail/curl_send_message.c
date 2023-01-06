@@ -88,16 +88,16 @@ void send_message_ssl(const char* dest, const char* to[], size_t to_size, const 
 		curl_easy_setopt(curl, CURLOPT_PASSWORD, pw);
 
 		/* This is the URL for your mailserver. Note the use of port 587 here,
-     * instead of the normal SMTP port (25). Port 587 is commonly used for
-     * secure mail submission (see RFC4403), but you should use whatever
-     * matches your server configuration. */
+		 * instead of the normal SMTP port (25). Port 587 is commonly used for
+		 * secure mail submission (see RFC4403), but you should use whatever
+		 * matches your server configuration. */
 		curl_easy_setopt(curl, CURLOPT_URL, dest);
 
 		/* In this example, we'll start with a plain text connection, and upgrade
-     * to Transport Layer Security (TLS) using the STARTTLS command. Be careful
-     * of using CURLUSESSL_TRY here, because if TLS upgrade fails, the transfer
-     * will continue anyway - see the security discussion in the libcurl
-     * tutorial for more details. */
+		 * to Transport Layer Security (TLS) using the STARTTLS command. Be careful
+		 * of using CURLUSESSL_TRY here, because if TLS upgrade fails, the transfer
+		 * will continue anyway - see the security discussion in the libcurl
+		 * tutorial for more details. */
 		curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
 
 		if (disableVerify)
@@ -107,12 +107,12 @@ void send_message_ssl(const char* dest, const char* to[], size_t to_size, const 
 		}
 
 		/* Note that this option isn't strictly required, omitting it will result
-     * in libcurl sending the MAIL FROM command with empty sender data. All
-     * autoresponses should have an empty reverse-path, and should be directed
-     * to the address in the reverse-path which triggered them. Otherwise,
-     * they could cause an endless loop. See RFC 5321 Section 4.5.5 for more
-     * details.
-     */
+		 * in libcurl sending the MAIL FROM command with empty sender data. All
+		 * autoresponses should have an empty reverse-path, and should be directed
+		 * to the address in the reverse-path which triggered them. Otherwise,
+		 * they could cause an endless loop. See RFC 5321 Section 4.5.5 for more
+		 * details.
+		 */
 		curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from);
 
 		for (size_t ii = 0; ii < to_size; ++ii)
@@ -122,15 +122,15 @@ void send_message_ssl(const char* dest, const char* to[], size_t to_size, const 
 		curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
 
 		/* We're using a callback function to specify the payload (the headers and
-     * body of the message). You could just use the CURLOPT_READDATA option to
-     * specify a FILE pointer to read from. */
+		 * body of the message). You could just use the CURLOPT_READDATA option to
+		 * specify a FILE pointer to read from. */
 		curl_easy_setopt(curl, CURLOPT_READFUNCTION, payload_source);
 		curl_easy_setopt(curl, CURLOPT_READDATA, &upload_ctx);
 		curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
 		/* Since the traffic will be encrypted, it is very useful to turn on debug
-     * information within libcurl to see what is happening during the transfer.
-     */
+		 * information within libcurl to see what is happening during the transfer.
+		 */
 		curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
 		/* Send the message */

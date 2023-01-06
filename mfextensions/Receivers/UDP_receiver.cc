@@ -136,13 +136,13 @@ std::list<std::string> mfviewer::UDPReceiver::tokenize_(std::string const& input
 		if (newpos != std::string::npos)
 		{
 			output.emplace_back(input, pos, newpos - pos);
-			//TLOG(TLVL_DEBUG + 33) << "tokenize_: " << output.back();
+			// TLOG(TLVL_DEBUG + 33) << "tokenize_: " << output.back();
 			pos = newpos + 1;
 		}
 		else
 		{
 			output.emplace_back(input, pos);
-			//TLOG(TLVL_DEBUG + 33) << "tokenize_: " << output.back();
+			// TLOG(TLVL_DEBUG + 33) << "tokenize_: " << output.back();
 			pos = newpos;
 		}
 	}
@@ -176,7 +176,7 @@ msg_ptr_t mfviewer::UDPReceiver::read_msg(std::string const& input)
 				if (pos != std::string::npos)
 				{
 					thisString = thisString.erase(0, pos);
-					//TLOG(TLVL_DEBUG + 33) << "thisString: " << thisString;
+					// TLOG(TLVL_DEBUG + 33) << "thisString: " << thisString;
 
 					if (strptime(thisString.c_str(), "%d-%b-%Y %H:%M:%S", &tm) != nullptr)
 					{

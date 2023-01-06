@@ -43,7 +43,7 @@ ma_action_mail::ma_action_mail(ma_rule const* rule, pset_t const& pset)
     : ma_action(rule, pset)
 {
 	std::stringstream ss;
-	//ss << (std::string)getenv("FHICL_FILE_PATH");
+	// ss << (std::string)getenv("FHICL_FILE_PATH");
 	ss << (std::string)getenv("SRT_PRIVATE_CONTEXT") << ":"
 	   << (std::string)getenv("SRT_PUBLIC_CONTEXT") << ":.";
 	std::string token;
@@ -60,7 +60,7 @@ ma_action_mail::ma_action_mail(ma_rule const* rule, pset_t const& pset)
 		if (system(&sys_check.str()[0])) break;
 	}
 
-	script_name = mail_file.str();  //pset.get<std::string>("name");
+	script_name = mail_file.str();  // pset.get<std::string>("name");
 	script_para = pset.get<std::string>("param", std::string());
 
 	param.init(rule, script_para);

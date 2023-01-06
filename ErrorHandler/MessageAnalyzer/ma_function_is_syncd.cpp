@@ -31,7 +31,7 @@ ma_func_is_syncd::evaluate(ma_condition const& cond, ma_cond_domain)
 		return boost::any(true);
 	}
 
-	//std::map<std::string, uint64_t>::const_iterator it = sync_time.find(source);
+	// std::map<std::string, uint64_t>::const_iterator it = sync_time.find(source);
 
 	if (sync_time.empty() || sync_time.find(source) != sync_time.end())
 	{

@@ -21,8 +21,8 @@ class ELANSI : public ELdestination
 {
 public:
 	/**
-   * \brief Configuration parameters for ELANSI
-   */
+	 * \brief Configuration parameters for ELANSI
+	 */
 	struct Config
 	{
 		/// ELdestination common config parameters
@@ -58,10 +58,10 @@ public:
 	ELANSI(Parameters const& pset);
 
 	/**
-   * \brief Serialize a MessageFacility message to the output
-   * \param o Stringstream object containing message data
-   * \param msg MessageFacility object containing header information
-   */
+	 * \brief Serialize a MessageFacility message to the output
+	 * \param o Stringstream object containing message data
+	 * \param msg MessageFacility object containing header information
+	 */
 	void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
 
 private:

@@ -39,7 +39,7 @@ novadaq::errorhandler::trim_hostname(std::string const& host)
  * @param[out] src Resolved Source
  * @param msg Message object
  * @return node_type_t indicating the type of the source
-*/
+ */
 novadaq::errorhandler::node_type_t
 novadaq::errorhandler::get_source_from_msg(std::string& src, qt_mf_msg const& msg)
 {
