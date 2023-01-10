@@ -21,6 +21,7 @@ old_style_config_vars
 #
 product			version		optional
 messagefacility	v2_09_00	s118
+messagefacility	v2_08_04	s117
 messagefacility	v2_08_04	s112
 qt				v5_15_6
 TRACE			v3_17_07
@@ -39,6 +40,13 @@ e20:s118:debug	e20:debug		e20	-nq-	-std=c++17
 e20:s118:prof	e20:prof		e20	-nq-	-std=c++17
 e26:s118:debug	e26:debug		e26	-nq-	-std=c++17
 e26:s118:prof	e26:prof		e26	-nq-	-std=c++17
+
+c7:s117:debug	c7:debug		c7	-nq-	-std=c++17
+c7:s117:prof	c7:prof			c7	-nq-	-std=c++17
+e20:s117:debug	e20:debug		e20	-nq-	-std=c++17
+e20:s117:prof	e20:prof		e20	-nq-	-std=c++17
+e19:s117:debug	e19:debug		e19	-nq-	-std=c++17
+e19:s117:prof	e19:prof		e19	-nq-	-std=c++17
 
 c7:s112:debug	c7:debug		c7	-nq-	-std=c++17
 c7:s112:prof	c7:prof			c7	-nq-	-std=c++17
