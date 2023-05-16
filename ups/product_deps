@@ -21,6 +21,7 @@ old_style_config_vars
 #
 product			version		optional
 messagefacility	v2_10_01	s123
+messagefacility	v2_09_00	s120a
 messagefacility	v2_09_00	s120
 messagefacility	v2_08_04	s112
 qt				v5_15_6a
@@ -40,6 +41,15 @@ e20:s123:debug	e20:debug		e20	-nq-	-std=c++17
 e20:s123:prof	e20:prof		e20	-nq-	-std=c++17
 e26:s123:debug	e26:debug		e26	-nq-	-std=c++17
 e26:s123:prof	e26:prof		e26	-nq-	-std=c++17
+
+c7:s120a:debug	c7:debug		c7	-nq-	-std=c++17
+c7:s120a:prof	c7:prof			c7	-nq-	-std=c++17
+c14:s120a:debug	c14:debug		c14	-nq-	-std=c++17
+c14:s120a:prof	c14:prof		c14	-nq-	-std=c++17
+e20:s120a:debug	e20:debug		e20	-nq-	-std=c++17
+e20:s120a:prof	e20:prof		e20	-nq-	-std=c++17
+e26:s120a:debug	e26:debug		e26	-nq-	-std=c++17
+e26:s120a:prof	e26:prof		e26	-nq-	-std=c++17
 
 c7:s120:debug	c7:debug		c7	-nq-	-std=c++17
 c7:s120:prof	c7:prof			c7	-nq-	-std=c++17
