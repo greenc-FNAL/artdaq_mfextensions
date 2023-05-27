@@ -263,7 +263,7 @@ void ELSMTP::routePayload(const std::ostringstream& oss, const ErrorObj& msg)
 	if (!sending_thread_active_)
 	{
 		sending_thread_active_ = true;
-		boost::thread t([=] { send_message_(); });
+		boost::thread t([this] { send_message_(); });
 		t.detach();
 	}
 }
