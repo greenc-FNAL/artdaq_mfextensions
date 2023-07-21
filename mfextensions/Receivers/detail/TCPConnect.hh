@@ -1,12 +1,20 @@
-#ifndef TCPConnect_hh
-#define TCPConnect_hh
-#include <arpa/inet.h>  // inet_aton
-#include <netdb.h>      // gethostbyname
-#include <netinet/in.h>
-#include <netinet/in.h>  // struct sockaddr_in
-#include <netinet/in.h>  // inet_aton
-#include <sys/socket.h>  // socket, bind, listen, accept
-#include <sys/socket.h>  // inet_aton
+/**
+ * @file TCPConnect.hh
+ * Provides utility functions for connecting TCP sockets
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_DETAIL_TCPCONNECT_HH_
+#define MFEXTENSIONS_RECEIVERS_DETAIL_TCPCONNECT_HH_
+
+#include "TRACE/trace.h"
+
+#include <arpa/inet.h>   // inet_aton
+#include <netdb.h>       // gethostbyname
+#include <netinet/in.h>  // struct sockaddr_in, inet_aton
+#include <sys/socket.h>  // socket, bind, listen, accept, inet_atonn
 #include <sys/types.h>   // socket, bind, listen, accept
 #include <unistd.h>      // close
 #include <cstdio>        // printf
@@ -18,20 +26,6 @@
 
 #include <regex>
 #include <string>
-
-#include "TRACE/trace.h"
-
-// This file (TCPConnect.hh) was created by Ron Rechenmacher <ron@fnal.gov> on
-// Sep 15, 2016. "TERMS AND CONDITIONS" governing this file are in the README
-// or COPYING file. If you do not have such a file, one can be obtained by
-// contacting Ron or Fermi Lab in Batavia IL, 60510, phone: 630-840-3000.
-// $RCSfile: .emacs.gnu,v $
-// rev="$Revision: 1.30 $$Date: 2016/03/01 14:27:27 $";
-
-/**
- * \file TCPConnect.hh
- * Provides utility functions for connecting TCP sockets
- */
 
 /**
  * \brief Convert a string hostname to a in_addr suitable for socket communication
@@ -296,4 +290,4 @@ inline int TCPConnect(char const* host_in, int dflt_port, int64_t flags = 0, int
 	return (s_fd);
 }
 
-#endif  // TCPConnect_hh
+#endif  // MFEXTENSIONS_RECEIVERS_DETAIL_TCPCONNECT_HH_

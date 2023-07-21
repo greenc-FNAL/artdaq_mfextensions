@@ -1,5 +1,13 @@
-#ifndef MF_LOG_READER_H
-#define MF_LOG_READER_H
+/**
+ * @file LogReader_receiver.hh
+ * Provides utility functions for connecting TCP sockets
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_LOGREADER_RECEIVER_HH_
+#define MFEXTENSIONS_RECEIVERS_LOGREADER_RECEIVER_HH_
 
 #include <fstream>
 #include <string>
@@ -67,4 +75,4 @@ private:
 };
 }  // namespace mfviewer
 
-#endif
+#endif  // MFEXTENSIONS_RECEIVERS_LOGREADER_RECEIVER_HH_

@@ -1,0 +1,2 @@
+---
+Checks: '-*,boost-*,bugprone-*,cert-*,clang-analyzer-*,concurrency-*,cppcoreguidelines-*,hicpp-*,modernize-*,performance-*,-clang-analyzer-valist.Uninitialized,-modernize-use-trailing-return-type,-modernize-use-nodiscard,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-macro-usage'

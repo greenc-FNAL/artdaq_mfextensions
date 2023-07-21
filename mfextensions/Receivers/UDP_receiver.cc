@@ -1,11 +1,23 @@
+/**
+ * @file UDP_receiver.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #define TRACE_NAME "UDP_Receiver"
 
 #include "mfextensions/Receivers/UDP_receiver.hh"
-#include <sys/poll.h>
-#include <sstream>
+
 #include "messagefacility/Utilities/ELseverityLevel.h"
 #include "mfextensions/Receivers/ReceiverMacros.hh"
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
+
+#include <sys/poll.h>
+#include <list>
+#include <memory>
+#include <sstream>
+#include <string>
 
 mfviewer::UDPReceiver::UDPReceiver(fhicl::ParameterSet const& pset)
     : MVReceiver(pset)
@@ -303,6 +315,6 @@ bool mfviewer::UDPReceiver::validate_packet(std::string const& input)
 	return true;
 }
 
-#include "moc_UDP_receiver.cpp"
+#include "moc_UDP_receiver.cpp"  // NOLINT
 
 DEFINE_MFVIEWER_RECEIVER(mfviewer::UDPReceiver)

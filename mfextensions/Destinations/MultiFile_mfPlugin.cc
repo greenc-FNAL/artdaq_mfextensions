@@ -1,3 +1,10 @@
+/**
+ * @file MultiFile_mfPlugin.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "cetlib/PluginTypeDeducer.h"
 #include "cetlib/ostream_handle.h"
 #include "fhiclcpp/ParameterSet.h"

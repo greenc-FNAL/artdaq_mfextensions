@@ -1,3 +1,10 @@
+/**
+ * @file throttle.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "mfextensions/Extensions/throttle.hh"
 
 throttle::throttle(std::string const& name, int limit, int64_t timespan)

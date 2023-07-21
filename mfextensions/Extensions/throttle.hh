@@ -1,5 +1,12 @@
-#ifndef artdaq_mfextensions_extensions_throttle_hh
-#define artdaq_mfextensions_extensions_throttle_hh
+/**
+ * @file throttle.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_EXTENSIONS_THROTTLE_HH_
+#define MFEXTENSIONS_EXTENSIONS_THROTTLE_HH_
 
 #include <string>
 
@@ -50,4 +57,4 @@ private:
 	bool in_use_;
 };
 
-#endif  // artdaq_mfextensions_extensions_throttle_hh
+#endif  // MFEXTENSIONS_EXTENSIONS_THROTTLE_HH_

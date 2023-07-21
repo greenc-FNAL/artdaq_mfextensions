@@ -1,10 +1,10 @@
-//
-// msgLogger.cc
-// ------------------------------------------------------------------
-// Command line appication to send a message through MessageFacility.
-//
-// ql   03/01/2010
-//
+/**
+ * @file msgsender.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
@@ -13,7 +13,6 @@
 #include <boost/filesystem.hpp>
 #include <boost/program_options.hpp>
 
-using namespace boost;
 namespace po = boost::program_options;
 
 #include <algorithm>

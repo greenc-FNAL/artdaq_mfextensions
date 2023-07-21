@@ -1,5 +1,12 @@
-#ifndef mfextensions_Receivers_ReceiverMacros_hh
-#define mfextensions_Receivers_ReceiverMacros_hh
+/**
+ * @file ReceiverMacros.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_RECEIVERMACROS_HH_
+#define MFEXTENSIONS_RECEIVERS_RECEIVERMACROS_HH_
 
 #include "fhiclcpp/fwd.h"
 #include "mfextensions/Receivers/MVReceiver.hh"
@@ -27,4 +34,4 @@ typedef std::unique_ptr<mfviewer::MVReceiver> makeFunc_t(fhicl::ParameterSet con
 		return std::unique_ptr<mfviewer::MVReceiver>(new klass(ps));          \
 	}                                                                         \
 	}
-#endif /* mfextensions_Receivers_RecevierMacros_h */
+#endif  // MFEXTENSIONS_RECEIVERS_RECEIVERMACROS_HH_

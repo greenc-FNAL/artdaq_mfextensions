@@ -1,3 +1,10 @@
+/**
+ * @file throttle_t.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "mfextensions/Extensions/throttle.hh"
 
 #define BOOST_TEST_MODULE throttle_t

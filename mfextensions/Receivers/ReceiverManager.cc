@@ -1,8 +1,21 @@
+/**
+ * @file ReceiverManager.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "mfextensions/Receivers/ReceiverManager.hh"
 
-#include <iostream>
-#include "fhiclcpp/ParameterSet.h"
 #include "mfextensions/Receivers/makeMVReceiver.hh"
+
+#include "fhiclcpp/ParameterSet.h"
+
+#include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 mfviewer::ReceiverManager::ReceiverManager(const fhicl::ParameterSet& pset)
 {

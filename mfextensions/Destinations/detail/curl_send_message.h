@@ -1,5 +1,12 @@
-#ifndef CURL_SEND_MESSAGE_H
-#define CURL_SEND_MESSAGE_H 1
+/**
+ * @file curl_send_message.h
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_DESTINATIONS_DETAIL_CURL_SEND_MESSAGE_H_
+#define MFEXTENSIONS_DESTINATIONS_DETAIL_CURL_SEND_MESSAGE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,4 +63,4 @@ void send_message_ssl(const char* dest, const char* to[], size_t to_size, const 
 }
 #endif
 
-#endif
+#endif  // MFEXTENSIONS_DESTINATIONS_DETAIL_CURL_SEND_MESSAGE_H_

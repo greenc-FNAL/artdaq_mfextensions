@@ -1,5 +1,12 @@
-#ifndef MFVIEWER_MVRECEIVER_H
-#define MFVIEWER_MVRECEIVER_H
+/**
+ * @file MVReceiver.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_MVRECEIVER_HH_
+#define MFEXTENSIONS_RECEIVERS_MVRECEIVER_HH_
 
 #include <string>
 
@@ -56,4 +63,4 @@ private:
 };
 }  // namespace mfviewer
 
-#endif  // MVRECEIVER_H
+#endif  // MFEXTENSIONS_RECEIVERS_MVRECEIVER_HH_

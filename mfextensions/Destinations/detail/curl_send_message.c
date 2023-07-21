@@ -1,4 +1,11 @@
-#include "curl_send_message.h"
+/**
+ * @file curl_send_message.h
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#include "mfextensions/Destinations/detail/curl_send_message.h"
 #include <curl/curl.h>
 #include <time.h>
 
@@ -98,7 +105,7 @@ void send_message_ssl(const char* dest, const char* to[], size_t to_size, const 
 		 * of using CURLUSESSL_TRY here, because if TLS upgrade fails, the transfer
 		 * will continue anyway - see the security discussion in the libcurl
 		 * tutorial for more details. */
-		curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);
+		curl_easy_setopt(curl, CURLOPT_USE_SSL, (long)CURLUSESSL_ALL);  // NOLINT
 
 		if (disableVerify)
 		{

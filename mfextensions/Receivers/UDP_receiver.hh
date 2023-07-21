@@ -1,9 +1,19 @@
-#ifndef MFVIEWER_RECEIVERS_UDP_RECEIVER_HH
-#define MFVIEWER_RECEIVERS_UDP_RECEIVER_HH
+/**
+ * @file UDP_receiver.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_UDP_RECEIVER_HH_
+#define MFEXTENSIONS_RECEIVERS_UDP_RECEIVER_HH_
 
 #include "mfextensions/Receivers/MVReceiver.hh"
 
 #include "messagefacility/MessageLogger/MessageLogger.h"
+
+#include <list>
+#include <string>
 
 namespace mfviewer {
 /// <summary>
@@ -61,4 +71,4 @@ private:
 };
 }  // namespace mfviewer
 
-#endif
+#endif  // MFEXTENSIONS_RECEIVERS_UDP_RECEIVER_HH_

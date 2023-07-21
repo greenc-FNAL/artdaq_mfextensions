@@ -1,11 +1,18 @@
-#ifndef MSGVIEWERDLG_H
-#define MSGVIEWERDLG_H
+/**
+ * @file mvdlg.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_BINARIES_MVDLG_HH_
+#define MFEXTENSIONS_BINARIES_MVDLG_HH_
 
 #include "mfextensions/Extensions/suppress.hh"
 #include "mfextensions/Extensions/throttle.hh"
 #include "mfextensions/Receivers/ReceiverManager.hh"
 #include "mfextensions/Receivers/qt_mf_msg.hh"
-#include "ui_msgviewerdlgui.h"
+#include "ui_msgviewerdlgui.h"  // NOLINT
 
 #include <QtCore/QMutex>
 #include <QtCore/QTimer>
@@ -34,7 +41,7 @@ public:
 	 * \param conf Configuration filename (fhicl document)
 	 * \param parent Parent Qt window
 	 */
-	msgViewerDlg(std::string const& conf, QDialog* parent = nullptr);
+	explicit msgViewerDlg(std::string const& conf, QDialog* parent = nullptr);
 
 	virtual ~msgViewerDlg();
 
@@ -204,4 +211,4 @@ enum list_mask_t
 	LIST_HOST = 0x04
 };
 
-#endif
+#endif  // MFEXTENSIONS_BINARIES_MVDLG_HH_

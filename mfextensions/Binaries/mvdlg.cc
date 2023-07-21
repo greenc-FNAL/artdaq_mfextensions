@@ -1,13 +1,22 @@
+/**
+ * @file mvdlg.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#include "mfextensions/Binaries/mvdlg.hh"
+
+#include "cetlib/filepath_maker.h"
+#include "fhiclcpp/ParameterSet.h"
+
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QScrollBar>
 #include <QtGui>
 
-#include "cetlib/filepath_maker.h"
-#include "fhiclcpp/ParameterSet.h"
-
-#include "mfextensions/Binaries/mvdlg.hh"
+#include <utility>
 
 #if GCC_VERSION >= 701000 || defined(__clang__)
 #pragma GCC diagnostic push
@@ -20,8 +29,6 @@
 #if GCC_VERSION >= 701000 || defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
-
-#include "mvdlg.hh"
 
 // replace the ${..} part in the filename with env variable
 // throw if the env does not exist
@@ -350,7 +357,7 @@ void msgViewerDlg::onNewMsg(msg_ptr_t const& msg)
 				// std::lock_guard<std::mutex> lk(filter_mutex_);
 				msgFilters_[d].msgs.push_back(msg);
 			}
-			if ((int)d == tabWidget->currentIndex())
+			if (static_cast<int>(d) == tabWidget->currentIndex())
 				displayMsg(msg, d);
 		}
 	}
@@ -422,7 +429,7 @@ void msgViewerDlg::trim_msg_pool()
 			}
 		}
 
-		if ((int)d == tabWidget->currentIndex())
+		if (static_cast<int>(d) == tabWidget->currentIndex())
 		{
 			if (maxDeletedMsgs > 0 && msgFilters_[d].nDisplayedDeletedMsgs > static_cast<int>(maxDeletedMsgs))
 			{

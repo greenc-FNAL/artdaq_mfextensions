@@ -1,9 +1,21 @@
-#ifndef RECEIVER_MANAGER_H
-#define RECEIVER_MANAGER_H
+/**
+ * @file ReceiverManager.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_RECEIVERMANAGER_HH_
+#define MFEXTENSIONS_RECEIVERS_RECEIVERMANAGER_HH_
+
+#include "mfextensions/Receivers/MVReceiver.hh"
+
+#include "fhiclcpp/fwd.h"
 
 #include <QObject>
-#include "fhiclcpp/fwd.h"
-#include "mfextensions/Receivers/MVReceiver.hh"
+
+#include <memory>
+#include <vector>
 
 namespace mfviewer {
 /// <summary>
@@ -60,4 +72,4 @@ private:
 };
 }  // namespace mfviewer
 
-#endif
+#endif  // MFEXTENSIONS_RECEIVERS_RECEIVERMANAGER_HH_

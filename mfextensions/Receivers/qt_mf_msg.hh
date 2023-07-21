@@ -1,5 +1,12 @@
-#ifndef MESSAGEFACILITY_EXTENSIONS_QT_MF_MSG_H
-#define MESSAGEFACILITY_EXTENSIONS_QT_MF_MSG_H
+/**
+ * @file qt_mf_msg.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_QT_MF_MSG_HH_
+#define MFEXTENSIONS_RECEIVERS_QT_MF_MSG_HH_
 
 // Wrapped mf message type to be used by msgviewer for
 // the purpose of fast processing
@@ -187,4 +194,4 @@ typedef std::list<msg_ptr_t> msgs_t;
 /// </summary>
 typedef std::map<QString, msgs_t> msgs_map_t;
 
-#endif
+#endif  // MFEXTENSIONS_RECEIVERS_QT_MF_MSG_HH_

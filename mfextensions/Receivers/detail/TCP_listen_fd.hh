@@ -1,12 +1,14 @@
-#ifndef TCP_listen_fd_hh
-#define TCP_listen_fd_hh
+/**
+ * @file TCP_listen_fd.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_RECEIVERS_DETAIL_TCP_LISTEN_FD_HH_
+#define MFEXTENSIONS_RECEIVERS_DETAIL_TCP_LISTEN_FD_HH_
 
-// This file (TCP_listen_fd.hh) was created by Ron Rechenmacher <ron@fnal.gov> on
-// Sep 15, 2016. "TERMS AND CONDITIONS" governing this file are in the README
-// or COPYING file. If you do not have such a file, one can be obtained by
-// contacting Ron or Fermi Lab in Batavia IL, 60510, phone: 630-840-3000.
-// $RCSfile: .emacs.gnu,v $
-// rev="$Revision: 1.30 $$Date: 2016/03/01 14:27:27 $";
+#include "TRACE/trace.h"
 
 #include <arpa/inet.h>  /* inet_aton */
 #include <errno.h>      // errno
@@ -16,7 +18,6 @@
 #include <stdlib.h>     // exit
 #include <strings.h>    // bzero
 #include <sys/socket.h> /* inet_aton, socket, bind, listen, accept */
-#include "trace.h"
 
 /**
  * \file TCP_listen_fd.hh
@@ -52,7 +53,7 @@ int TCP_listen_fd(int port, int rcvbuf)
 		return (2);
 	}
 
-	bzero((char *)&sin, sizeof(sin));
+	bzero(reinterpret_cast<char *>(&sin), sizeof(sin));
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
 	sin.sin_addr.s_addr = INADDR_ANY;
@@ -97,4 +98,4 @@ int TCP_listen_fd(int port, int rcvbuf)
 	return (listener_fd);
 }  // TCP_listen_fd
 
-#endif  // TCP_listen_fd_hh
+#endif  // MFEXTENSIONS_RECEIVERS_DETAIL_TCP_LISTEN_FD_HH_

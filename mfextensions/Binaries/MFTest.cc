@@ -1,4 +1,11 @@
-//#define NDEBUG
+/**
+ * @file MFTest.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+// #define NDEBUG
 
 #define MF_DEBUG
 
@@ -66,7 +73,7 @@ int main()
 	{
 		if (i % 1000 == 0)
 		{
-			sprintf(buf, "mftest-%d", i);
+			snprintf(buf, sizeof(buf), "mftest-%d", i);
 			mf::SetApplicationName(buf);
 		}
 

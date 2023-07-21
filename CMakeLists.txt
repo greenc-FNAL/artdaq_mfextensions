@@ -35,6 +35,11 @@ cet_set_compiler_flags(DIAGS VIGILANT
 string(TOUPPER ${CMAKE_BUILD_TYPE} BTYPE_UC)
 if(BTYPE_UC STREQUAL DEBUG)
   add_definitions(-DDEBUGME)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+		set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+	endif()
+
+
 	if(DEFINED ENV{USE_ASAN})
 		if($ENV{USE_ASAN} GREATER 0)
 			message("!!! Address Sanitizer Activated!!!")
@@ -92,9 +97,6 @@ add_subdirectory(doc)
 
 # MFExtensions Library
 add_subdirectory(mfextensions)
-
-# ErrorHandler from NOvA
-add_subdirectory(ErrorHandler)
 
 # Unit Tests for MFExtensions
 add_subdirectory(test)

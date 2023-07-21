@@ -1,3 +1,10 @@
+/**
+ * @file OTS_mfPlugin.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/types/ConfigurationTable.h"
@@ -20,7 +27,7 @@
 #include "mfextensions/Receivers/detail/TCPConnect.hh"
 
 #define TRACE_NAME "OTS_mfPlugin"
-#include "trace.h"
+#include "TRACE/trace.h"
 
 // Boost includes
 #include <boost/algorithm/string.hpp>
@@ -60,7 +67,7 @@ public:
 	/// ELOTS Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELOTS</param>
-	ELOTS(Parameters const& pset);
+	explicit ELOTS(Parameters const& pset);
 
 	/**
 	 * \brief Fill the "Prefix" portion of the message

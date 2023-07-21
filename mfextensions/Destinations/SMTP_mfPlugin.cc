@@ -1,3 +1,10 @@
+/**
+ * @file SMTP_mfPlugin.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/types/ConfigurationTable.h"
@@ -86,7 +93,7 @@ public:
 	/// ELSMTP Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELSMTP</param>
-	ELSMTP(Parameters const& pset);
+	explicit ELSMTP(Parameters const& pset);
 
 	~ELSMTP()
 	{
@@ -99,7 +106,7 @@ public:
 	 * \param o Stringstream object containing message data
 	 * \param msg MessageFacility object containing header information
 	 */
-	virtual void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
+	void routePayload(const std::ostringstream& o, const ErrorObj& msg) override;
 
 private:
 	void send_message_();
@@ -115,7 +122,7 @@ private:
 	std::string message_prefix_;
 
 	// Message information
-	long pid_;
+	int pid_;
 	std::string hostname_;
 	std::string hostaddr_;
 	std::string app_;
@@ -140,7 +147,7 @@ private:
 // ELSMTP c'tor
 //======================================================================
 ELSMTP::ELSMTP(Parameters const& pset)
-    : ELdestination(pset().elDestConfig()), smtp_host_(pset().host()), port_(pset().port()), to_(pset().to()), from_(pset().from()), subject_(pset().subject()), message_prefix_(pset().messageHeader()), pid_(static_cast<long>(getpid())), use_ssl_(pset().useSmtps()), username_(pset().user()), password_(pset().pw()), ssl_verify_host_cert_(pset().verifyCert()), sending_thread_active_(false), abort_sleep_(false), send_interval_s_(pset().sendInterval())
+    : ELdestination(pset().elDestConfig()), smtp_host_(pset().host()), port_(pset().port()), to_(pset().to()), from_(pset().from()), subject_(pset().subject()), message_prefix_(pset().messageHeader()), pid_(static_cast<int>(getpid())), use_ssl_(pset().useSmtps()), username_(pset().user()), password_(pset().pw()), ssl_verify_host_cert_(pset().verifyCert()), sending_thread_active_(false), abort_sleep_(false), send_interval_s_(pset().sendInterval())
 {
 	// hostname
 	char hostname_c[1024];
@@ -176,7 +183,7 @@ ELSMTP::ELSMTP(Parameters const& pset)
 				if (ifa->ifa_addr->sa_family == AF_INET)
 				{
 					// a valid IPv4 addres
-					tmpAddrPtr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;
+					tmpAddrPtr = &((struct sockaddr_in*)ifa->ifa_addr)->sin_addr;  // NOLINT
 					char addressBuffer[INET_ADDRSTRLEN];
 					inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;
@@ -185,7 +192,7 @@ ELSMTP::ELSMTP(Parameters const& pset)
 				else if (ifa->ifa_addr->sa_family == AF_INET6)
 				{
 					// a valid IPv6 address
-					tmpAddrPtr = &((struct sockaddr_in6*)ifa->ifa_addr)->sin6_addr;
+					tmpAddrPtr = &((struct sockaddr_in6*)ifa->ifa_addr)->sin6_addr;  // NOLINT
 					char addressBuffer[INET6_ADDRSTRLEN];
 					inet_ntop(AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
 					hostaddr_ = addressBuffer;

@@ -1,5 +1,12 @@
-#ifndef MFEXTENSIONS_SUPPRESS_H
-#define MFEXTENSIONS_SUPPRESS_H
+/**
+ * @file suppress.hh
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
+#ifndef MFEXTENSIONS_EXTENSIONS_SUPPRESS_HH_
+#define MFEXTENSIONS_EXTENSIONS_SUPPRESS_HH_
 
 #include <boost/regex.hpp>
 #include <string>
@@ -39,4 +46,4 @@ private:
 	bool in_use_;
 };
 
-#endif
+#endif  // MFEXTENSIONS_EXTENSIONS_SUPPRESS_HH_

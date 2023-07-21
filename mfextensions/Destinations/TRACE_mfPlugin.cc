@@ -1,3 +1,10 @@
+/**
+ * @file TRACE_mfPlugin.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "cetlib/PluginTypeDeducer.h"
 #include "cetlib/ProvideMakePluginMacros.h"
 #include "fhiclcpp/ParameterSet.h"
@@ -54,7 +61,7 @@ public:
 	/// ELTRACE Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELTRACE</param>
-	ELTRACE(Parameters const& pset);
+	explicit ELTRACE(Parameters const& pset);
 
 	/**
 	 * \brief Fill the "Prefix" portion of the message

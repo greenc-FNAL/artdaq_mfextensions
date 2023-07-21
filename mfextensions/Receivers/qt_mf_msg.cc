@@ -1,8 +1,15 @@
+/**
+ * @file qt_mf_msg.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "messagefacility/Utilities/ELseverityLevel.h"
 
 #include "messagefacility/MessageService/ELdestination.h"
 #include "mfextensions/Receivers/qt_mf_msg.hh"
-//#include "mfextensions/Extensions/MFExtensions.hh"
+// #include "mfextensions/Extensions/MFExtensions.hh"
 #include <iostream>
 
 size_t qt_mf_msg::sequence = 0;

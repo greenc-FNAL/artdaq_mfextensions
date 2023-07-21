@@ -1,6 +1,17 @@
+/**
+ * @file LogReader_receiver.cc
+ * Provides utility functions for connecting TCP sockets
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "mfextensions/Receivers/LogReader_receiver.hh"
-#include <iostream>
 #include "mfextensions/Receivers/ReceiverMacros.hh"
+
+#include <ctime>
+#include <iostream>
+#include <memory>
 
 mfviewer::LogReader::LogReader(const fhicl::ParameterSet& pset)
     : MVReceiver(pset), pos_(0), filename_(pset.get<std::string>("filename")), counter_(0), metadata_1(R"(\%MSG-([wide])\s([^:]*):\s\s([^\s]*)\s*(\d\d-[^-]*-\d{4}\s\d+:\d+:\d+)\s.[DS]T\s\s(\w+))")
@@ -68,9 +79,6 @@ void mfviewer::LogReader::run()
 
 	std::cout << "LogReader_receiver shutting down!" << std::endl;
 }
-
-#include <ctime>
-#include <iostream>
 
 msg_ptr_t mfviewer::LogReader::read_next()
 {
@@ -150,6 +158,6 @@ msg_ptr_t mfviewer::LogReader::read_next()
 	return msg;
 }
 
-#include "moc_LogReader_receiver.cpp"
+#include "moc_LogReader_receiver.cpp"  // NOLINT
 
 DEFINE_MFVIEWER_RECEIVER(mfviewer::LogReader)

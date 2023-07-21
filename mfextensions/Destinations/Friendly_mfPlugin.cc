@@ -1,3 +1,10 @@
+/**
+ * @file Friendly_mfPlugin.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "cetlib/PluginTypeDeducer.h"
 #include "cetlib/ostream_handle.h"
 #include "fhiclcpp/ParameterSet.h"
@@ -15,13 +22,13 @@
 #include <memory>
 
 namespace mfplugins {
-using namespace mf::service;
+
 using mf::ErrorObj;
 
 /// <summary>
 /// Parser-Friendly Message Facility destination plugin
 /// </summary>
-class ELFriendly : public ELostreamOutput
+class ELFriendly : public mf::service::ELostreamOutput
 {
 public:
 	/**

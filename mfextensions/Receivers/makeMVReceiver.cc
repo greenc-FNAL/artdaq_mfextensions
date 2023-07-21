@@ -1,3 +1,11 @@
+/**
+ * @file makeMVReceiver.cc
+ * Provides utility functions for connecting TCP sockets
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "mfextensions/Receivers/makeMVReceiver.hh"
 
 #include "cetlib/BasicPluginFactory.h"

@@ -1,3 +1,10 @@
+/**
+ * @file ANSI_mfPlugin.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "cetlib/PluginTypeDeducer.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/types/ConfigurationTable.h"
@@ -5,7 +12,7 @@
 #include "messagefacility/MessageService/ELdestination.h"
 #include "messagefacility/Utilities/ELseverityLevel.h"
 #include "messagefacility/Utilities/exception.h"
-//#include "messagefacility/Utilities/formatTime.h"
+// #include "messagefacility/Utilities/formatTime.h"
 #include <iostream>
 #include "cetlib/compiler_macros.h"
 
@@ -55,7 +62,7 @@ public:
 	/// ELANSI Constructor
 	/// </summary>
 	/// <param name="pset">ParameterSet used to configure ELANSI</param>
-	ELANSI(Parameters const& pset);
+	explicit ELANSI(Parameters const& pset);
 
 	/**
 	 * \brief Serialize a MessageFacility message to the output

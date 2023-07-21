@@ -1,3 +1,10 @@
+/**
+ * @file suppress.cc
+ *
+ * This is part of the artdaq Framework, copyright 2023.
+ * Licensing/copyright details are in the LICENSE file that you should have
+ * received with this code.
+ */
 #include "mfextensions/Extensions/suppress.hh"
 
 suppress::suppress(std::string const& name)
