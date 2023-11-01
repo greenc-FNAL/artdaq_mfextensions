@@ -84,6 +84,10 @@ endif()
 
 cet_register_export_set(SET_NAME artdaq_mfextensions NAMESPACE artdaq_mfextensions)
 
+if (NOT COMMAND cet_make)
+  include(compat/CetMakeCommand) # Legacy cet_make()
+endif()
+
 # Configuration Files
 add_subdirectory(fcl)
 
